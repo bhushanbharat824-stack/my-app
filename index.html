@@ -19,7 +19,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
   
   <script>
-    // आपका Firebase कॉन्फ़िगरेशन
     const firebaseConfig = {
       apiKey: "AIzaSyDeRIsBfRdGPXwgZxfi5QLR_dNXmV3E_1k",
       authDomain: "rajbhasha-qpr.firebaseapp.com",
@@ -29,20 +28,24 @@
       appId: "1:934013797840:web:c747cb5fd4b905885125d5",
       measurementId: "G-WX79KCQ4XV"
     };
-    // Firebase और Firestore चालू करें
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
   </script>
+
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; }
+      main { padding: 0 !important; margin: 0 !important; }
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    // ── Constants ────────────────────────────────────────────────────────────────
     const AUDIT_KEY   = "rajbhasha_audit_v4";
-
-    // Role definitions & passwords
     const ROLES = {
       SECTION:    { id: "SECTION",    label: "अनुभाग",        labelEn: "Section",     icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
       AAO:        { id: "AAO",        label: "AAO",            labelEn: "AAO",         icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
@@ -51,7 +54,6 @@
     };
     const PASSWORDS = { AAO: "AAO@2025", SAO: "SAO@2025", HINDI_CELL: "HINDI@2025" };
 
-    // Report status flow
     const STATUS = {
       DRAFT:           { id: "DRAFT",           label: "मसौदा",          icon: "📝", color: "#94a3b8", bg: "#f8fafc" },
       PENDING_AAO:     { id: "PENDING_AAO",     label: "AAO के पास",      icon: "⏳", color: "#6366f1", bg: "#eef2ff" },
@@ -64,36 +66,13 @@
       REJECTED:        { id: "REJECTED",        label: "अस्वीकृत",        icon: "❌", color: "#dc2626", bg: "#fee2e2" },
     };
 
-    const SECTIONS_LIST = [
-      "प्रशासन","स्थापना","लेखा","सतर्कता","हिंदी अनुभाग",
-      "तकनीकी","सुरक्षा","भंडार","आईटी","परिचालन","यात्री सेवा","वाणिज्य",
-    ];
-    const QUARTERS = [
-      { id: "Q1", label: "Q1 · अप्रैल–जून" },
-      { id: "Q2", label: "Q2 · जुलाई–सितंबर" },
-      { id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },
-      { id: "Q4", label: "Q4 · जनवरी–मार्च" },
-    ];
+    const SECTIONS_LIST = ["प्रशासन","स्थापना","लेखा","सतर्कता","हिंदी अनुभाग","तकनीकी","सुरक्षा","भंडार","आईटी","परिचालन","यात्री सेवा","वाणिज्य"];
+    const QUARTERS = [{ id: "Q1", label: "Q1 · अप्रैल–जून" },{ id: "Q2", label: "Q2 · जुलाई–सितंबर" },{ id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },{ id: "Q4", label: "Q4 · जनवरी–मार्च" }];
     const YEARS = ["2022","2023","2024","2025","2026","2027","2028","2029","2030"];
+    const SECTION_COLORS = [{ bg:"#ede9fe", border:"#8b5cf6", text:"#5b21b6", icon:"📜" },{ bg:"#fce7f3", border:"#ec4899", text:"#9d174d", icon:"🏛️" },{ bg:"#fee2e2", border:"#ef4444", text:"#991b1b", icon:"📄" },{ bg:"#fff7ed", border:"#f97316", text:"#9a3412", icon:"📬" },{ bg:"#fefce8", border:"#eab308", text:"#854d0e", icon:"✉️" },{ bg:"#f0fdf4", border:"#22c55e", text:"#166534", icon:"📨" },{ bg:"#ecfeff", border:"#06b6d4", text:"#155e75", icon:"🗂️" },{ bg:"#eff6ff", border:"#3b82f6", text:"#1e40af", icon:"🎓" },{ bg:"#f0fdf4", border:"#10b981", text:"#065f46", icon:"🤝" },{ bg:"#fdf4ff", border:"#a855f7", text:"#581c87", icon:"📝" },{ bg:"#fff1f2", border:"#f43f5e", text:"#881337", icon:"🏆" },{ bg:"#f8fafc", border:"#64748b", text:"#0f172a", icon:"✅" }];
 
-    const SECTION_COLORS = [
-      { bg:"#ede9fe", border:"#8b5cf6", text:"#5b21b6", icon:"📜" },
-      { bg:"#fce7f3", border:"#ec4899", text:"#9d174d", icon:"🏛️" },
-      { bg:"#fee2e2", border:"#ef4444", text:"#991b1b", icon:"📄" },
-      { bg:"#fff7ed", border:"#f97316", text:"#9a3412", icon:"📬" },
-      { bg:"#fefce8", border:"#eab308", text:"#854d0e", icon:"✉️" },
-      { bg:"#f0fdf4", border:"#22c55e", text:"#166534", icon:"📨" },
-      { bg:"#ecfeff", border:"#06b6d4", text:"#155e75", icon:"🗂️" },
-      { bg:"#eff6ff", border:"#3b82f6", text:"#1e40af", icon:"🎓" },
-      { bg:"#f0fdf4", border:"#10b981", text:"#065f46", icon:"🤝" },
-      { bg:"#fdf4ff", border:"#a855f7", text:"#581c87", icon:"📝" },
-      { bg:"#fff1f2", border:"#f43f5e", text:"#881337", icon:"🏆" },
-      { bg:"#f8fafc", border:"#64748b", text:"#0f172a", icon:"✅" },
-    ];
-
-    // ── Storage ──────────────────────────────────────────────────────────────────
-    function ls(k, d = null)    { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
-    function lsSet(k, v)        { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+    function ls(k, d = null) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 
     const auditLog = {
       add(user, action, details) {
@@ -104,7 +83,6 @@
       clear:  () => localStorage.removeItem(AUDIT_KEY),
     };
 
-    // ── Helpers ──────────────────────────────────────────────────────────────────
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
 
     function computeScore(r) {
@@ -129,39 +107,21 @@
 
     function emptyForm() {
       return {
-        officeNameAddress:"", officerName:"", stdCode:"", phone:"", email:"",
-        year:"2025", quarter:"Q1", region:"A", ackId: genId(),
-        b1_s1_totalFiles:"", b1_s1_hindiFiles:"",
-        b1_s2_totalMeetings:"", b1_s2_hindiMinutes:"", b1_s2_totalDocs:"", b1_s2_hindiDocs:"",
-        b1_s3_totalIssued:"", b1_s3_bilingual:"", b1_s3_englishOnly:"", b1_s3_hindiOnly:"",
-        b1_s4_totalReceived:"", b1_s4_noReplyNeeded:"", b1_s4_hindiReply:"", b1_s4_englishReply:"",
-        b1_s5_ka_total:"", b1_s5_ka_hindiReply:"", b1_s5_ka_engReply:"", b1_s5_ka_noReply:"",
-        b1_s5_kha_total:"", b1_s5_kha_hindiReply:"", b1_s5_kha_engReply:"", b1_s5_kha_noReply:"",
-        b1_s6_ka_hindi:"", b1_s6_ka_english:"", b1_s6_ka_total:"",
-        b1_s6_kha_hindi:"", b1_s6_kha_english:"", b1_s6_kha_total:"",
-        b1_s6_ga_hindi:"", b1_s6_ga_english:"", b1_s6_ga_total:"",
-        b1_s7_hindiPages:"", b1_s7_engPages:"", b1_s7_totalPages:"", b1_s7_eoffice:"",
-        b1_s8_workshops:"", b1_s8_officers:"", b1_s8_staff:"",
-        b1_s9_meetingDate:"", b1_s9_subOfficeCmtes:"", b1_s9_subOfficeMeetings:"", b1_s9_agendaHindi:"नहीं",
-        b1_s10_meetingDate:"",
+        officeNameAddress:"", officerName:"", stdCode:"", phone:"", email:"", year:"2025", quarter:"Q1", region:"A", ackId: genId(),
+        b1_s1_totalFiles:"", b1_s1_hindiFiles:"", b1_s2_totalMeetings:"", b1_s2_hindiMinutes:"", b1_s2_totalDocs:"", b1_s2_hindiDocs:"",
+        b1_s3_totalIssued:"", b1_s3_bilingual:"", b1_s3_englishOnly:"", b1_s3_hindiOnly:"", b1_s4_totalReceived:"", b1_s4_noReplyNeeded:"", b1_s4_hindiReply:"", b1_s4_englishReply:"",
+        b1_s5_ka_total:"", b1_s5_ka_hindiReply:"", b1_s5_ka_engReply:"", b1_s5_ka_noReply:"", b1_s5_kha_total:"", b1_s5_kha_hindiReply:"", b1_s5_kha_engReply:"", b1_s5_kha_noReply:"",
+        b1_s6_ka_hindi:"", b1_s6_ka_english:"", b1_s6_ka_total:"", b1_s6_kha_hindi:"", b1_s6_kha_english:"", b1_s6_kha_total:"", b1_s6_ga_hindi:"", b1_s6_ga_english:"", b1_s6_ga_total:"",
+        b1_s7_hindiPages:"", b1_s7_engPages:"", b1_s7_totalPages:"", b1_s7_eoffice:"", b1_s8_workshops:"", b1_s8_officers:"", b1_s8_staff:"",
+        b1_s9_meetingDate:"", b1_s9_subOfficeCmtes:"", b1_s9_subOfficeMeetings:"", b1_s9_agendaHindi:"नहीं", b1_s10_meetingDate:"",
         b1_s11_innovation:"", b1_s11_special:"", b1_s11_other:"",
-        b2_s1_notified:"नहीं",
-        b2_s2_totalOfficers:"", b2_s2_totalStaff:"",
-        b2_s2_hindiWorkingOfficers:"", b2_s2_hindiWorkingStaff:"",
-        b2_s2_trainingOfficers:"", b2_s2_trainingStaff:"",
-        b2_shorthand_total:"", b2_shorthand_trained:"", b2_shorthand_working:"", b2_shorthand_pending:"",
-        b2_typing_total:"", b2_typing_trained:"", b2_typing_working:"", b2_typing_pending:"",
-        b2_translation_officers:"", b2_translation_staff:"", b2_translation_trained:"", b2_translation_pending:"",
-        b2_comp_total:"", b2_comp_trained:"", b2_comp_working:"",
-        b2_codes_total:"", b2_codes_bilingual:"",
-        b2_rule84_ordered:"", b2_rule84_pending:"",
-        b2_inspection_sections_total:"", b2_inspection_sections_inspected:"",
-        b2_inspection_offices_total:"", b2_inspection_offices_inspected:"",
-        b2_publications_total:"", b2_publications_hindi:"", b2_publications_eng:"",
-        b2_books_expenditure:"", b2_books_hindiExpenditure:"",
-        b2_website_url:"", b2_website_type:"केवल अंग्रेजी",
-        b2_hindi_diwas:"", b2_hindi_sangoshti:"", b2_other_programs:"", b2_innovation:"",
-        b2_narakas:"नहीं", b2_narakas_lastMeeting:"", b2_narakas_participation:"नहीं",
+        b2_s1_notified:"नहीं", b2_s2_totalOfficers:"", b2_s2_totalStaff:"", b2_s2_hindiWorkingOfficers:"", b2_s2_hindiWorkingStaff:"", b2_s2_trainingOfficers:"", b2_s2_trainingStaff:"",
+        b2_shorthand_total:"", b2_shorthand_trained:"", b2_shorthand_working:"", b2_shorthand_pending:"", b2_typing_total:"", b2_typing_trained:"", b2_typing_working:"", b2_typing_pending:"",
+        b2_translation_officers:"", b2_translation_staff:"", b2_translation_trained:"", b2_translation_pending:"", b2_comp_total:"", b2_comp_trained:"", b2_comp_working:"",
+        b2_codes_total:"", b2_codes_bilingual:"", b2_rule84_ordered:"", b2_rule84_pending:"", b2_inspection_sections_total:"", b2_inspection_sections_inspected:"",
+        b2_inspection_offices_total:"", b2_inspection_offices_inspected:"", b2_publications_total:"", b2_publications_hindi:"", b2_publications_eng:"",
+        b2_books_expenditure:"", b2_books_hindiExpenditure:"", b2_website_url:"", b2_website_type:"केवल अंग्रेजी",
+        b2_hindi_diwas:"", b2_hindi_sangoshti:"", b2_other_programs:"", b2_innovation:"", b2_narakas:"नहीं", b2_narakas_lastMeeting:"", b2_narakas_participation:"नहीं",
       };
     }
 
@@ -169,45 +129,30 @@
     const Inp = ({ label, value, onChange, type="text", placeholder="" }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
-        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
-          style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%" }}
-          onFocus={e=>e.target.style.borderColor="#6366f1"} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
+        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%" }} onFocus={e=>e.target.style.borderColor="#6366f1"} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
       </div>
     );
     const Num = ({ label, value, onChange }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", lineHeight:1.3 }}>{label}</label>}
-        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)}
-          style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box" }}
-          onFocus={e=>e.target.style.borderColor="#6366f1"} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
+        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box" }} onFocus={e=>e.target.style.borderColor="#6366f1"} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
       </div>
     );
     const Radio = ({ label, value, onChange, options }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-          {options.map(o=>(
-            <button key={o} onClick={()=>onChange(o)} style={{
-              padding:"5px 14px", borderRadius:20, fontSize:12, fontWeight:600, cursor:"pointer",
-              border:"1.5px solid", borderColor: value===o?"#6366f1":"#e2e8f0",
-              background: value===o?"#6366f1":"#fff", color: value===o?"#fff":"#475569",
-            }}>{o}</button>
-          ))}
+          {options.map(o=>(<button key={o} onClick={()=>onChange(o)} style={{ padding:"5px 14px", borderRadius:20, fontSize:12, fontWeight:600, cursor:"pointer", border:"1.5px solid", borderColor: value===o?"#6366f1":"#e2e8f0", background: value===o?"#6366f1":"#fff", color: value===o?"#fff":"#475569", }}>{o}</button>))}
         </div>
       </div>
     );
-    const Grid = ({ cols=2, children }) => (
-      <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>
-    );
+    const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
     const SecCard = ({ title, icon, color, children }) => {
       const [open, setOpen] = useState(true);
       return (
         <div style={{ borderRadius:14, border:`2px solid ${color.border}`, overflow:"hidden", marginBottom:14, boxShadow:"0 2px 10px rgba(0,0,0,0.05)" }}>
           <div onClick={()=>setOpen(o=>!o)} style={{ background:color.bg, padding:"12px 18px", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer", userSelect:"none" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{ fontSize:20 }}>{icon}</span>
-              <span style={{ fontSize:13, fontWeight:700, color:color.text }}>{title}</span>
-            </div>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}><span style={{ fontSize:20 }}>{icon}</span><span style={{ fontSize:13, fontWeight:700, color:color.text }}>{title}</span></div>
             <span style={{ color:color.text, transform: open?"rotate(180deg)":"rotate(0)", display:"inline-block", transition:"transform 0.2s" }}>▾</span>
           </div>
           {open && <div style={{ background:"#fff", padding:18 }}>{children}</div>}
@@ -221,8 +166,7 @@
           <tbody>{rows.map((row,ri)=>(
             <tr key={ri}>{row.map((cell,ci)=>(
               <td key={ci} style={{ border:"1px solid #e2e8f0", padding:3 }}>
-                {cell.key ? <input type="number" min={0} value={data[cell.key]||""} onChange={e=>onChange(cell.key,e.target.value)} style={{ width:"100%", padding:"5px 6px", border:"none", fontSize:13, fontWeight:600, textAlign:"center", background:"transparent", outline:"none" }} />
-                  : <span style={{ padding:"5px 8px", display:"block", color:"#64748b", fontWeight:600 }}>{cell.label}</span>}
+                {cell.key ? <input type="number" min={0} value={data[cell.key]||""} onChange={e=>onChange(cell.key,e.target.value)} style={{ width:"100%", padding:"5px 6px", border:"none", fontSize:13, fontWeight:600, textAlign:"center", background:"transparent", outline:"none" }} /> : <span style={{ padding:"5px 8px", display:"block", color:"#64748b", fontWeight:600 }}>{cell.label}</span>}
               </td>
             ))}</tr>
           ))}</tbody>
@@ -250,19 +194,10 @@
             return (
               <div key={s.role} style={{ display:"flex", alignItems:"center", flex:1 }}>
                 <div style={{ display:"flex", flexDirection:"column", alignItems:"center", flex:1, gap:4 }}>
-                  <div style={{
-                    width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center",
-                    fontSize:18, border:"2.5px solid",
-                    background: active ? r.color : done ? "#d1fae5" : "#f1f5f9",
-                    borderColor: active ? r.color : done ? "#10b981" : "#e2e8f0",
-                    boxShadow: active ? `0 0 0 4px ${r.color}30` : "none",
-                    transition:"all 0.3s",
-                  }}>{done ? "✓" : s.icon}</div>
+                  <div style={{ width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, border:"2.5px solid", background: active ? r.color : done ? "#d1fae5" : "#f1f5f9", borderColor: active ? r.color : done ? "#10b981" : "#e2e8f0", boxShadow: active ? `0 0 0 4px ${r.color}30` : "none", transition:"all 0.3s", }}>{done ? "✓" : s.icon}</div>
                   <span style={{ fontSize:10, fontWeight: active?700:400, color: active?r.color : done?"#10b981":"#94a3b8", textAlign:"center" }}>{s.label}</span>
                 </div>
-                {i < steps.length-1 && (
-                  <div style={{ height:3, flex:0.4, background: i<currentIdx?"#10b981":"#e2e8f0", borderRadius:2, transition:"background 0.3s" }} />
-                )}
+                {i < steps.length-1 && (<div style={{ height:3, flex:0.4, background: i<currentIdx?"#10b981":"#e2e8f0", borderRadius:2, transition:"background 0.3s" }} />)}
               </div>
             );
           })}
@@ -291,28 +226,17 @@
       };
 
       return (
-        <div style={{
-          minHeight:"100vh",
-          background:"linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4c1d95 70%,#7c3aed 100%)",
-          display:"flex", alignItems:"center", justifyContent:"center", padding:16,
-        }}>
+        <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4c1d95 70%,#7c3aed 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
           <div style={{ width:"100%", maxWidth:480 }}>
-            {/* Header */}
             <div style={{ textAlign:"center", marginBottom:28 }}>
               <div style={{ fontSize:54, marginBottom:10 }}>🏛️</div>
               <h1 style={{ fontSize:26, fontWeight:800, color:"#fff", margin:"0 0 4px", letterSpacing:"-0.5px" }}>राजभाषा पोर्टल</h1>
               <p style={{ fontSize:12, color:"rgba(255,255,255,0.65)", margin:0 }}>तिमाही प्रगति रिपोर्ट · अनुलग्नक-2</p>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:16,
-                background:"rgba(255,255,255,0.1)", backdropFilter:"blur(8px)", borderRadius:40, padding:"8px 20px" }}>
-                {["🏢 अनुभाग","→","🔎 AAO","→","✅ SAO","→","🏛️ हिंदी प्रकोष्ठ"].map((t,i)=>(
-                  <span key={i} style={{ fontSize: t==="→"?16:11, color: t==="→"?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.85)", fontWeight:600 }}>{t}</span>
-                ))}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:16, background:"rgba(255,255,255,0.1)", backdropFilter:"blur(8px)", borderRadius:40, padding:"8px 20px" }}>
+                {["🏢 अनुभाग","→","🔎 AAO","→","✅ SAO","→","🏛️ हिंदी प्रकोष्ठ"].map((t,i)=>(<span key={i} style={{ fontSize: t==="→"?16:11, color: t==="→"?"rgba(255,255,255,0.4)":"rgba(255,255,255,0.85)", fontWeight:600 }}>{t}</span>))}
               </div>
             </div>
-
-            {/* Card */}
             <div style={{ background:"rgba(255,255,255,0.97)", borderRadius:24, padding:28, boxShadow:"0 24px 60px rgba(0,0,0,0.3)" }}>
-              {/* Step: choose role */}
               {step==="choice" && (
                 <div>
                   <p style={{ fontSize:13, fontWeight:700, color:"#64748b", margin:"0 0 16px" }}>अपनी भूमिका चुनें:</p>
@@ -320,18 +244,9 @@
                     {roleCards.map(rc=>{
                       const r = ROLES[rc.role];
                       return (
-                        <button key={rc.role} onClick={()=>{ setStep(rc.step); setErr(""); setPass(""); }}
-                          style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", borderRadius:14, border:"none",
-                            background:r.grad, color:"#fff", cursor:"pointer", textAlign:"left",
-                            boxShadow:"0 4px 14px rgba(0,0,0,0.12)", transition:"transform 0.15s" }}
-                          onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-                          onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
-                        >
+                        <button key={rc.role} onClick={()=>{ setStep(rc.step); setErr(""); setPass(""); }} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", borderRadius:14, border:"none", background:r.grad, color:"#fff", cursor:"pointer", textAlign:"left", boxShadow:"0 4px 14px rgba(0,0,0,0.12)", transition:"transform 0.15s" }} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>
                           <span style={{ fontSize:30, flexShrink:0 }}>{r.icon}</span>
-                          <div>
-                            <div style={{ fontWeight:800, fontSize:15 }}>{r.label}</div>
-                            <div style={{ fontSize:11, opacity:0.85, marginTop:2 }}>{rc.desc}</div>
-                          </div>
+                          <div><div style={{ fontWeight:800, fontSize:15 }}>{r.label}</div><div style={{ fontSize:11, opacity:0.85, marginTop:2 }}>{rc.desc}</div></div>
                           <span style={{ marginLeft:"auto", fontSize:18, opacity:0.7 }}>→</span>
                         </button>
                       );
@@ -339,21 +254,14 @@
                   </div>
                 </div>
               )}
-
-              {/* Step: SECTION login */}
               {step==="section" && (
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
-                    <span style={{ fontSize:28 }}>🏢</span>
-                    <div>
-                      <div style={{ fontSize:16, fontWeight:800, color:"#1e293b" }}>अनुभाग प्रवेश</div>
-                      <div style={{ fontSize:11, color:"#94a3b8" }}>रिपोर्ट भरें और AAO को भेजें</div>
-                    </div>
+                    <span style={{ fontSize:28 }}>🏢</span><div><div style={{ fontSize:16, fontWeight:800, color:"#1e293b" }}>अनुभाग प्रवेश</div><div style={{ fontSize:11, color:"#94a3b8" }}>रिपोर्ट भरें और AAO को भेजें</div></div>
                   </div>
                   <div>
                     <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>अपना अनुभाग चुनें</label>
-                    <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}}
-                      style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }}>
+                    <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }}>
                       <option value="">-- अनुभाग चुनें --</option>
                       {SECTIONS_LIST.map(s=><option key={s}>{s}</option>)}
                     </select>
@@ -363,18 +271,11 @@
                   <BackBtn onClick={()=>{setStep("choice"); setErr(""); setSection("");}} />
                 </div>
               )}
-
-              {/* Step: AAO login */}
               {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
-              {/* Step: SAO login */}
               {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
-              {/* Step: Hindi Cell login */}
               {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
             </div>
-
-            <p style={{ textAlign:"center", fontSize:10, color:"rgba(255,255,255,0.4)", marginTop:14 }}>
-              Digital India · QPR v4.0 · अनुलग्नक-2 (संशोधित) · OM 20003/01/2024-रा.भा.
-            </p>
+            <p style={{ textAlign:"center", fontSize:10, color:"rgba(255,255,255,0.4)", marginTop:14 }}>Digital India · QPR v4.0 · अनुलग्नक-2 (संशोधित)</p>
           </div>
         </div>
       );
@@ -385,18 +286,11 @@
       return (
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
-            <span style={{ fontSize:28 }}>{r.icon}</span>
-            <div>
-              <div style={{ fontSize:16, fontWeight:800, color:"#1e293b" }}>{r.label} प्रवेश</div>
-              <div style={{ fontSize:11, color:"#94a3b8" }}>{r.labelEn} Login</div>
-            </div>
+            <span style={{ fontSize:28 }}>{r.icon}</span><div><div style={{ fontSize:16, fontWeight:800, color:"#1e293b" }}>{r.label} प्रवेश</div><div style={{ fontSize:11, color:"#94a3b8" }}>{r.labelEn} Login</div></div>
           </div>
           <div>
             <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>पासवर्ड</label>
-            <input type="password" value={pass} onChange={e=>{setPass(e.target.value); setErr("");}}
-              onKeyDown={e=>e.key==="Enter"&&onLogin()} placeholder="पासवर्ड दर्ज करें..." autoFocus
-              style={{ width:"100%", boxSizing:"border-box", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }}
-              onFocus={e=>e.target.style.borderColor=r.color} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
+            <input type="password" value={pass} onChange={e=>{setPass(e.target.value); setErr("");}} onKeyDown={e=>e.key==="Enter"&&onLogin()} placeholder="पासवर्ड दर्ज करें..." autoFocus style={{ width:"100%", boxSizing:"border-box", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }} onFocus={e=>e.target.style.borderColor=r.color} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
           </div>
           {err && <ErrBox msg={err} />}
           <BtnPrimary grad={r.grad} onClick={onLogin}>लॉगिन करें →</BtnPrimary>
@@ -405,12 +299,8 @@
       );
     }
     function ErrBox({ msg }) { return <div style={{ fontSize:12, color:"#dc2626", background:"#fee2e2", padding:"8px 12px", borderRadius:8 }}>{msg}</div>; }
-    function BtnPrimary({ grad, onClick, children }) {
-      return <button onClick={onClick} style={{ padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:grad, color:"#fff", fontWeight:800, fontSize:14, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{children}</button>;
-    }
-    function BackBtn({ onClick }) {
-      return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>;
-    }
+    function BtnPrimary({ grad, onClick, children }) { return <button onClick={onClick} style={{ padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:grad, color:"#fff", fontWeight:800, fontSize:14, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{children}</button>; }
+    function BackBtn({ onClick }) { return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>; }
 
     // ── NAVBAR ───────────────────────────────────────────────────────────────────
     function Navbar({ user, view, setView, onLogout }) {
@@ -422,31 +312,19 @@
         ...(user.role==="HINDI_CELL" ? [{ id:"audit", icon:"🔍", label:"ऑडिट" }] : []),
       ];
       return (
-        <nav style={{ background:r.grad, padding:"0 20px", display:"flex", alignItems:"center", justifyContent:"space-between", height:56, position:"sticky", top:0, zIndex:200, boxShadow:`0 2px 16px ${r.color}60` }}>
+        <nav className="no-print" style={{ background:r.grad, padding:"0 20px", display:"flex", alignItems:"center", justifyContent:"space-between", height:56, position:"sticky", top:0, zIndex:200, boxShadow:`0 2px 16px ${r.color}60` }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <span style={{ fontSize:22 }}>🏛️</span>
-            <div>
-              <div style={{ fontSize:13, fontWeight:800, color:"#fff", lineHeight:1 }}>राजभाषा QPR</div>
-              <div style={{ fontSize:9, color:"rgba(255,255,255,0.65)", letterSpacing:"0.06em" }}>अनुलग्नक-2 · संशोधित</div>
-            </div>
+            <span style={{ fontSize:22 }}>🏛️</span><div><div style={{ fontSize:13, fontWeight:800, color:"#fff", lineHeight:1 }}>राजभाषा QPR</div><div style={{ fontSize:9, color:"rgba(255,255,255,0.65)", letterSpacing:"0.06em" }}>अनुलग्नक-2 · संशोधित</div></div>
           </div>
           <div style={{ display:"flex", gap:4 }}>
             {tabs.map(t=>(
-              <button key={t.id} onClick={()=>setView(t.id)} style={{
-                display:"flex", alignItems:"center", gap:5, padding:"6px 12px", borderRadius:10,
-                cursor:"pointer", fontSize:12, border:"none", fontWeight:600, transition:"all 0.15s",
-                background: view===t.id ? "rgba(255,255,255,0.22)" : "transparent",
-                color: view===t.id ? "#fff" : "rgba(255,255,255,0.7)",
-              }}>
-                <span style={{ fontSize:15 }}>{t.icon}</span>
-                <span>{t.label}</span>
+              <button key={t.id} onClick={()=>setView(t.id)} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", borderRadius:10, cursor:"pointer", fontSize:12, border:"none", fontWeight:600, transition:"all 0.15s", background: view===t.id ? "rgba(255,255,255,0.22)" : "transparent", color: view===t.id ? "#fff" : "rgba(255,255,255,0.7)", }}>
+                <span style={{ fontSize:15 }}>{t.icon}</span><span>{t.label}</span>
               </button>
             ))}
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>
-              {r.icon} {user.name}
-            </div>
+            <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>{r.icon} {user.name}</div>
             <button onClick={onLogout} style={{ fontSize:11, color:"#fecaca", background:"rgba(220,38,38,0.2)", border:"1px solid rgba(220,38,38,0.35)", borderRadius:8, padding:"5px 10px", cursor:"pointer", fontWeight:700 }}>बाहर</button>
           </div>
         </nav>
@@ -478,73 +356,28 @@
           {isDue && (
             <div style={{ background:"#fef3c7", border:"2px solid #f59e0b", borderRadius:14, padding:"14px 20px", display:"flex", gap:12, alignItems:"center" }}>
               <span style={{ fontSize:28 }}>⚠️</span>
-              <div>
-                <div style={{ fontWeight:800, color:"#92400e", fontSize:14 }}>समय सीमा निकट!</div>
-                <div style={{ fontSize:12, color:"#b45309" }}>इस माह की 5 तारीख तक रिपोर्ट जमा अनिवार्य है।</div>
-              </div>
+              <div><div style={{ fontWeight:800, color:"#92400e", fontSize:14 }}>समय सीमा निकट!</div><div style={{ fontSize:12, color:"#b45309" }}>इस माह की 5 तारीख तक रिपोर्ट जमा अनिवार्य है।</div></div>
             </div>
           )}
 
           <div style={{ background:"#fff", borderRadius:16, padding:"16px 20px", border:"1.5px solid #e2e8f0" }}>
             <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", marginBottom:10, textTransform:"uppercase", letterSpacing:"0.05em" }}>रिपोर्ट प्रवाह</div>
             <WorkflowPipeline currentRole={user.role} />
-            <div style={{ marginTop:10, background:r.bg, borderRadius:10, padding:"8px 14px", fontSize:12, color:r.color, fontWeight:700, border:`1px solid ${r.color}40` }}>
-              {user.role==="SECTION"    && "✏️ आप रिपोर्ट भरकर AAO को भेजते हैं।"}
-              {user.role==="AAO"        && "🔎 आप अनुभाग से आई रिपोर्ट जाँचकर SAO को आगे भेजते हैं।"}
-              {user.role==="SAO"        && "✅ आप AAO की अनुशंसित रिपोर्ट स्वीकृत कर हिंदी प्रकोष्ठ को भेजते हैं।"}
-              {user.role==="HINDI_CELL" && "🏛️ आप SAO से आई रिपोर्ट अंतिम रूप से स्वीकार करते हैं।"}
-            </div>
           </div>
 
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:12 }}>
             {stats.map(s=>(
               <div key={s.label} style={{ background:`${s.c}15`, borderRadius:14, padding:"16px 18px", border:`1.5px solid ${s.c}30` }}>
-                <div style={{ fontSize:22 }}>{s.icon}</div>
-                <div style={{ fontSize:28, fontWeight:800, color:s.c, lineHeight:1, marginTop:4 }}>{s.value}</div>
-                <div style={{ fontSize:11, color:s.c, marginTop:4, fontWeight:600 }}>{s.label}</div>
+                <div style={{ fontSize:22 }}>{s.icon}</div><div style={{ fontSize:28, fontWeight:800, color:s.c, lineHeight:1, marginTop:4 }}>{s.value}</div><div style={{ fontSize:11, color:s.c, marginTop:4, fontWeight:600 }}>{s.label}</div>
               </div>
             ))}
           </div>
 
           {user.role!=="SECTION" && pendingForMe>0 && (
-            <button onClick={()=>setView("inbox")} style={{
-              display:"flex", alignItems:"center", justifyContent:"space-between",
-              background:r.grad, borderRadius:14, padding:"16px 22px", border:"none", cursor:"pointer", color:"#fff",
-              boxShadow:`0 4px 18px ${r.color}40`,
-            }}>
-              <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                <span style={{ fontSize:28 }}>📥</span>
-                <div style={{ textAlign:"left" }}>
-                  <div style={{ fontWeight:800, fontSize:15 }}>{pendingForMe} रिपोर्ट आपकी प्रतीक्षा में</div>
-                  <div style={{ fontSize:11, opacity:0.85 }}>समीक्षा करने के लिए क्लिक करें</div>
-                </div>
-              </div>
+            <button onClick={()=>setView("inbox")} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:r.grad, borderRadius:14, padding:"16px 22px", border:"none", cursor:"pointer", color:"#fff", boxShadow:`0 4px 18px ${r.color}40`, }}>
+              <div style={{ display:"flex", alignItems:"center", gap:12 }}><span style={{ fontSize:28 }}>📥</span><div style={{ textAlign:"left" }}><div style={{ fontWeight:800, fontSize:15 }}>{pendingForMe} रिपोर्ट आपकी प्रतीक्षा में</div><div style={{ fontSize:11, opacity:0.85 }}>समीक्षा करने के लिए क्लिक करें</div></div></div>
               <span style={{ fontSize:22 }}>→</span>
             </button>
-          )}
-
-          {myReports.length>0 && (
-            <div style={{ background:"#fff", borderRadius:16, padding:20, border:"1.5px solid #e2e8f0" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
-                <h2 style={{ fontSize:14, fontWeight:800, margin:0, color:"#1e293b" }}>🕐 हाल की गतिविधि</h2>
-                <button onClick={()=>setView("inbox")} style={{ fontSize:12, color:r.color, background:"none", border:"none", cursor:"pointer", fontWeight:700 }}>सभी देखें →</button>
-              </div>
-              {myReports.slice(0,5).map((rep,i)=>{
-                const st = STATUS[rep.status] || STATUS.DRAFT;
-                const sc = computeScore(rep);
-                const c  = SECTION_COLORS[i%SECTION_COLORS.length];
-                return (
-                  <div key={rep.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom:"1px solid #f1f5f9" }}>
-                    <div style={{ width:36, height:36, borderRadius:10, background:c.bg, border:`1.5px solid ${c.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0 }}>{c.icon}</div>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ fontSize:13, fontWeight:700, color:"#1e293b" }}>{rep.sectionName}</div>
-                      <div style={{ fontSize:10, color:"#94a3b8" }}>{QUARTERS.find(q=>q.id===rep.quarter)?.label} · {rep.year}</div>
-                    </div>
-                    <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
-                  </div>
-                );
-              })}
-            </div>
           )}
         </div>
       );
@@ -585,20 +418,14 @@
             <div style={{ display:"flex", marginBottom:8 }}>
               {steps.map((s,i)=>(
                 <div key={i} onClick={()=>i<step&&setStep(i)} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:3, cursor:i<step?"pointer":"default" }}>
-                  <div style={{ width:34, height:34, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, border:"2px solid",
-                    background: i===step?"#6366f1": i<step?"#d1fae5":"#f8fafc", borderColor: i===step?"#6366f1": i<step?"#10b981":"#e2e8f0" }}>
-                    {i<step?"✓":i+1}
-                  </div>
+                  <div style={{ width:34, height:34, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14, border:"2px solid", background: i===step?"#6366f1": i<step?"#d1fae5":"#f8fafc", borderColor: i===step?"#6366f1": i<step?"#10b981":"#e2e8f0" }}>{i<step?"✓":i+1}</div>
                   <span style={{ fontSize:10, color: i===step?"#6366f1":i<step?"#10b981":"#94a3b8", fontWeight:i===step?700:400, textAlign:"center" }}>{s}</span>
                 </div>
               ))}
             </div>
-            <div style={{ height:4, background:"#f1f5f9", borderRadius:4 }}>
-              <div style={{ height:4, background:"linear-gradient(90deg,#6366f1,#8b5cf6)", borderRadius:4, width:`${(step/(totalSteps-1))*100}%`, transition:"width 0.3s" }} />
-            </div>
+            <div style={{ height:4, background:"#f1f5f9", borderRadius:4 }}><div style={{ height:4, background:"linear-gradient(90deg,#6366f1,#8b5cf6)", borderRadius:4, width:`${(step/(totalSteps-1))*100}%`, transition:"width 0.3s" }} /></div>
           </div>
 
-          {/* Meta step */}
           {step===0 && (
             <SecCard title="कार्यालय की जानकारी" icon="🏢" color={SECTION_COLORS[0]}>
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -606,17 +433,14 @@
                 <Grid cols={3}><Inp label="अधिकारी का नाम" value={data.officerName} onChange={v=>set("officerName",v)} /><Inp label="एस.टी.डी. कोड" value={data.stdCode} onChange={v=>set("stdCode",v)} /><Inp label="फोन नं." value={data.phone} onChange={v=>set("phone",v)} /></Grid>
                 <Inp label="ई-मेल" value={data.email} onChange={v=>set("email",v)} type="email" />
                 <Grid cols={3}>
-                  <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>वर्ष</label>
-                    <select value={data.year} onChange={e=>set("year",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{YEARS.map(y=><option key={y}>{y}</option>)}</select></div>
-                  <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>तिमाही</label>
-                    <select value={data.quarter} onChange={e=>set("quarter",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{QUARTERS.map(q=><option key={q.id} value={q.id}>{q.label}</option>)}</select></div>
+                  <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>वर्ष</label><select value={data.year} onChange={e=>set("year",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{YEARS.map(y=><option key={y}>{y}</option>)}</select></div>
+                  <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>तिमाही</label><select value={data.quarter} onChange={e=>set("quarter",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{QUARTERS.map(q=><option key={q.id} value={q.id}>{q.label}</option>)}</select></div>
                   <Radio label="क्षेत्र" value={data.region} onChange={v=>set("region",v)} options={["A","B","C"]} />
                 </Grid>
               </div>
             </SecCard>
           )}
 
-          {/* Part-I step */}
           {step===1 && (
             <div>
               <SecCard title="1. माननीय मंत्री जी को भेजी गई फाइलें" icon="📜" color={SECTION_COLORS[0]}>
@@ -628,14 +452,6 @@
               <SecCard title="3. धारा 3(3) के अंतर्गत जारी दस्तावेज" icon="📄" color={SECTION_COLORS[2]}>
                 <Grid><Num label="(क) कुल जारी" value={data.b1_s3_totalIssued} onChange={v=>set("b1_s3_totalIssued",v)} /><Num label="(ख) द्विभाषी" value={data.b1_s3_bilingual} onChange={v=>set("b1_s3_bilingual",v)} /><Num label="(ग) केवल अंग्रेजी" value={data.b1_s3_englishOnly} onChange={v=>set("b1_s3_englishOnly",v)} /><Num label="(घ) केवल हिंदी" value={data.b1_s3_hindiOnly} onChange={v=>set("b1_s3_hindiOnly",v)} /></Grid>
               </SecCard>
-              <SecCard title="4. हिंदी में प्राप्त पत्र (राजभाषा नियम-5)" icon="📬" color={SECTION_COLORS[3]}>
-                <Grid><Num label="(क) कुल प्राप्त" value={data.b1_s4_totalReceived} onChange={v=>set("b1_s4_totalReceived",v)} /><Num label="(ख) उत्तर अपेक्षित नहीं" value={data.b1_s4_noReplyNeeded} onChange={v=>set("b1_s4_noReplyNeeded",v)} /><Num label="(ग) हिंदी/द्विभाषी उत्तर" value={data.b1_s4_hindiReply} onChange={v=>set("b1_s4_hindiReply",v)} /><Num label="(घ) अंग्रेजी में उत्तर" value={data.b1_s4_englishReply} onChange={v=>set("b1_s4_englishReply",v)} /></Grid>
-              </SecCard>
-              <SecCard title="5. अंग्रेजी पत्रों के उत्तर हिंदी में (क/ख क्षेत्र)" icon="✉️" color={SECTION_COLORS[4]}>
-                <TblInput headers={["क्षेत्र","अंग्रेजी में प्राप्त","हिंदी में उत्तर","अंग्रेजी में उत्तर","उत्तर अपेक्षित नहीं"]}
-                  rows={[[{label:"'क' क्षेत्र"},{key:"b1_s5_ka_total"},{key:"b1_s5_ka_hindiReply"},{key:"b1_s5_ka_engReply"},{key:"b1_s5_ka_noReply"}],[{label:"'ख' क्षेत्र"},{key:"b1_s5_kha_total"},{key:"b1_s5_kha_hindiReply"},{key:"b1_s5_kha_engReply"},{key:"b1_s5_kha_noReply"}]]}
-                  data={data} onChange={(k,v)=>set(k,v)} />
-              </SecCard>
               <SecCard title="6. मूल पत्राचार का ब्यौरा" icon="📨" color={SECTION_COLORS[5]}>
                 <TblInput headers={["क्षेत्र","हिंदी में","अंग्रेजी में","कुल","हिंदी %"]}
                   rows={[
@@ -644,52 +460,23 @@
                     [{label:"'ग' क्षेत्र"},{key:"b1_s6_ga_hindi"},{key:"b1_s6_ga_english"},{key:"b1_s6_ga_total"},{label: data.b1_s6_ga_total>0?`${Math.round((data.b1_s6_ga_hindi/data.b1_s6_ga_total)*100)||0}%`:"-"}],
                   ]} data={data} onChange={(k,v)=>set(k,v)} />
               </SecCard>
-              <SecCard title="7. फाइल टिप्पण लेखन" icon="🗂️" color={SECTION_COLORS[6]}>
-                <Grid><Num label="हिंदी में पृष्ठ" value={data.b1_s7_hindiPages} onChange={v=>set("b1_s7_hindiPages",v)} /><Num label="अंग्रेजी में पृष्ठ" value={data.b1_s7_engPages} onChange={v=>set("b1_s7_engPages",v)} /><Num label="कुल पृष्ठ" value={data.b1_s7_totalPages} onChange={v=>set("b1_s7_totalPages",v)} /><Num label="ई-ऑफिस टिप्पणियाँ" value={data.b1_s7_eoffice} onChange={v=>set("b1_s7_eoffice",v)} /></Grid>
-              </SecCard>
-              <SecCard title="8. हिंदी कार्यशालाएं" icon="🎓" color={SECTION_COLORS[7]}>
-                <Grid cols={3}><Num label="कार्यशालाएं" value={data.b1_s8_workshops} onChange={v=>set("b1_s8_workshops",v)} /><Num label="प्रशिक्षित अधिकारी" value={data.b1_s8_officers} onChange={v=>set("b1_s8_officers",v)} /><Num label="प्रशिक्षित कर्मचारी" value={data.b1_s8_staff} onChange={v=>set("b1_s8_staff",v)} /></Grid>
-              </SecCard>
-              <SecCard title="9. राजभाषा कार्यान्वयन समिति बैठक" icon="🤝" color={SECTION_COLORS[8]}>
-                <Grid><Inp label="(क) बैठक की तिथि" value={data.b1_s9_meetingDate} onChange={v=>set("b1_s9_meetingDate",v)} type="date" /><Num label="(ख) अधीनस्थ समितियां" value={data.b1_s9_subOfficeCmtes} onChange={v=>set("b1_s9_subOfficeCmtes",v)} /><Num label="(ग) आयोजित बैठकें" value={data.b1_s9_subOfficeMeetings} onChange={v=>set("b1_s9_subOfficeMeetings",v)} /><Radio label="(घ) कार्यसूची हिंदी में?" value={data.b1_s9_agendaHindi} onChange={v=>set("b1_s9_agendaHindi",v)} options={["हाँ","नहीं"]} /></Grid>
-              </SecCard>
             </div>
           )}
 
-          {/* Part-II step (Q4 only) */}
           {step===2 && isQ4 && (
             <div>
               <div style={{ background:"#eff6ff", border:"2px solid #6366f1", borderRadius:12, padding:"10px 16px", marginBottom:14, fontSize:12, color:"#3730a3", fontWeight:700 }}>📋 भाग-II · केवल 31 मार्च को समाप्त तिमाही के साथ भरा जाए</div>
               <SecCard title="1. राजभाषा नियम,1976 · नियम 10(4) अधिसूचना" icon="📜" color={SECTION_COLORS[0]}>
                 <Radio label="क्या कार्यालय अधिसूचित है?" value={data.b2_s1_notified} onChange={v=>set("b2_s1_notified",v)} options={["हाँ","नहीं"]} />
               </SecCard>
-              <SecCard title="2. अधिकारियों/कर्मचारियों को हिंदी का ज्ञान" icon="🎓" color={SECTION_COLORS[1]}>
-                <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                  <Grid cols={3}><Num label="कुल अधिकारी" value={data.b2_s2_totalOfficers} onChange={v=>set("b2_s2_totalOfficers",v)} /><Num label="कुल कर्मचारी" value={data.b2_s2_totalStaff} onChange={v=>set("b2_s2_totalStaff",v)} /><div/></Grid>
-                  <Grid><Num label="हिंदी में कार्य - अधिकारी" value={data.b2_s2_hindiWorkingOfficers} onChange={v=>set("b2_s2_hindiWorkingOfficers",v)} /><Num label="हिंदी में कार्य - कर्मचारी" value={data.b2_s2_hindiWorkingStaff} onChange={v=>set("b2_s2_hindiWorkingStaff",v)} /><Num label="प्रशिक्षण ले रहे अधिकारी" value={data.b2_s2_trainingOfficers} onChange={v=>set("b2_s2_trainingOfficers",v)} /><Num label="प्रशिक्षण ले रहे कर्मचारी" value={data.b2_s2_trainingStaff} onChange={v=>set("b2_s2_trainingStaff",v)} /></Grid>
-                </div>
-              </SecCard>
             </div>
           )}
 
-          {/* Preview step */}
           {((step===2&&!isQ4)||(step===3&&isQ4)) && (
             <div style={{ background:"#fff", borderRadius:16, padding:24, border:"1.5px solid #e2e8f0", marginBottom:16 }}>
               <h3 style={{ fontSize:15, fontWeight:800, margin:"0 0 16px", color:"#1e293b" }}>👁️ पूर्वावलोकन एवं प्रमाण-पत्र</h3>
               <div style={{ background:"#f8fafc", borderRadius:12, padding:16, border:"1px solid #e2e8f0", fontSize:13, color:"#475569", lineHeight:1.8, marginBottom:16 }}>
                 <strong>प्रमाण-पत्र:</strong> मैं यह प्रमाणित करता/करती हूं कि इस रिपोर्ट में दी गई सूचना उपलब्ध अभिलेखों के आधार पर बनाई गई है तथा पूर्णतया सत्य है।
-              </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:16 }}>
-                {[["अनुभाग",user.name],["कार्यालय",data.officeNameAddress||"—"],["तिमाही",QUARTERS.find(q=>q.id===data.quarter)?.label],["वर्ष",data.year],["क्षेत्र",data.region+" क्षेत्र"],["पावती संख्या",data.ackId]].map(([k,v])=>(
-                  <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 12px" }}>
-                    <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700 }}>{k}</div>
-                    <div style={{ fontSize:13, color:"#1e293b", fontWeight:600 }}>{v}</div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background:st.bg, border:`2px solid ${st.border}`, borderRadius:12, padding:"12px 18px", display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-                <span style={{ fontSize:13, color:st.text, fontWeight:700 }}>🎯 अनुमानित स्कोर</span>
-                <span style={{ fontSize:22, fontWeight:800, color:st.text }}>{score}% — {st.label}</span>
               </div>
               <button onClick={handleSubmit} style={{ width:"100%", padding:"14px 0", borderRadius:14, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", fontWeight:800, fontSize:15, boxShadow:"0 6px 20px rgba(99,102,241,0.4)" }}>
                 ✅ रिपोर्ट अंतिम रूप से जमा करें और AAO को भेजें
@@ -698,11 +485,8 @@
           )}
 
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:18 }}>
-            <button onClick={()=>setStep(s=>Math.max(0,s-1))} disabled={step===0}
-              style={{ padding:"9px 22px", borderRadius:10, border:"1.5px solid #e2e8f0", background:step===0?"#f8fafc":"#fff", color:step===0?"#cbd5e1":"#475569", cursor:step===0?"not-allowed":"pointer", fontWeight:700, fontSize:13 }}>← पिछला</button>
-            {step<totalSteps-1&&(
-              <button onClick={()=>setStep(s=>s+1)} style={{ padding:"9px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", cursor:"pointer", fontWeight:700, fontSize:13 }}>अगला →</button>
-            )}
+            <button onClick={()=>setStep(s=>Math.max(0,s-1))} disabled={step===0} style={{ padding:"9px 22px", borderRadius:10, border:"1.5px solid #e2e8f0", background:step===0?"#f8fafc":"#fff", color:step===0?"#cbd5e1":"#475569", cursor:step===0?"not-allowed":"pointer", fontWeight:700, fontSize:13 }}>← पिछला</button>
+            {step<totalSteps-1&&(<button onClick={()=>setStep(s=>s+1)} style={{ padding:"9px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", cursor:"pointer", fontWeight:700, fontSize:13 }}>अगला →</button>)}
           </div>
         </div>
       );
@@ -724,34 +508,22 @@
       const [remark, setRemark]     = useState("");
       const [search, setSearch]     = useState("");
 
-      const filtered = visible.filter(x=>
-        !search || x.sectionName?.includes(search) || x.ackId?.includes(search)
-      );
+      const filtered = visible.filter(x=> !search || x.sectionName?.includes(search) || x.ackId?.includes(search));
 
-      if(selected) return <ReportDetail report={selected} user={user} remark={remark} setRemark={setRemark}
-        onAction={(action,rem)=>{ onAction(selected,action,rem); setSelected(null); setRemark(""); }}
-        onBack={()=>{ setSelected(null); setRemark(""); }} />;
+      if(selected) return <ReportDetail report={selected} user={user} remark={remark} setRemark={setRemark} onAction={(action,rem)=>{ onAction(selected,action,rem); setSelected(null); setRemark(""); }} onBack={()=>{ setSelected(null); setRemark(""); }} />;
 
       return (
         <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #e2e8f0", overflow:"hidden" }}>
           <div style={{ background:r.grad, padding:"16px 22px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>
-              {user.role==="SECTION" ? "📋 मेरी रिपोर्टें" : "📥 आवक रिपोर्टें"} — {r.label}
-            </h2>
-            <span style={{ fontSize:12, color:"rgba(255,255,255,0.8)", background:"rgba(255,255,255,0.18)", padding:"3px 12px", borderRadius:20 }}>
-              {filtered.length} रिपोर्टें
-            </span>
+            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>{user.role==="SECTION" ? "📋 मेरी रिपोर्टें" : "📥 आवक रिपोर्टें"} — {r.label}</h2>
           </div>
           <div style={{ padding:"12px 16px", background:"#f8fafc", borderBottom:"1px solid #e2e8f0" }}>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 अनुभाग या पावती संख्या से खोजें..."
-              style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }} />
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 अनुभाग या पावती संख्या से खोजें..." style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }} />
           </div>
           {filtered.length===0?(
             <div style={{ textAlign:"center", padding:48, color:"#94a3b8" }}>
               <div style={{ fontSize:40 }}>{user.role==="SECTION"?"📂":"📭"}</div>
-              <div style={{ marginTop:10, fontSize:14 }}>
-                {user.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में नहीं।"}
-              </div>
+              <div style={{ marginTop:10, fontSize:14 }}>{user.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में नहीं।"}</div>
             </div>
           ):(
             filtered.map((rep,i)=>{
@@ -760,19 +532,11 @@
               const c    = SECTION_COLORS[i%SECTION_COLORS.length];
               const canAct = (user.role==="AAO"&&rep.status==="PENDING_AAO") || (user.role==="SAO"&&rep.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&rep.status==="SAO_APPROVED");
               return (
-                <div key={rep.id} onClick={()=>setSelected(rep)}
-                  style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }}
-                  onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"}
-                  onMouseLeave={e=>e.currentTarget.style.background="#fff"}
-                >
+                <div key={rep.id} onClick={()=>setSelected(rep)} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
                   <div style={{ width:40, height:40, borderRadius:12, background:c.bg, border:`1.5px solid ${c.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{c.icon}</div>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:13, fontWeight:700, color:"#1e293b" }}>{rep.sectionName}</div>
-                    <div style={{ fontSize:10, color:"#94a3b8" }}>{QUARTERS.find(q=>q.id===rep.quarter)?.label} · {rep.year} · {rep.region} क्षेत्र · {rep.ackId}</div>
-                  </div>
+                  <div style={{ flex:1, minWidth:0 }}><div style={{ fontSize:13, fontWeight:700, color:"#1e293b" }}>{rep.sectionName}</div><div style={{ fontSize:10, color:"#94a3b8" }}>{QUARTERS.find(q=>q.id===rep.quarter)?.label} · {rep.year} · {rep.ackId}</div></div>
                   <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
                     <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
-                    <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:12, background:"#f1f5f9", color:"#475569" }}>{sc}%</span>
                   </div>
                   {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>समीक्षा करें</span>}
                 </div>
@@ -783,7 +547,7 @@
       );
     }
 
-    // ── REPORT DETAIL with action panel ──────────────────────────────────────────
+    // ── 🖨️ REPORT DETAIL (यहाँ Print बटन जोड़ा गया है) ─────────────────────────
     function ReportDetail({ report, user, remark, setRemark, onAction, onBack }) {
       const r  = ROLES[user.role];
       const st = STATUS[report.status]||STATUS.DRAFT;
@@ -806,7 +570,14 @@
 
       return (
         <div style={{ maxWidth:760, margin:"0 auto" }}>
-          <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700, marginBottom:16 }}>← वापस सूची में</button>
+          
+          {/* 🖨️ PDF/Print बटन और Back बटन (इन्हें PDF में नहीं छापना है, इसलिए .no-print लगाया है) */}
+          <div className="no-print" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+            <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700 }}>← वापस सूची में</button>
+            <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>
+              🖨️ PDF में सेव करें / प्रिंट करें
+            </button>
+          </div>
 
           {/* Header */}
           <div style={{ background:r.grad, borderRadius:16, padding:"18px 22px", marginBottom:16, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -820,10 +591,23 @@
             </div>
           </div>
 
+          {/* Report data */}
+          <div style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
+            <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 मुख्य रिपोर्ट विवरण</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              {fieldsToShow.map(([k,v])=>(
+                <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
+                  <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700 }}>{k}</div>
+                  <div style={{ fontSize:12, color:"#1e293b", fontWeight:600 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Timeline */}
           {report.timeline?.length>0 && (
             <div style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
-              <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📍 रिपोर्ट यात्रा</div>
+              <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📍 रिपोर्ट यात्रा (ऑडिट ट्रेल)</div>
               {report.timeline.map((t,i)=>{
                 const tr = ROLES[t.role]||{color:"#94a3b8",icon:"📌"};
                 return (
@@ -844,20 +628,17 @@
             </div>
           )}
 
-          {/* Action panel */}
+          {/* Action panel (इन्हें भी PDF में नहीं छापना है) */}
           {canAct && (
-            <div style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
+            <div className="no-print" style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
               <div style={{ fontSize:14, fontWeight:800, color:"#1e293b", marginBottom:12 }}>{r.icon} आपकी कार्रवाई</div>
               <div style={{ marginBottom:14 }}>
                 <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>टिप्पणी / कारण (वैकल्पिक)</label>
-                <textarea value={remark} onChange={e=>setRemark(e.target.value)} rows={2} placeholder="यदि कोई टिप्पणी हो..."
-                  style={{ width:"100%", boxSizing:"border-box", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:13, resize:"vertical" }} />
+                <textarea value={remark} onChange={e=>setRemark(e.target.value)} rows={2} placeholder="यदि कोई टिप्पणी हो..." style={{ width:"100%", boxSizing:"border-box", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:13, resize:"vertical" }} />
               </div>
               <div style={{ display:"flex", gap:12 }}>
                 {(actionBtns[user.role]||[]).map(btn=>(
-                  <button key={btn.action} onClick={()=>onAction(btn.action, remark)} style={{ flex:1, padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:btn.grad, color:"#fff", fontWeight:800, fontSize:13, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>
-                    {btn.label}
-                  </button>
+                  <button key={btn.action} onClick={()=>onAction(btn.action, remark)} style={{ flex:1, padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:btn.grad, color:"#fff", fontWeight:800, fontSize:13, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{btn.label}</button>
                 ))}
               </div>
             </div>
@@ -873,8 +654,7 @@
       return (
         <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #e2e8f0", overflow:"hidden" }}>
           <div style={{ background:"linear-gradient(135deg,#0f172a,#1e293b)", padding:"16px 22px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>🔍 ऑडिट ट्रेल</h2>
-            <button onClick={()=>{auditLog.clear(); setLogs([]);}} style={{ fontSize:11, color:"#fca5a5", background:"rgba(220,38,38,0.2)", border:"1px solid rgba(220,38,38,0.3)", borderRadius:8, padding:"4px 10px", cursor:"pointer" }}>साफ़ करें</button>
+            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>🔍 सिस्टम लॉग</h2>
           </div>
           {logs.length===0 ? <div style={{ textAlign:"center", padding:48, color:"#94a3b8" }}>कोई लॉग नहीं</div>
           : logs.map(log=>(
@@ -894,15 +674,11 @@
     function App() {
       const [user, setUser]       = useState(()=>{ try { return JSON.parse(sessionStorage.getItem("rb_user_v4")); } catch { return null; } });
       const [view, setView]       = useState("dashboard");
-      // Firebase से डेटा लेने के लिए State
       const [reports, setReports] = useState([]);
 
-      // 🌟 Firebase Real-time Listener 🌟
       useEffect(() => {
-        // यह कोड Firebase 'reports' कलेक्शन को लगातार चेक करता रहेगा
         const unsubscribe = db.collection("reports").onSnapshot((snapshot) => {
           const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          // डेटा को तारीख के हिसाब से सॉर्ट करें (नया सबसे ऊपर)
           data.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
           setReports(data);
         });
@@ -922,12 +698,9 @@
         setView("dashboard");
       };
 
-      // 🌟 Firebase में नई रिपोर्ट सेव करना 🌟
       const handleSave = (report) => {
-        // Firestore खुद से ID जनरेट करता है, इसलिए हम अपना वाला हटा देंगे (Ack ID रहेगा)
         const reportToSave = { ...report };
         delete reportToSave.id; 
-        
         db.collection("reports").add(reportToSave)
           .then(() => {
             auditLog.add(user, "CREATE", `नई रिपोर्ट ${report.ackId} — ${report.sectionName} → AAO`);
@@ -936,7 +709,6 @@
           .catch(err => alert("डेटा सेव करने में समस्या आई: " + err.message));
       };
 
-      // 🌟 Firebase में रिपोर्ट अपडेट करना (AAO/SAO Action) 🌟
       const handleAction = (report, action, remark) => {
         const actionLabels = {
           AAO_APPROVED:  `AAO ने स्वीकृत किया और SAO को भेजा`,
@@ -970,7 +742,8 @@
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} />}
             {view==="audit"     && user.role==="HINDI_CELL" && <AuditView />}
           </main>
-          <footer style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)", letterSpacing:"0.05em" }}>
+          {/* Footer को भी PDF में नहीं छापना है */}
+          <footer className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)", letterSpacing:"0.05em" }}>
             <span>© 2026 Digital India · राजभाषा QPR v4.0</span>
             <span>प्र.नि.ले.प. रेलवे, मुंबई</span>
           </footer>
