@@ -14,14 +14,32 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+  
+  <script>
+    // आपका Firebase कॉन्फ़िगरेशन
+    const firebaseConfig = {
+      apiKey: "AIzaSyDeRIsBfRdGPXwgZxfi5QLR_dNXmV3E_1k",
+      authDomain: "rajbhasha-qpr.firebaseapp.com",
+      projectId: "rajbhasha-qpr",
+      storageBucket: "rajbhasha-qpr.firebasestorage.app",
+      messagingSenderId: "934013797840",
+      appId: "1:934013797840:web:c747cb5fd4b905885125d5",
+      measurementId: "G-WX79KCQ4XV"
+    };
+    // Firebase और Firestore चालू करें
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useMemo } = React;
+    const { useState, useEffect, useMemo } = React;
 
     // ── Constants ────────────────────────────────────────────────────────────────
-    const STORAGE_KEY = "rajbhasha_qpr_v4";
     const AUDIT_KEY   = "rajbhasha_audit_v4";
 
     // Role definitions & passwords
@@ -254,7 +272,7 @@
 
     // ── LOGIN ────────────────────────────────────────────────────────────────────
     function LoginScreen({ onLogin }) {
-      const [step, setStep]       = useState("choice");  // choice | section | aao | sao | hindi
+      const [step, setStep]       = useState("choice");
       const [section, setSection] = useState("");
       const [pass, setPass]       = useState("");
       const [err, setErr]         = useState("");
@@ -279,14 +297,11 @@
           display:"flex", alignItems:"center", justifyContent:"center", padding:16,
         }}>
           <div style={{ width:"100%", maxWidth:480 }}>
-
             {/* Header */}
             <div style={{ textAlign:"center", marginBottom:28 }}>
               <div style={{ fontSize:54, marginBottom:10 }}>🏛️</div>
               <h1 style={{ fontSize:26, fontWeight:800, color:"#fff", margin:"0 0 4px", letterSpacing:"-0.5px" }}>राजभाषा पोर्टल</h1>
               <p style={{ fontSize:12, color:"rgba(255,255,255,0.65)", margin:0 }}>तिमाही प्रगति रिपोर्ट · अनुलग्नक-2</p>
-
-              {/* Workflow strip */}
               <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:6, marginTop:16,
                 background:"rgba(255,255,255,0.1)", backdropFilter:"blur(8px)", borderRadius:40, padding:"8px 20px" }}>
                 {["🏢 अनुभाग","→","🔎 AAO","→","✅ SAO","→","🏛️ हिंदी प्रकोष्ठ"].map((t,i)=>(
@@ -297,7 +312,6 @@
 
             {/* Card */}
             <div style={{ background:"rgba(255,255,255,0.97)", borderRadius:24, padding:28, boxShadow:"0 24px 60px rgba(0,0,0,0.3)" }}>
-
               {/* Step: choose role */}
               {step==="choice" && (
                 <div>
@@ -351,22 +365,11 @@
               )}
 
               {/* Step: AAO login */}
-              {step==="aao" && (
-                <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr}
-                  onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />
-              )}
-
+              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
               {/* Step: SAO login */}
-              {step==="sao" && (
-                <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr}
-                  onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />
-              )}
-
+              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
               {/* Step: Hindi Cell login */}
-              {step==="hindi" && (
-                <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr}
-                  onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />
-              )}
+              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
             </div>
 
             <p style={{ textAlign:"center", fontSize:10, color:"rgba(255,255,255,0.4)", marginTop:14 }}>
@@ -377,7 +380,6 @@
       );
     }
 
-    // small reused sub-components
     function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack }) {
       const r = ROLES[role];
       return (
@@ -457,7 +459,6 @@
       const isDue      = new Date().getDate() <= 5;
       const myReports  = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
 
-      // count by status for current role's inbox
       const inboxCount = {
         AAO:        reports.filter(x=>x.status==="PENDING_AAO").length,
         SAO:        reports.filter(x=>x.status==="AAO_APPROVED").length,
@@ -474,7 +475,6 @@
 
       return (
         <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
-          {/* Alert */}
           {isDue && (
             <div style={{ background:"#fef3c7", border:"2px solid #f59e0b", borderRadius:14, padding:"14px 20px", display:"flex", gap:12, alignItems:"center" }}>
               <span style={{ fontSize:28 }}>⚠️</span>
@@ -485,7 +485,6 @@
             </div>
           )}
 
-          {/* Workflow banner */}
           <div style={{ background:"#fff", borderRadius:16, padding:"16px 20px", border:"1.5px solid #e2e8f0" }}>
             <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", marginBottom:10, textTransform:"uppercase", letterSpacing:"0.05em" }}>रिपोर्ट प्रवाह</div>
             <WorkflowPipeline currentRole={user.role} />
@@ -497,7 +496,6 @@
             </div>
           </div>
 
-          {/* Stats */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:12 }}>
             {stats.map(s=>(
               <div key={s.label} style={{ background:`${s.c}15`, borderRadius:14, padding:"16px 18px", border:`1.5px solid ${s.c}30` }}>
@@ -508,7 +506,6 @@
             ))}
           </div>
 
-          {/* Pending alert for non-section roles */}
           {user.role!=="SECTION" && pendingForMe>0 && (
             <button onClick={()=>setView("inbox")} style={{
               display:"flex", alignItems:"center", justifyContent:"space-between",
@@ -526,7 +523,6 @@
             </button>
           )}
 
-          {/* Recent */}
           {myReports.length>0 && (
             <div style={{ background:"#fff", borderRadius:16, padding:20, border:"1.5px solid #e2e8f0" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
@@ -536,7 +532,6 @@
               {myReports.slice(0,5).map((rep,i)=>{
                 const st = STATUS[rep.status] || STATUS.DRAFT;
                 const sc = computeScore(rep);
-                const ss = scoreStatus(sc);
                 const c  = SECTION_COLORS[i%SECTION_COLORS.length];
                 return (
                   <div key={rep.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 0", borderBottom:"1px solid #f1f5f9" }}>
@@ -567,7 +562,7 @@
       const totalSteps = isQ4 ? 4 : 3;
 
       const handleSubmit = () => {
-        const report = { ...data, id:Date.now(), sectionName:user.name, timestamp:new Date().toISOString(), status:"PENDING_AAO", timeline:[{ ts:new Date().toISOString(), role:"SECTION", name:user.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }] };
+        const report = { ...data, sectionName:user.name, timestamp:new Date().toISOString(), status:"PENDING_AAO", timeline:[{ ts:new Date().toISOString(), role:"SECTION", name:user.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }] };
         onSave(report);
         setDone(true);
       };
@@ -578,9 +573,6 @@
           <h2 style={{ fontSize:20, fontWeight:800, color:"#065f46", margin:"16px 0 8px" }}>रिपोर्ट AAO के पास भेज दी गई!</h2>
           <div style={{ fontSize:13, color:"#94a3b8", marginBottom:12 }}>पावती संख्या</div>
           <div style={{ fontSize:18, fontWeight:800, color:"#6366f1", background:"#eef2ff", display:"inline-block", padding:"8px 20px", borderRadius:10 }}>{data.ackId}</div>
-          <div style={{ marginTop:12 }}>
-            <span style={{ background:st.bg, color:st.text, border:`1px solid ${st.border}`, fontSize:13, fontWeight:700, padding:"4px 14px", borderRadius:20 }}>{st.label} · {score}%</span>
-          </div>
           <div style={{ marginTop:20, fontSize:12, color:"#64748b" }}>अब AAO आपकी रिपोर्ट की जाँच करेंगे।</div>
         </div>
       );
@@ -589,7 +581,6 @@
 
       return (
         <div style={{ maxWidth:800, margin:"0 auto" }}>
-          {/* Progress */}
           <div style={{ background:"#fff", borderRadius:14, padding:"14px 20px", marginBottom:18, border:"1.5px solid #e2e8f0" }}>
             <div style={{ display:"flex", marginBottom:8 }}>
               {steps.map((s,i)=>(
@@ -607,12 +598,6 @@
             </div>
           </div>
 
-          {/* Score */}
-          <div style={{ background:st.bg, border:`2px solid ${st.border}`, borderRadius:12, padding:"10px 18px", marginBottom:18, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <span style={{ fontSize:12, color:st.text, fontWeight:700 }}>📊 अनुमानित स्कोर</span>
-            <span style={{ fontSize:20, fontWeight:800, color:st.text }}>{score}% · {st.label}</span>
-          </div>
-
           {/* Meta step */}
           {step===0 && (
             <SecCard title="कार्यालय की जानकारी" icon="🏢" color={SECTION_COLORS[0]}>
@@ -627,7 +612,6 @@
                     <select value={data.quarter} onChange={e=>set("quarter",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{QUARTERS.map(q=><option key={q.id} value={q.id}>{q.label}</option>)}</select></div>
                   <Radio label="क्षेत्र" value={data.region} onChange={v=>set("region",v)} options={["A","B","C"]} />
                 </Grid>
-                {isQ4&&<div style={{ background:"#eff6ff", border:"1.5px solid #6366f1", borderRadius:10, padding:"10px 14px", fontSize:12, color:"#3730a3", fontWeight:600 }}>📌 Q4 के लिए भाग-II भी भरना अनिवार्य है।</div>}
               </div>
             </SecCard>
           )}
@@ -669,18 +653,6 @@
               <SecCard title="9. राजभाषा कार्यान्वयन समिति बैठक" icon="🤝" color={SECTION_COLORS[8]}>
                 <Grid><Inp label="(क) बैठक की तिथि" value={data.b1_s9_meetingDate} onChange={v=>set("b1_s9_meetingDate",v)} type="date" /><Num label="(ख) अधीनस्थ समितियां" value={data.b1_s9_subOfficeCmtes} onChange={v=>set("b1_s9_subOfficeCmtes",v)} /><Num label="(ग) आयोजित बैठकें" value={data.b1_s9_subOfficeMeetings} onChange={v=>set("b1_s9_subOfficeMeetings",v)} /><Radio label="(घ) कार्यसूची हिंदी में?" value={data.b1_s9_agendaHindi} onChange={v=>set("b1_s9_agendaHindi",v)} options={["हाँ","नहीं"]} /></Grid>
               </SecCard>
-              <SecCard title="10. हिंदी सलाहकार समिति बैठक" icon="💡" color={SECTION_COLORS[9]}>
-                <Inp label="बैठक की तिथि" value={data.b1_s10_meetingDate} onChange={v=>set("b1_s10_meetingDate",v)} type="date" />
-              </SecCard>
-              <SecCard title="11. उल्लेखनीय कार्य/उपलब्धियाँ" icon="🏆" color={SECTION_COLORS[10]}>
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  {[["b1_s11_innovation","i) नवोन्मेषी कार्य"],["b1_s11_special","ii) विशिष्ट आयोजन"],["b1_s11_other","iii) अन्य आयोजन"]].map(([k,l])=>(
-                    <div key={k}><label style={{ fontSize:11, fontWeight:700, color:"#475569", display:"block", marginBottom:4 }}>{l}</label>
-                      <textarea value={data[k]} onChange={e=>set(k,e.target.value)} maxLength={500} rows={2}
-                        style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:12, resize:"vertical" }} /></div>
-                  ))}
-                </div>
-              </SecCard>
             </div>
           )}
 
@@ -695,45 +667,6 @@
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                   <Grid cols={3}><Num label="कुल अधिकारी" value={data.b2_s2_totalOfficers} onChange={v=>set("b2_s2_totalOfficers",v)} /><Num label="कुल कर्मचारी" value={data.b2_s2_totalStaff} onChange={v=>set("b2_s2_totalStaff",v)} /><div/></Grid>
                   <Grid><Num label="हिंदी में कार्य - अधिकारी" value={data.b2_s2_hindiWorkingOfficers} onChange={v=>set("b2_s2_hindiWorkingOfficers",v)} /><Num label="हिंदी में कार्य - कर्मचारी" value={data.b2_s2_hindiWorkingStaff} onChange={v=>set("b2_s2_hindiWorkingStaff",v)} /><Num label="प्रशिक्षण ले रहे अधिकारी" value={data.b2_s2_trainingOfficers} onChange={v=>set("b2_s2_trainingOfficers",v)} /><Num label="प्रशिक्षण ले रहे कर्मचारी" value={data.b2_s2_trainingStaff} onChange={v=>set("b2_s2_trainingStaff",v)} /></Grid>
-                  <div style={{ borderTop:"1.5px solid #f1f5f9", paddingTop:12 }}>
-                    <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:8 }}>2(ii). हिंदी आशुलिपि/टंकण</div>
-                    <TblInput headers={["श्रेणी","कुल","प्रशिक्षित","हिंदी में कार्य","शेष"]}
-                      rows={[[{label:"आशुलिपिक"},{key:"b2_shorthand_total"},{key:"b2_shorthand_trained"},{key:"b2_shorthand_working"},{key:"b2_shorthand_pending"}],[{label:"टंकक/लिपिक"},{key:"b2_typing_total"},{key:"b2_typing_trained"},{key:"b2_typing_working"},{key:"b2_typing_pending"}]]}
-                      data={data} onChange={(k,v)=>set(k,v)} />
-                  </div>
-                  <div style={{ borderTop:"1.5px solid #f1f5f9", paddingTop:12 }}>
-                    <div style={{ fontSize:12, fontWeight:700, color:"#475569", marginBottom:8 }}>2(iii). अनुवाद का ज्ञान</div>
-                    <Grid><Num label="अनुवाद कार्य - अधिकारी" value={data.b2_translation_officers} onChange={v=>set("b2_translation_officers",v)} /><Num label="अनुवाद कार्य - कर्मचारी" value={data.b2_translation_staff} onChange={v=>set("b2_translation_staff",v)} /><Num label="प्रशिक्षण प्राप्त" value={data.b2_translation_trained} onChange={v=>set("b2_translation_trained",v)} /><Num label="प्रशिक्षण शेष" value={data.b2_translation_pending} onChange={v=>set("b2_translation_pending",v)} /></Grid>
-                  </div>
-                </div>
-              </SecCard>
-              <SecCard title="3. कंप्यूटर पर हिंदी टंकण प्रशिक्षण" icon="💻" color={SECTION_COLORS[2]}>
-                <Grid cols={3}><Num label="कुल" value={data.b2_comp_total} onChange={v=>set("b2_comp_total",v)} /><Num label="प्रशिक्षित" value={data.b2_comp_trained} onChange={v=>set("b2_comp_trained",v)} /><Num label="हिंदी में कार्यरत" value={data.b2_comp_working} onChange={v=>set("b2_comp_working",v)} /></Grid>
-              </SecCard>
-              <SecCard title="5. कोड, मैनुअल, मानकीकृत प्रपत्र" icon="📚" color={SECTION_COLORS[3]}>
-                <Grid><Num label="कुल संख्या" value={data.b2_codes_total} onChange={v=>set("b2_codes_total",v)} /><Num label="द्विभाषी संख्या" value={data.b2_codes_bilingual} onChange={v=>set("b2_codes_bilingual",v)} /></Grid>
-              </SecCard>
-              <SecCard title="8. राजभाषा संबंधित निरीक्षण" icon="🔍" color={SECTION_COLORS[5]}>
-                <Grid><Num label="अनुभागों की कुल संख्या" value={data.b2_inspection_sections_total} onChange={v=>set("b2_inspection_sections_total",v)} /><Num label="निरीक्षित अनुभाग" value={data.b2_inspection_sections_inspected} onChange={v=>set("b2_inspection_sections_inspected",v)} /><Num label="अधीनस्थ कार्यालय कुल" value={data.b2_inspection_offices_total} onChange={v=>set("b2_inspection_offices_total",v)} /><Num label="निरीक्षित कार्यालय" value={data.b2_inspection_offices_inspected} onChange={v=>set("b2_inspection_offices_inspected",v)} /></Grid>
-              </SecCard>
-              <SecCard title="14. वेबसाइट" icon="🌐" color={SECTION_COLORS[8]}>
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  <Inp label="वेबसाइट का पता" value={data.b2_website_url} onChange={v=>set("b2_website_url",v)} placeholder="https://" />
-                  <Radio label="भाषा स्थिति" value={data.b2_website_type} onChange={v=>set("b2_website_type",v)} options={["केवल अंग्रेजी","आंशिक द्विभाषी","पूरी तरह द्विभाषी"]} />
-                </div>
-              </SecCard>
-              <SecCard title="15. उपलब्धियाँ एवं विशिष्ट आयोजन" icon="🏅" color={SECTION_COLORS[9]}>
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  {[["b2_hindi_diwas","(क) हिंदी दिवस/पखवाड़ा"],["b2_hindi_sangoshti","(ख) हिंदी संगोष्ठी"],["b2_other_programs","(ग) अन्य आयोजन"]].map(([k,l])=>(
-                    <div key={k}><label style={{ fontSize:11, fontWeight:700, color:"#475569", display:"block", marginBottom:4 }}>{l}</label>
-                      <input value={data[k]} onChange={e=>set(k,e.target.value)} style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:12 }} /></div>
-                  ))}
-                </div>
-              </SecCard>
-              <SecCard title="16. नराकास (अधीनस्थ कार्यालय)" icon="🤝" color={SECTION_COLORS[10]}>
-                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                  <Radio label="(क) क्या कार्यालय नराकास का सदस्य है?" value={data.b2_narakas} onChange={v=>set("b2_narakas",v)} options={["हाँ","नहीं"]} />
-                  {data.b2_narakas==="हाँ"&&<><Inp label="(ख) पिछली बैठक की तारीख" value={data.b2_narakas_lastMeeting} onChange={v=>set("b2_narakas_lastMeeting",v)} type="date" /><Radio label="(ग) विभागाध्यक्ष ने दोनों बैठकों में भाग लिया?" value={data.b2_narakas_participation} onChange={v=>set("b2_narakas_participation",v)} options={["हाँ","नहीं"]} /></>}
                 </div>
               </SecCard>
             </div>
@@ -758,18 +691,12 @@
                 <span style={{ fontSize:13, color:st.text, fontWeight:700 }}>🎯 अनुमानित स्कोर</span>
                 <span style={{ fontSize:22, fontWeight:800, color:st.text }}>{score}% — {st.label}</span>
               </div>
-              {/* Workflow arrow */}
-              <div style={{ background:"#eef2ff", border:"1.5px solid #6366f1", borderRadius:12, padding:"12px 18px", display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
-                <span style={{ fontSize:20 }}>📤</span>
-                <div style={{ fontSize:12, color:"#3730a3", fontWeight:700 }}>जमा करने पर यह रिपोर्ट स्वचालित रूप से <strong>AAO</strong> के इनबॉक्स में चली जाएगी।</div>
-              </div>
               <button onClick={handleSubmit} style={{ width:"100%", padding:"14px 0", borderRadius:14, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", fontWeight:800, fontSize:15, boxShadow:"0 6px 20px rgba(99,102,241,0.4)" }}>
                 ✅ रिपोर्ट अंतिम रूप से जमा करें और AAO को भेजें
               </button>
             </div>
           )}
 
-          {/* Nav */}
           <div style={{ display:"flex", justifyContent:"space-between", marginTop:18 }}>
             <button onClick={()=>setStep(s=>Math.max(0,s-1))} disabled={step===0}
               style={{ padding:"9px 22px", borderRadius:10, border:"1.5px solid #e2e8f0", background:step===0?"#f8fafc":"#fff", color:step===0?"#cbd5e1":"#475569", cursor:step===0?"not-allowed":"pointer", fontWeight:700, fontSize:13 }}>← पिछला</button>
@@ -785,7 +712,6 @@
     function Inbox({ reports, user, onAction }) {
       const r = ROLES[user.role];
 
-      // Which reports this role sees
       const visible = useMemo(()=>{
         if(user.role==="SECTION")    return reports.filter(x=>x.sectionName===user.name);
         if(user.role==="AAO")        return reports.filter(x=>x.status==="PENDING_AAO");
@@ -831,7 +757,6 @@
             filtered.map((rep,i)=>{
               const st   = STATUS[rep.status]||STATUS.DRAFT;
               const sc   = computeScore(rep);
-              const ss   = scoreStatus(sc);
               const c    = SECTION_COLORS[i%SECTION_COLORS.length];
               const canAct = (user.role==="AAO"&&rep.status==="PENDING_AAO") || (user.role==="SAO"&&rep.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&rep.status==="SAO_APPROVED");
               return (
@@ -847,7 +772,7 @@
                   </div>
                   <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
                     <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
-                    <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:12, background:ss.bg, color:ss.text }}>{sc}%</span>
+                    <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:12, background:"#f1f5f9", color:"#475569" }}>{sc}%</span>
                   </div>
                   {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>समीक्षा करें</span>}
                 </div>
@@ -863,7 +788,6 @@
       const r  = ROLES[user.role];
       const st = STATUS[report.status]||STATUS.DRAFT;
       const sc = computeScore(report);
-      const ss = scoreStatus(sc);
 
       const canAct = (user.role==="AAO"&&report.status==="PENDING_AAO") || (user.role==="SAO"&&report.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&report.status==="SAO_APPROVED");
 
@@ -874,17 +798,10 @@
       };
 
       const fieldsToShow = [
-        ["कार्यालय",report.officeNameAddress||"—"],["अधिकारी",report.officerName||"—"],["ई-मेल",report.email||"—"],["फोन",report.phone||"—"],
+        ["कार्यालय",report.officeNameAddress||"—"],["अधिकारी",report.officerName||"—"],
         ["तिमाही",QUARTERS.find(q=>q.id===report.quarter)?.label],["वर्ष",report.year],["क्षेत्र",report.region+" क्षेत्र"],["पावती",report.ackId],
-        ["1. मंत्री फाइलें (कुल)",report.b1_s1_totalFiles||"—"],["1. मंत्री फाइलें (हिंदी)",report.b1_s1_hindiFiles||"—"],
-        ["2. सचिव बैठकें (कुल)",report.b1_s2_totalMeetings||"—"],["2. हिंदी कार्यवाही",report.b1_s2_hindiMinutes||"—"],
-        ["6. पत्राचार 'क' (हिंदी/कुल)",`${report.b1_s6_ka_hindi||0}/${report.b1_s6_ka_total||0}`],
-        ["6. पत्राचार 'ख' (हिंदी/कुल)",`${report.b1_s6_kha_hindi||0}/${report.b1_s6_kha_total||0}`],
-        ["6. पत्राचार 'ग' (हिंदी/कुल)",`${report.b1_s6_ga_hindi||0}/${report.b1_s6_ga_total||0}`],
-        ["7. टिप्पण (हिंदी/कुल)",`${report.b1_s7_hindiPages||0}/${report.b1_s7_totalPages||0}`],
-        ["8. हिंदी कार्यशालाएं",report.b1_s8_workshops||"0"],
-        ["9. RAKS बैठक तिथि",report.b1_s9_meetingDate||"—"],
-        ["10. सलाहकार बैठक",report.b1_s10_meetingDate||"—"],
+        ["1. मंत्री फाइलें (कुल/हिंदी)",`${report.b1_s1_totalFiles||0}/${report.b1_s1_hindiFiles||0}`],
+        ["6. पत्राचार 'क' (कुल/हिंदी)",`${report.b1_s6_ka_total||0}/${report.b1_s6_ka_hindi||0}`],
       ];
 
       return (
@@ -896,11 +813,10 @@
             <div>
               <div style={{ fontSize:18, fontWeight:800, color:"#fff" }}>{report.sectionName}</div>
               <div style={{ fontSize:12, color:"rgba(255,255,255,0.8)" }}>{QUARTERS.find(q=>q.id===report.quarter)?.label} · {report.year} · {report.region} क्षेत्र</div>
-              <div style={{ fontSize:10, color:"rgba(255,255,255,0.6)", fontFamily:"monospace", marginTop:2 }}>{report.ackId}</div>
             </div>
             <div style={{ textAlign:"right" }}>
               <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:13, fontWeight:700, color:"#fff" }}>{st.icon} {st.label}</div>
-              <div style={{ fontSize:20, fontWeight:800, color:"#fff", marginTop:6 }}>{sc}% — {ss.label}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:"#fff", marginTop:6 }}>{sc}%</div>
             </div>
           </div>
 
@@ -928,19 +844,6 @@
             </div>
           )}
 
-          {/* Report data */}
-          <div style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
-            <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-              {fieldsToShow.map(([k,v])=>(
-                <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px" }}>
-                  <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700 }}>{k}</div>
-                  <div style={{ fontSize:12, color:"#1e293b", fontWeight:600 }}>{v}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Action panel */}
           {canAct && (
             <div style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
@@ -957,12 +860,6 @@
                   </button>
                 ))}
               </div>
-            </div>
-          )}
-
-          {!canAct && (
-            <div style={{ background:"#f8fafc", borderRadius:12, padding:"14px 18px", border:"1px solid #e2e8f0", fontSize:12, color:"#64748b", textAlign:"center" }}>
-              ℹ️ यह रिपोर्ट अभी <strong>{st.label}</strong> स्थिति में है। आपकी भूमिका में इस पर अभी कोई कार्रवाई उपलब्ध नहीं।
             </div>
           )}
         </div>
@@ -987,7 +884,6 @@
                 <div style={{ fontSize:13, fontWeight:700 }}>{log.user} <span style={{ fontWeight:400, color:"#64748b" }}>— {log.details}</span></div>
                 <div style={{ fontSize:10, color:"#94a3b8" }}>{fmtDt(log.ts)}</div>
               </div>
-              <span style={{ fontSize:10, background:"#f1f5f9", border:"1px solid #e2e8f0", padding:"2px 8px", borderRadius:10, color:"#64748b", flexShrink:0, alignSelf:"flex-start" }}>{log.role}</span>
             </div>
           ))}
         </div>
@@ -998,25 +894,49 @@
     function App() {
       const [user, setUser]       = useState(()=>{ try { return JSON.parse(sessionStorage.getItem("rb_user_v4")); } catch { return null; } });
       const [view, setView]       = useState("dashboard");
-      const [reports, setReports] = useState(()=>ls(STORAGE_KEY,[]));
+      // Firebase से डेटा लेने के लिए State
+      const [reports, setReports] = useState([]);
+
+      // 🌟 Firebase Real-time Listener 🌟
+      useEffect(() => {
+        // यह कोड Firebase 'reports' कलेक्शन को लगातार चेक करता रहेगा
+        const unsubscribe = db.collection("reports").onSnapshot((snapshot) => {
+          const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // डेटा को तारीख के हिसाब से सॉर्ट करें (नया सबसे ऊपर)
+          data.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+          setReports(data);
+        });
+        return () => unsubscribe();
+      }, []);
 
       const handleLogin = u => {
         setUser(u);
         sessionStorage.setItem("rb_user_v4", JSON.stringify(u));
         auditLog.add(u, "LOGIN", `${u.role} — ${u.name}`);
       };
+
       const handleLogout = () => {
         auditLog.add(user, "LOGOUT", "सत्र समाप्त");
         setUser(null);
         sessionStorage.removeItem("rb_user_v4");
         setView("dashboard");
       };
-      const handleSave = report => {
-        const next = [report, ...reports];
-        setReports(next); lsSet(STORAGE_KEY, next);
-        auditLog.add(user, "CREATE", `नई रिपोर्ट ${report.ackId} — ${report.sectionName} → AAO`);
-        setView("inbox");
+
+      // 🌟 Firebase में नई रिपोर्ट सेव करना 🌟
+      const handleSave = (report) => {
+        // Firestore खुद से ID जनरेट करता है, इसलिए हम अपना वाला हटा देंगे (Ack ID रहेगा)
+        const reportToSave = { ...report };
+        delete reportToSave.id; 
+        
+        db.collection("reports").add(reportToSave)
+          .then(() => {
+            auditLog.add(user, "CREATE", `नई रिपोर्ट ${report.ackId} — ${report.sectionName} → AAO`);
+            setView("inbox");
+          })
+          .catch(err => alert("डेटा सेव करने में समस्या आई: " + err.message));
       };
+
+      // 🌟 Firebase में रिपोर्ट अपडेट करना (AAO/SAO Action) 🌟
       const handleAction = (report, action, remark) => {
         const actionLabels = {
           AAO_APPROVED:  `AAO ने स्वीकृत किया और SAO को भेजा`,
@@ -1027,10 +947,16 @@
           REJECTED:      `हिंदी प्रकोष्ठ ने अस्वीकृत किया`,
         };
         const timelineEntry = { ts:new Date().toISOString(), role:user.role, name:user.name, action:actionLabels[action]||action, remark };
-        const updated = { ...report, status:action, timeline:[...(report.timeline||[]), timelineEntry] };
-        const next = reports.map(r=>r.id===report.id ? updated : r);
-        setReports(next); lsSet(STORAGE_KEY, next);
-        auditLog.add(user, "ACTION", `${report.ackId} — ${actionLabels[action]||action}${remark?` · "${remark}"`:""}`);
+        const newTimeline = [...(report.timeline||[]), timelineEntry];
+
+        db.collection("reports").doc(report.id).update({
+          status: action,
+          timeline: newTimeline
+        })
+        .then(() => {
+          auditLog.add(user, "ACTION", `${report.ackId} — ${actionLabels[action]||action}${remark?` · "${remark}"`:""}`);
+        })
+        .catch(err => alert("अपडेट करने में समस्या आई: " + err.message));
       };
 
       if(!user) return <LoginScreen onLogin={handleLogin} />;
@@ -1045,8 +971,8 @@
             {view==="audit"     && user.role==="HINDI_CELL" && <AuditView />}
           </main>
           <footer style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)", letterSpacing:"0.05em" }}>
-            <span>© 2025 Digital India · राजभाषा QPR v4.0 · अनुलग्नक-2</span>
-            <span>प्र.नि.ले.प. रेलवे, मुंबई · OM 20003/01/2024-रा.भा.(का.-2)</span>
+            <span>© 2026 Digital India · राजभाषा QPR v4.0</span>
+            <span>प्र.नि.ले.प. रेलवे, मुंबई</span>
           </footer>
         </div>
       );
