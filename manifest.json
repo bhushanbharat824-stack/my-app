@@ -1,0 +1,52 @@
+const CACHE_NAME = 'rajbhasha-qpr-cache-v1';
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  // अगर आपके पास लोकल आइकन्स हैं, तो उन्हें भी यहाँ जोड़ें
+  // './icon-192.png',
+  // './icon-512.png'
+];
+
+// 1. Install Event: फाइलों को कैश (Cache) में सेव करना
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
+  );
+  self.skipWaiting();
+});
+
+// 2. Activate Event: पुरानी कैश फाइलों को डिलीट करना
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// 3. Fetch Event: जब इंटरनेट न हो, तो कैश से फाइलें दिखाना
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // अगर फाइल कैश में है, तो उसे रिटर्न करें
+        if (response) {
+          return response;
+        }
+        // नहीं तो इंटरनेट से लाएं
+        return fetch(event.request);
+      })
+  );
+});
