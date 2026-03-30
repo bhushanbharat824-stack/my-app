@@ -330,6 +330,10 @@
       const inboxCount = { AAO: reports.filter(x=>x.status==="PENDING_AAO").length, SAO: reports.filter(x=>x.status==="AAO_APPROVED").length, HINDI_CELL: reports.filter(x=>x.status==="SAO_APPROVED").length };
       const pendingForMe = inboxCount[user.role] || 0;
 
+      // 🌟 डैशबोर्ड ट्रैकर के लिए State 🌟
+      const [trackQ, setTrackQ] = useState("Q1");
+      const [trackY, setTrackY] = useState("2025");
+
       const stats = [
         { label:"कुल रिपोर्टें",  value: myReports.length, icon:"📄", c:"#6366f1" },
         { label:"लंबित", value: pendingForMe, icon:"⏳", c:"#f59e0b" },
@@ -342,6 +346,45 @@
             <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>रिपोर्ट प्रवाह</div>
             <WorkflowPipeline currentRole={user.role} />
           </div>
+
+          {/* 🌟 अनुभाग जमा स्थिति ट्रैकर (केवल हिंदी प्रकोष्ठ के लिए) 🌟 */}
+          {user.role === "HINDI_CELL" && (
+            <div className="no-print" style={{ background:"#fff", borderRadius:16, padding:"20px", border:"1.5px solid #e2e8f0" }}>
+              <h3 style={{ fontSize:16, fontWeight:800, margin:"0 0 14px", color:"#1e293b" }}>📊 अनुभागों की रिपोर्ट जमा स्थिति</h3>
+              <div style={{ display:"flex", gap:10, marginBottom:16 }}>
+                <select value={trackQ} onChange={e=>setTrackQ(e.target.value)} style={{ padding:"8px 12px", borderRadius:8, border:"1px solid #cbd5e1", outline:"none", fontSize:13, fontWeight:600 }}>
+                  {QUARTERS.map(q=><option key={q.id} value={q.id}>{q.label}</option>)}
+                </select>
+                <select value={trackY} onChange={e=>setTrackY(e.target.value)} style={{ padding:"8px 12px", borderRadius:8, border:"1px solid #cbd5e1", outline:"none", fontSize:13, fontWeight:600 }}>
+                  {YEARS.map(y=><option key={y} value={y}>{y}</option>)}
+                </select>
+              </div>
+              
+              <div style={{ fontSize:13, fontWeight:700, color:"#475569", marginBottom:12 }}>
+                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r.year === trackY && r.quarter === trackQ).length}</span> / {SECTIONS_LIST.length}
+              </div>
+              
+              <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
+                {SECTIONS_LIST.map(sec => {
+                  // चेक करें कि इस अनुभाग ने चुनी हुई तिमाही की रिपोर्ट जमा की है या नहीं
+                  const hasSubmitted = reports.some(r => r.sectionName === sec && r.year === trackY && r.quarter === trackQ);
+                  return (
+                    <div key={sec} style={{ 
+                      padding:"8px 14px", borderRadius:8, fontSize:12, fontWeight:700,
+                      background: hasSubmitted ? "#f8fafc" : "#eef2ff",
+                      color: hasSubmitted ? "#94a3b8" : "#3730a3",
+                      border: `1px solid ${hasSubmitted ? '#e2e8f0' : '#c7d2fe'}`,
+                      opacity: hasSubmitted ? 0.6 : 1, // हल्का रंग (Light color)
+                      display: "flex", alignItems: "center", gap: "6px"
+                    }}>
+                      {sec} {hasSubmitted ? "✅" : ""}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))", gap:12 }}>
             {stats.map(s=>(
               <div key={s.label} style={{ background:`${s.c}15`, borderRadius:14, padding:"16px 18px", border:`1.5px solid ${s.c}30` }}>
@@ -349,6 +392,7 @@
               </div>
             ))}
           </div>
+
           {user.role!=="SECTION" && pendingForMe>0 && (
             <button onClick={()=>setView("inbox")} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:r.grad, borderRadius:14, padding:"16px 22px", border:"none", cursor:"pointer", color:"#fff", boxShadow:`0 4px 18px ${r.color}40`, }}>
               <div style={{ display:"flex", alignItems:"center", gap:12 }}><span style={{ fontSize:28 }}>📥</span><div style={{ textAlign:"left" }}><div style={{ fontWeight:800, fontSize:15 }}>{pendingForMe} रिपोर्ट आपकी प्रतीक्षा में</div></div></div><span style={{ fontSize:22 }}>→</span>
@@ -359,18 +403,19 @@
     }
 
     // ── 📝 REPORT FORM (Section only) ─────────────────────────────────────────────
-    function ReportForm({ onSave, user }) {
+    function ReportForm({ onSave, user, reports }) {
       const [data, setData] = useState(emptyForm());
       const [step, setStep] = useState(0);
       const [done, setDone] = useState(false);
       const set = (k,v) => setData(d=>({...d,[k]:v}));
       
-      // 🌟 शर्त: क्या यह Q4 है और क्या यूजर "हिंदी अनुभाग" है? 🌟
       const isQ4 = data.quarter==="Q4";
       const isHindiSection = user.name === "हिंदी अनुभाग";
       const showPart2 = isQ4 && isHindiSection; 
-      
       const totalSteps = showPart2 ? 4 : 3;
+
+      // 🌟 शर्त: क्या अनुभाग ने इस तिमाही की रिपोर्ट पहले ही भर दी है? 🌟
+      const alreadySubmitted = reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
       const handleSubmit = () => {
         const report = { ...data, sectionName:user.name, timestamp:new Date().toISOString(), status:"PENDING_AAO", timeline:[{ ts:new Date().toISOString(), role:"SECTION", name:user.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }] };
@@ -385,7 +430,6 @@
         </div>
       );
 
-      // डायनामिक स्टेप्स
       const steps = ["कार्यालय विवरण","भाग-I",...(showPart2?["भाग-II"]:[]),"पूर्वावलोकन"];
 
       return (
@@ -404,13 +448,10 @@
 
           {step===0 && (
             <div>
-              {/* 🌟 चेतावनी संदेश (Warning Banner) 🌟 */}
               {!showPart2 && (
                 <div style={{ background:"#fff7ed", border:"1.5px solid #f97316", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
                   <span style={{fontSize:24}}>📌</span>
-                  <div style={{ fontSize:12, color:"#9a3412", fontWeight:600 }}>
-                    राजभाषा रिपोर्ट भाग-II (वार्षिक रिपोर्ट) केवल <strong>"हिंदी अनुभाग"</strong> द्वारा <strong>Q4 (जनवरी-मार्च)</strong> तिमाही में भरा जाना है। आपके अनुभाग के लिए इसे निष्क्रिय (Disable) कर दिया गया है।
-                  </div>
+                  <div style={{ fontSize:12, color:"#9a3412", fontWeight:600 }}>राजभाषा रिपोर्ट भाग-II (वार्षिक रिपोर्ट) केवल <strong>"हिंदी अनुभाग"</strong> द्वारा <strong>Q4 (जनवरी-मार्च)</strong> में भरा जाना है। आपके लिए यह निष्क्रिय है।</div>
                 </div>
               )}
               
@@ -426,6 +467,14 @@
                   </Grid>
                 </div>
               </SecCard>
+
+              {/* 🌟 दोबारा रिपोर्ट भरने से रोकने के लिए चेतावनी 🌟 */}
+              {alreadySubmitted && (
+                <div style={{ background:"#fee2e2", color:"#991b1b", padding:"14px 18px", borderRadius:10, border:"1.5px solid #ef4444", fontSize:13, fontWeight:700, marginTop:16, display:"flex", gap:10, alignItems:"center" }}>
+                  <span style={{fontSize:24}}>⛔</span>
+                  <div>आप <strong>{data.year}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा नहीं भर सकते (निष्क्रिय)।</div>
+                </div>
+              )}
             </div>
           )}
 
@@ -445,7 +494,6 @@
             </div>
           )}
 
-          {/* 🌟 भाग-II तभी दिखेगा जब हिंदी अनुभाग हो 🌟 */}
           {step===2 && showPart2 && (
             <div>
               <div style={{ background:"#eff6ff", border:"2px solid #6366f1", borderRadius:12, padding:"10px 16px", marginBottom:14, fontSize:12, color:"#3730a3", fontWeight:700 }}>📋 भाग-II · केवल 31 मार्च को समाप्त तिमाही के साथ भरा जाए</div>
@@ -479,7 +527,13 @@
 
           <div className="no-print" style={{ display:"flex", justifyContent:"space-between", marginTop:18 }}>
             <button onClick={()=>setStep(s=>Math.max(0,s-1))} disabled={step===0} style={{ padding:"9px 22px", borderRadius:10, border:"1.5px solid #e2e8f0", background:step===0?"#f8fafc":"#fff", color:step===0?"#cbd5e1":"#475569", cursor:step===0?"not-allowed":"pointer", fontWeight:700, fontSize:13 }}>← पिछला</button>
-            {step<totalSteps-1&&(<button onClick={()=>setStep(s=>s+1)} style={{ padding:"9px 22px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", cursor:"pointer", fontWeight:700, fontSize:13 }}>अगला →</button>)}
+            {step<totalSteps-1&&(
+              <button 
+                onClick={()=>setStep(s=>s+1)} 
+                disabled={step===0 && alreadySubmitted} // 🌟 अगर जमा कर दी है तो बटन निष्क्रिय (Disabled) 🌟
+                style={{ padding:"9px 22px", borderRadius:10, border:"none", background:(step===0 && alreadySubmitted) ? "#cbd5e1" : "linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", cursor:(step===0 && alreadySubmitted) ? "not-allowed" : "pointer", fontWeight:700, fontSize:13 }}
+              >अगला →</button>
+            )}
           </div>
         </div>
       );
@@ -490,10 +544,8 @@
       const [q, setQ] = useState("Q1");
       const [y, setY] = useState(new Date().getFullYear().toString());
 
-      // चुनी गई तिमाही और वर्ष की सभी रिपोर्टों को फिल्टर करना
       const filtered = reports.filter(r => r.quarter === q && r.year === y);
       
-      // सभी अनुभागों के डेटा को एक साथ जोड़ना (Auto-Sum)
       const agg = {};
       filtered.forEach(r => {
         Object.keys(r).forEach(k => {
@@ -707,10 +759,18 @@
 
       return (
         <div style={{ minHeight:"100vh", background:"#f8fafc", fontFamily:"'Noto Sans Devanagari','Inter',sans-serif" }}>
+          
+          {/* 🌟 स्क्रॉल होने वाली सूचना (Marquee) 🌟 */}
+          <div className="no-print" style={{ background: "#fefcbf", color: "#975a16", padding: "8px 16px", fontSize: "13px", fontWeight: "700", borderBottom: "1px solid #fef08a", display: "flex", alignItems: "center" }}>
+            <span style={{ marginRight: "10px", fontSize: "16px" }}>📢</span>
+            <marquee scrollamount="5">रिपोर्ट भरने की अंतिम तिथि तिमाही समाप्ति से आगामी माह की 5 तारीख है। कृपया रिपोर्ट समय पर प्रस्तुत करें।</marquee>
+          </div>
+
           <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} />
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
             {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} />}
-            {view==="form"      && user.role==="SECTION" && <ReportForm onSave={handleSave} user={user} />}
+            {/* 🌟 Reports array को ReportForm में भेजा है ताकि डुप्लीकेट रोका जा सके 🌟 */}
+            {view==="form"      && user.role==="SECTION" && <ReportForm onSave={handleSave} user={user} reports={reports} />}
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} user={user} />}
           </main>
