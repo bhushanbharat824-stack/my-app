@@ -223,7 +223,16 @@
       const tryLogin = (role, name) => {
         const pw = PASSWORDS[role];
         if (pw && pass !== pw) { setErr("❌ गलत पासवर्ड"); return; }
-        onLogin({ role, name: name || ROLES[role].label });
+        
+        // 🌟 डमी लॉजिक: AAO और SAO के लिए 'मैप्ड सेक्शन' बनाना 🌟
+        if (role === "AAO" || role === "SAO") {
+           if (!section) { setErr("❌ कृपया अपना अनुभाग चुनें"); return; }
+           onLogin({ role: role, name: `${role}-${section}`, mappedSection: section });
+        } else if (role === "HINDI_CELL") {
+           onLogin({ role: role, name: "हिंदी प्रकोष्ठ", mappedSection: "ALL" });
+        } else {
+           onLogin({ role: role, name: name, mappedSection: name });
+        }
       };
 
       return (
@@ -266,21 +275,36 @@
                   <BackBtn onClick={()=>{setStep("choice"); setErr(""); setSection("");}} />
                 </div>
               )}
-              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
-              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
-              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr("");}} />}
+              {/* 🌟 AAO और SAO के लॉगिन में भी ड्रॉपडाउन जोड़ दिया गया है 🌟 */}
+              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
+              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
+              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
             </div>
           </div>
         </div>
       );
     }
 
-    function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack }) {
+    function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection }) {
       const r = ROLES[role];
+      const needsSection = role === "AAO" || role === "SAO"; // चेक करें कि क्या अनुभाग चुनना ज़रूरी है
+
       return (
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}><span style={{ fontSize:28 }}>{r.icon}</span><div><div style={{ fontSize:16, fontWeight:800, color:"#1e293b" }}>{r.label} प्रवेश</div></div></div>
-          <div><input type="password" value={pass} onChange={e=>{setPass(e.target.value); setErr("");}} onKeyDown={e=>e.key==="Enter"&&onLogin()} placeholder="पासवर्ड दर्ज करें..." autoFocus style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }} /></div>
+          
+          {/* 🌟 AAO/SAO के लिए अनुभाग चुनने का ऑप्शन 🌟 */}
+          {needsSection && (
+            <div>
+              <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>आप किस अनुभाग के {r.label} हैं?</label>
+              <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none", marginBottom:4 }}>
+                <option value="">-- अपना अनुभाग चुनें --</option>
+                {SECTIONS_LIST.map(s=><option key={s}>{s}</option>)}
+              </select>
+            </div>
+          )}
+
+          <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>पासवर्ड</label><input type="password" value={pass} onChange={e=>{setPass(e.target.value); setErr("");}} onKeyDown={e=>e.key==="Enter"&&onLogin()} placeholder="पासवर्ड दर्ज करें..." autoFocus style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }} /></div>
           {err && <ErrBox msg={err} />}
           <BtnPrimary grad={r.grad} onClick={onLogin}>लॉगिन करें →</BtnPrimary>
           <BackBtn onClick={onBack} />
@@ -327,10 +351,15 @@
     function Dashboard({ reports, user, setView }) {
       const r = ROLES[user.role];
       const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
-      const inboxCount = { AAO: reports.filter(x=>x.status==="PENDING_AAO").length, SAO: reports.filter(x=>x.status==="AAO_APPROVED").length, HINDI_CELL: reports.filter(x=>x.status==="SAO_APPROVED").length };
+      
+      // 🌟 स्मार्ट डैशबोर्ड काउंट (केवल अपने अनुभाग की पेंडिंग रिपोर्ट गिनेगा) 🌟
+      const inboxCount = { 
+        AAO: reports.filter(x=>x.status==="PENDING_AAO" && x.sectionName===user.mappedSection).length, 
+        SAO: reports.filter(x=>x.status==="AAO_APPROVED" && x.sectionName===user.mappedSection).length, 
+        HINDI_CELL: reports.filter(x=>x.status==="SAO_APPROVED").length 
+      };
       const pendingForMe = inboxCount[user.role] || 0;
 
-      // 🌟 डैशबोर्ड ट्रैकर के लिए State 🌟
       const [trackQ, setTrackQ] = useState("Q1");
       const [trackY, setTrackY] = useState("2025");
 
@@ -347,7 +376,6 @@
             <WorkflowPipeline currentRole={user.role} />
           </div>
 
-          {/* 🌟 अनुभाग जमा स्थिति ट्रैकर (केवल हिंदी प्रकोष्ठ के लिए) 🌟 */}
           {user.role === "HINDI_CELL" && (
             <div className="no-print" style={{ background:"#fff", borderRadius:16, padding:"20px", border:"1.5px solid #e2e8f0" }}>
               <h3 style={{ fontSize:16, fontWeight:800, margin:"0 0 14px", color:"#1e293b" }}>📊 अनुभागों की रिपोर्ट जमा स्थिति</h3>
@@ -366,7 +394,6 @@
               
               <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
                 {SECTIONS_LIST.map(sec => {
-                  // चेक करें कि इस अनुभाग ने चुनी हुई तिमाही की रिपोर्ट जमा की है या नहीं
                   const hasSubmitted = reports.some(r => r.sectionName === sec && r.year === trackY && r.quarter === trackQ);
                   return (
                     <div key={sec} style={{ 
@@ -374,7 +401,7 @@
                       background: hasSubmitted ? "#f8fafc" : "#eef2ff",
                       color: hasSubmitted ? "#94a3b8" : "#3730a3",
                       border: `1px solid ${hasSubmitted ? '#e2e8f0' : '#c7d2fe'}`,
-                      opacity: hasSubmitted ? 0.6 : 1, // हल्का रंग (Light color)
+                      opacity: hasSubmitted ? 0.6 : 1, 
                       display: "flex", alignItems: "center", gap: "6px"
                     }}>
                       {sec} {hasSubmitted ? "✅" : ""}
@@ -414,7 +441,6 @@
       const showPart2 = isQ4 && isHindiSection; 
       const totalSteps = showPart2 ? 4 : 3;
 
-      // 🌟 शर्त: क्या अनुभाग ने इस तिमाही की रिपोर्ट पहले ही भर दी है? 🌟
       const alreadySubmitted = reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
       const handleSubmit = () => {
@@ -468,11 +494,10 @@
                 </div>
               </SecCard>
 
-              {/* 🌟 दोबारा रिपोर्ट भरने से रोकने के लिए चेतावनी 🌟 */}
               {alreadySubmitted && (
                 <div style={{ background:"#fee2e2", color:"#991b1b", padding:"14px 18px", borderRadius:10, border:"1.5px solid #ef4444", fontSize:13, fontWeight:700, marginTop:16, display:"flex", gap:10, alignItems:"center" }}>
                   <span style={{fontSize:24}}>⛔</span>
-                  <div>आप <strong>{data.year}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा नहीं भर सकते (निष्क्रिय)।</div>
+                  <div>आप <strong>{data.year}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा नहीं भर सकते।</div>
                 </div>
               )}
             </div>
@@ -530,7 +555,7 @@
             {step<totalSteps-1&&(
               <button 
                 onClick={()=>setStep(s=>s+1)} 
-                disabled={step===0 && alreadySubmitted} // 🌟 अगर जमा कर दी है तो बटन निष्क्रिय (Disabled) 🌟
+                disabled={step===0 && alreadySubmitted} 
                 style={{ padding:"9px 22px", borderRadius:10, border:"none", background:(step===0 && alreadySubmitted) ? "#cbd5e1" : "linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", cursor:(step===0 && alreadySubmitted) ? "not-allowed" : "pointer", fontWeight:700, fontSize:13 }}
               >अगला →</button>
             )}
@@ -621,10 +646,12 @@
     // ── INBOX ───────────────────────────────────────────────────────────────────
     function Inbox({ reports, user, onAction }) {
       const r = ROLES[user.role];
+      
+      // 🌟 स्मार्ट इनबॉक्स: केवल अपने अनुभाग की रिपोर्ट दिखाएगा 🌟
       const visible = useMemo(()=>{
         if(user.role==="SECTION")    return reports.filter(x=>x.sectionName===user.name);
-        if(user.role==="AAO")        return reports.filter(x=>x.status==="PENDING_AAO");
-        if(user.role==="SAO")        return reports.filter(x=>["AAO_APPROVED"].includes(x.status));
+        if(user.role==="AAO")        return reports.filter(x=>x.status==="PENDING_AAO" && x.sectionName===user.mappedSection);
+        if(user.role==="SAO")        return reports.filter(x=>["AAO_APPROVED"].includes(x.status) && x.sectionName===user.mappedSection);
         if(user.role==="HINDI_CELL") return reports.filter(x=>x.status==="SAO_APPROVED");
         return reports;
       },[reports,user]);
@@ -769,7 +796,6 @@
           <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} />
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
             {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} />}
-            {/* 🌟 Reports array को ReportForm में भेजा है ताकि डुप्लीकेट रोका जा सके 🌟 */}
             {view==="form"      && user.role==="SECTION" && <ReportForm onSave={handleSave} user={user} reports={reports} />}
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} user={user} />}
