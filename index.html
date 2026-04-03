@@ -15,21 +15,13 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
-  
+  <script src="https://cdn.zohostatic.com/catalyst/serverless/v3.0.0/catalystWebSDK.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDeRIsBfRdGPXwgZxfi5QLR_dNXmV3E_1k",
-      authDomain: "rajbhasha-qpr.firebaseapp.com",
-      projectId: "rajbhasha-qpr",
-      storageBucket: "rajbhasha-qpr.firebasestorage.app",
-      messagingSenderId: "934013797840",
-      appId: "1:934013797840:web:c747cb5fd4b905885125d5",
-      measurementId: "G-WX79KCQ4XV"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    // ⚠️ यहाँ अपना Zoho Project ID और ZAID डालें
+    catalyst.initApp({
+      projectID: "35852000000012084",
+      zaid: "60047971666"
+    });
   </script>
 
   <style>
@@ -81,31 +73,7 @@
     const YEARS = ["2022","2023","2024","2025","2026","2027","2028","2029","2030"];
     const SECTION_COLORS = [{ bg:"#ede9fe", border:"#8b5cf6", text:"#5b21b6", icon:"📜" },{ bg:"#fce7f3", border:"#ec4899", text:"#9d174d", icon:"🏛️" },{ bg:"#fee2e2", border:"#ef4444", text:"#991b1b", icon:"📄" },{ bg:"#fff7ed", border:"#f97316", text:"#9a3412", icon:"📬" },{ bg:"#fefce8", border:"#eab308", text:"#854d0e", icon:"✉️" },{ bg:"#f0fdf4", border:"#22c55e", text:"#166534", icon:"📨" },{ bg:"#ecfeff", border:"#06b6d4", text:"#155e75", icon:"🗂️" },{ bg:"#eff6ff", border:"#3b82f6", text:"#1e40af", icon:"🎓" },{ bg:"#f0fdf4", border:"#10b981", text:"#065f46", icon:"🤝" },{ bg:"#fdf4ff", border:"#a855f7", text:"#581c87", icon:"📝" },{ bg:"#fff1f2", border:"#f43f5e", text:"#881337", icon:"🏆" },{ bg:"#f8fafc", border:"#64748b", text:"#0f172a", icon:"✅" }];
 
-    function ls(k, d = null) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
-    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-
-    const auditLog = {
-      add(user, action, details) {
-        const logs = ls(AUDIT_KEY, []);
-        lsSet(AUDIT_KEY, [{ id: Date.now(), ts: new Date().toISOString(), user: user.name, role: user.role, action, details }, ...logs].slice(0, 1000));
-      },
-      getAll: () => ls(AUDIT_KEY, []),
-      clear:  () => localStorage.removeItem(AUDIT_KEY),
-    };
-
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
-
-    function computeScore(r) {
-      if (!r) return 0;
-      const total6 = (parseFloat(r.b1_s6_ka_total)||0) + (parseFloat(r.b1_s6_kha_total)||0) + (parseFloat(r.b1_s6_ga_total)||0);
-      const hindi6 = (parseFloat(r.b1_s6_ka_hindi)||0) + (parseFloat(r.b1_s6_kha_hindi)||0) + (parseFloat(r.b1_s6_ga_hindi)||0);
-      const corrPct   = total6 > 0 ? hindi6 / total6 : 0;
-      const total7    = parseFloat(r.b1_s7_totalPages) || 0;
-      const hindi7    = parseFloat(r.b1_s7_hindiPages) || 0;
-      const notingPct = total7 > 0 ? hindi7 / total7 : 0;
-      const workshops = Math.min(parseFloat(r.b1_s8_workshops)||0, 4) / 4;
-      return Math.round((corrPct*0.40 + notingPct*0.30 + workshops*0.15 + (r.b1_s9_meetingDate?1:0)*0.10 + (r.b1_s10_meetingDate?1:0)*0.05)*100);
-    }
 
     function emptyForm() {
       return {
@@ -134,7 +102,6 @@
       };
     }
 
-    // ── Tiny UI ──────────────────────────────────────────────────────────────────
     const Inp = ({ label, value, onChange, type="text", placeholder="" }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
@@ -184,7 +151,6 @@
       </div>
     );
 
-    // ── Workflow pipeline display ─────────────────────────────────────────────────
     function WorkflowPipeline({ currentRole }) {
       const steps = [{ role:"SECTION", label:"अनुभाग", icon:"🏢" }, { role:"AAO", label:"AAO", icon:"🔎" }, { role:"SAO", label:"SAO", icon:"✅" }, { role:"HINDI_CELL", label:"हिंदी प्रकोष्ठ", icon:"🏛️" }];
       const currentIdx = ["SECTION","AAO","SAO","HINDI_CELL"].indexOf(currentRole);
@@ -206,7 +172,6 @@
       );
     }
 
-    // ── LOGIN ────────────────────────────────────────────────────────────────────
     function LoginScreen({ onLogin }) {
       const [step, setStep]       = useState("choice");
       const [section, setSection] = useState("");
@@ -224,7 +189,6 @@
         const pw = PASSWORDS[role];
         if (pw && pass !== pw) { setErr("❌ गलत पासवर्ड"); return; }
         
-        // 🌟 डमी लॉजिक: AAO और SAO के लिए 'मैप्ड सेक्शन' बनाना 🌟
         if (role === "AAO" || role === "SAO") {
            if (!section) { setErr("❌ कृपया अपना अनुभाग चुनें"); return; }
            onLogin({ role: role, name: `${role}-${section}`, mappedSection: section });
@@ -275,7 +239,6 @@
                   <BackBtn onClick={()=>{setStep("choice"); setErr(""); setSection("");}} />
                 </div>
               )}
-              {/* 🌟 AAO और SAO के लॉगिन में भी ड्रॉपडाउन जोड़ दिया गया है 🌟 */}
               {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
               {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
               {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
@@ -287,13 +250,10 @@
 
     function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection }) {
       const r = ROLES[role];
-      const needsSection = role === "AAO" || role === "SAO"; // चेक करें कि क्या अनुभाग चुनना ज़रूरी है
-
+      const needsSection = role === "AAO" || role === "SAO"; 
       return (
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}><span style={{ fontSize:28 }}>{r.icon}</span><div><div style={{ fontSize:16, fontWeight:800, color:"#1e293b" }}>{r.label} प्रवेश</div></div></div>
-          
-          {/* 🌟 AAO/SAO के लिए अनुभाग चुनने का ऑप्शन 🌟 */}
           {needsSection && (
             <div>
               <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>आप किस अनुभाग के {r.label} हैं?</label>
@@ -303,7 +263,6 @@
               </select>
             </div>
           )}
-
           <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>पासवर्ड</label><input type="password" value={pass} onChange={e=>{setPass(e.target.value); setErr("");}} onKeyDown={e=>e.key==="Enter"&&onLogin()} placeholder="पासवर्ड दर्ज करें..." autoFocus style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }} /></div>
           {err && <ErrBox msg={err} />}
           <BtnPrimary grad={r.grad} onClick={onLogin}>लॉगिन करें →</BtnPrimary>
@@ -315,11 +274,9 @@
     function BtnPrimary({ grad, onClick, children }) { return <button onClick={onClick} style={{ padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:grad, color:"#fff", fontWeight:800, fontSize:14, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{children}</button>; }
     function BackBtn({ onClick }) { return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>; }
 
-    // ── NAVBAR ───────────────────────────────────────────────────────────────────
-    function Navbar({ user, view, setView, onLogout }) {
+    function Navbar({ user, view, setView, onLogout, refreshData }) {
       const r = ROLES[user.role];
       const isHindiAdmin = user.role === "HINDI_CELL" || user.name === "हिंदी अनुभाग";
-      
       const tabs = [
         { id:"dashboard", icon:"📊", label:"डैशबोर्ड" },
         ...(user.role==="SECTION" ? [{ id:"form", icon:"📝", label:"नई रिपोर्ट" }] : []),
@@ -338,6 +295,9 @@
                 <span style={{ fontSize:15 }}>{t.icon}</span><span>{t.label}</span>
               </button>
             ))}
+            <button onClick={refreshData} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", borderRadius:10, cursor:"pointer", fontSize:12, border:"1px solid rgba(255,255,255,0.3)", background:"transparent", color:"#fff" }}>
+               🔄 रिफ्रेश
+            </button>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>{r.icon} {user.name}</div>
@@ -347,12 +307,10 @@
       );
     }
 
-    // ── DASHBOARD ────────────────────────────────────────────────────────────────
     function Dashboard({ reports, user, setView }) {
       const r = ROLES[user.role];
       const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
       
-      // 🌟 स्मार्ट डैशबोर्ड काउंट (केवल अपने अनुभाग की पेंडिंग रिपोर्ट गिनेगा) 🌟
       const inboxCount = { 
         AAO: reports.filter(x=>x.status==="PENDING_AAO" && x.sectionName===user.mappedSection).length, 
         SAO: reports.filter(x=>x.status==="AAO_APPROVED" && x.sectionName===user.mappedSection).length, 
@@ -429,7 +387,6 @@
       );
     }
 
-    // ── 📝 REPORT FORM (Section only) ─────────────────────────────────────────────
     function ReportForm({ onSave, user, reports }) {
       const [data, setData] = useState(emptyForm());
       const [step, setStep] = useState(0);
@@ -477,7 +434,7 @@
               {!showPart2 && (
                 <div style={{ background:"#fff7ed", border:"1.5px solid #f97316", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
                   <span style={{fontSize:24}}>📌</span>
-                  <div style={{ fontSize:12, color:"#9a3412", fontWeight:600 }}>राजभाषा रिपोर्ट भाग-II (वार्षिक रिपोर्ट) केवल <strong>"हिंदी अनुभाग"</strong> द्वारा <strong>Q4 (जनवरी-मार्च)</strong> में भरा जाना है। आपके लिए यह निष्क्रिय है।</div>
+                  <div style={{ fontSize:12, color:"#9a3412", fontWeight:600 }}>राजभाषा रिपोर्ट भाग-II केवल <strong>"हिंदी अनुभाग"</strong> द्वारा <strong>Q4</strong> में भरा जाना है। आपके लिए यह निष्क्रिय है।</div>
                 </div>
               )}
               
@@ -564,7 +521,6 @@
       );
     }
 
-    // ── 📑 CONSOLIDATED REPORT (नया फीचर) ─────────────────────────────────────────
     function ConsolidatedView({ reports }) {
       const [q, setQ] = useState("Q1");
       const [y, setY] = useState(new Date().getFullYear().toString());
@@ -643,11 +599,9 @@
       );
     }
 
-    // ── INBOX ───────────────────────────────────────────────────────────────────
     function Inbox({ reports, user, onAction }) {
       const r = ROLES[user.role];
       
-      // 🌟 स्मार्ट इनबॉक्स: केवल अपने अनुभाग की रिपोर्ट दिखाएगा 🌟
       const visible = useMemo(()=>{
         if(user.role==="SECTION")    return reports.filter(x=>x.sectionName===user.name);
         if(user.role==="AAO")        return reports.filter(x=>x.status==="PENDING_AAO" && x.sectionName===user.mappedSection);
@@ -698,7 +652,6 @@
       );
     }
 
-    // ── 🖨️ REPORT DETAIL ─────────────────────────
     function ReportDetail({ report, user, remark, setRemark, onAction, onBack }) {
       const r  = ROLES[user.role];
       const st = STATUS[report.status]||STATUS.DRAFT;
@@ -729,7 +682,7 @@
             <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
               {Object.entries(report).slice(0, 20).map(([k,v]) => {
-                if(typeof v === 'string' && v.length > 0 && !k.includes("id")) return (
+                if(typeof v === 'string' && v.length > 0 && !k.includes("id") && k !== "formData") return (
                   <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
                     <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700 }}>{k.replace('b1_','').replace('b2_','').replace('s1_','')}</div>
                     <div style={{ fontSize:12, color:"#1e293b", fontWeight:600 }}>{v}</div>
@@ -760,40 +713,99 @@
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
 
-      useEffect(() => {
-        const unsubscribe = db.collection("reports").onSnapshot((snapshot) => {
-          const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // 🌟 Zoho Catalyst Data Fetching 🌟
+      const fetchReports = () => {
+        if(!window.catalyst) return;
+        catalyst.app.zcql().executeZCQLQuery("SELECT * FROM RajbhashaReports").then((response) => {
+          const data = response.map(row => {
+            let dbRow = row.RajbhashaReports;
+            let parsedForm = {};
+            let parsedTimeline = [];
+            try { parsedForm = JSON.parse(dbRow.formData); } catch(e){}
+            try { parsedTimeline = JSON.parse(dbRow.timeline); } catch(e){}
+            
+            return {
+                ROWID: dbRow.ROWID,
+                id: dbRow.ROWID, // React के लिए
+                sectionName: dbRow.sectionName,
+                quarter: dbRow.quarter,
+                year: dbRow.year,
+                status: dbRow.status,
+                ackId: dbRow.ackId,
+                // 🌟 यहाँ हमने submittedAt को वापस timestamp से जोड़ दिया है 🌟
+                timestamp: dbRow.submittedAt, 
+                timeline: parsedTimeline,
+                ...parsedForm
+            };
+          });
           data.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
           setReports(data);
+        }).catch(err => {
+            console.log("Zoho No Data / Error:", err);
         });
-        return () => unsubscribe();
-      }, []);
+      };
+
+      useEffect(() => {
+        if(user) fetchReports();
+      }, [view, user]); 
 
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
 
+      // 🌟 Zoho में Save करने का कोड 🌟
       const handleSave = (report) => {
-        const reportToSave = { ...report }; delete reportToSave.id; 
-        db.collection("reports").add(reportToSave).then(() => setView("inbox"));
+        const formDataToSave = { ...report };
+        delete formDataToSave.sectionName; delete formDataToSave.quarter; delete formDataToSave.year;
+        delete formDataToSave.status; delete formDataToSave.ackId; delete formDataToSave.timestamp; delete formDataToSave.timeline;
+
+        const rowData = {
+            sectionName: report.sectionName,
+            quarter: report.quarter,
+            year: report.year,
+            status: report.status,
+            ackId: report.ackId,
+            // 🌟 यहाँ हमने timestamp की जगह submittedAt लिख दिया है 🌟
+            submittedAt: report.timestamp, 
+            timeline: JSON.stringify(report.timeline || []),
+            formData: JSON.stringify(formDataToSave)
+        };
+
+        catalyst.app.datastore().table('RajbhashaReports').insertRow(rowData)
+          .then(() => {
+            setView("inbox");
+          })
+          .catch(err => alert("Zoho Save Error: " + err.message));
       };
 
+      // 🌟 Zoho में Update करने का कोड 🌟
       const handleAction = (report, action, remark) => {
         const timelineEntry = { ts:new Date().toISOString(), role:user.role, name:user.name, action:action, remark };
-        db.collection("reports").doc(report.id).update({ status: action, timeline: [...(report.timeline||[]), timelineEntry] });
+        const newTimeline = [...(report.timeline||[]), timelineEntry];
+
+        const rowData = {
+            ROWID: report.ROWID,
+            status: action,
+            timeline: JSON.stringify(newTimeline)
+        };
+
+        catalyst.app.datastore().table('RajbhashaReports').updateRow(rowData)
+          .then(() => {
+            setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
+            setView("dashboard");
+          })
+          .catch(err => alert("Zoho Update Error: " + err.message));
       };
 
       if(!user) return <LoginScreen onLogin={handleLogin} />;
 
       return (
         <div style={{ minHeight:"100vh", background:"#f8fafc", fontFamily:"'Noto Sans Devanagari','Inter',sans-serif" }}>
-          
-          {/* 🌟 स्क्रॉल होने वाली सूचना (Marquee) 🌟 */}
           <div className="no-print" style={{ background: "#fefcbf", color: "#975a16", padding: "8px 16px", fontSize: "13px", fontWeight: "700", borderBottom: "1px solid #fef08a", display: "flex", alignItems: "center" }}>
             <span style={{ marginRight: "10px", fontSize: "16px" }}>📢</span>
             <marquee scrollamount="5">रिपोर्ट भरने की अंतिम तिथि तिमाही समाप्ति से आगामी माह की 5 तारीख है। कृपया रिपोर्ट समय पर प्रस्तुत करें।</marquee>
           </div>
 
-          <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} />
+          <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} refreshData={fetchReports} />
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
             {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} />}
             {view==="form"      && user.role==="SECTION" && <ReportForm onSave={handleSave} user={user} reports={reports} />}
