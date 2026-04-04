@@ -19,8 +19,8 @@
   <script>
     // ⚠️ यहाँ अपना Zoho Project ID और ZAID डालें
     catalyst.initApp({
-      projectID: "35852000000012084",
-      zaid: "60047971666"
+      projectID: "यहाँ_अपना_PROJECT_ID_डालें",
+      zaid: "यहाँ_अपना_ZAID_डालें"
     });
   </script>
 
@@ -295,6 +295,7 @@
                 <span style={{ fontSize:15 }}>{t.icon}</span><span>{t.label}</span>
               </button>
             ))}
+            {/* Zoho Manual Refresh Button */}
             <button onClick={refreshData} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", borderRadius:10, cursor:"pointer", fontSize:12, border:"1px solid rgba(255,255,255,0.3)", background:"transparent", color:"#fff" }}>
                🔄 रिफ्रेश
             </button>
@@ -732,8 +733,7 @@
                 year: dbRow.year,
                 status: dbRow.status,
                 ackId: dbRow.ackId,
-                // 🌟 यहाँ हमने submittedAt को वापस timestamp से जोड़ दिया है 🌟
-                timestamp: dbRow.submittedAt, 
+                timestamp: dbRow.timestamp,
                 timeline: parsedTimeline,
                 ...parsedForm
             };
@@ -747,7 +747,7 @@
 
       useEffect(() => {
         if(user) fetchReports();
-      }, [view, user]); 
+      }, [view, user]); // जब भी स्क्रीन बदलेगी, Zoho से नया डेटा आएगा
 
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
@@ -755,6 +755,7 @@
       // 🌟 Zoho में Save करने का कोड 🌟
       const handleSave = (report) => {
         const formDataToSave = { ...report };
+        // मुख्य कॉलम को formData से हटा दें ताकि जगह बचे
         delete formDataToSave.sectionName; delete formDataToSave.quarter; delete formDataToSave.year;
         delete formDataToSave.status; delete formDataToSave.ackId; delete formDataToSave.timestamp; delete formDataToSave.timeline;
 
@@ -764,8 +765,7 @@
             year: report.year,
             status: report.status,
             ackId: report.ackId,
-            // 🌟 यहाँ हमने timestamp की जगह submittedAt लिख दिया है 🌟
-            submittedAt: report.timestamp, 
+            timestamp: report.timestamp,
             timeline: JSON.stringify(report.timeline || []),
             formData: JSON.stringify(formDataToSave)
         };
@@ -790,6 +790,7 @@
 
         catalyst.app.datastore().table('RajbhashaReports').updateRow(rowData)
           .then(() => {
+            // स्क्रीन पर तुरंत अपडेट दिखाने के लिए
             setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
             setView("dashboard");
           })
