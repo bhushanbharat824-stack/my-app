@@ -16,12 +16,12 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script src="https://cdn.zohostatic.com/catalyst/serverless/v3.0.0/catalystWebSDK.js"></script>
+  <script src="https://static.zohocdn.com/catalyst/sdk/js/4.4.0/catalystWebSDK.js"></script>
   <script>
     // ✅ सही Web SDK Initialization
-    window.catalyst.initApp({
+    catalyst.initApp({
       projectID: "35852000000012084",
-      zaid: "60047971666"
+      zaid: "60047971666""
     });
   </script>
 
@@ -629,7 +629,7 @@
           {filtered.length===0?(
             <div style={{ textAlign:"center", padding:48, color:"#94a3b8" }}>
               <div style={{ fontSize:40 }}>{user.role==="SECTION"?"📂":"📭"}</div>
-              <div style={{ marginTop:10, fontSize:14 }}>{user.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में नहीं।"}</div>
+              <div style={{ marginTop:10, fontSize:14 }}>{user.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में working नहीं।"}</div>
             </div>
           ):(
             filtered.map((rep,i)=>{
@@ -713,13 +713,13 @@
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
 
-      // 🌟 Zoho Catalyst Data Fetching (सही Web SDK API) 🌟
+      // 🌟 Zoho Catalyst Data Fetching (Web SDK v4 API) 🌟
       const fetchReports = () => {
-        if(!window.catalyst) return;
+        if(typeof catalyst === 'undefined') return;
         
-        var zcql = window.catalyst.ZCatalystQL;
+        var zcql = catalyst.ZCatalystQL;
         zcql.executeQuery("SELECT * FROM RajbhashaReports").then((response) => {
-          // Web SDK में डेटा response.content के रूप में आता है
+          // ZCQL v4 API में डेटा response.content के अंदर आता है
           if (!response.content) return;
 
           const data = response.content.map(row => {
@@ -756,8 +756,13 @@
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
 
-      // 🌟 Zoho में Save करने का कोड (सही Web SDK API) 🌟
+      // 🌟 Zoho में Save करने का कोड (Web SDK v4 API) 🌟
       const handleSave = (report) => {
+        if(typeof catalyst === 'undefined') {
+            alert("Zoho SDK लोड नहीं हो पाया है। कृपया इंटरनेट कनेक्शन चेक करें।");
+            return;
+        }
+
         const formDataToSave = { ...report };
         delete formDataToSave.sectionName; delete formDataToSave.quarter; delete formDataToSave.year;
         delete formDataToSave.status; delete formDataToSave.ackId; delete formDataToSave.timestamp; delete formDataToSave.timeline;
@@ -773,8 +778,8 @@
             formData: JSON.stringify(formDataToSave)
         };
 
-        // Web SDK में table.addRow() इस्तेमाल होता है और डेटा Array [] में भेजा जाता है
-        var datastore = window.catalyst.table;
+        // Web SDK v4 में catalyst.table.addRow() इस्तेमाल होता है और डेटा Array [] में भेजा जाता है
+        var datastore = catalyst.table;
         var table = datastore.tableId('RajbhashaReports');
 
         table.addRow([rowData])
@@ -785,7 +790,7 @@
           .catch(err => alert("Zoho Save Error: " + err.message));
       };
 
-      // 🌟 Zoho में Update करने का कोड (सही Web SDK API) 🌟
+      // 🌟 Zoho में Update करने का कोड (Web SDK v4 API) 🌟
       const handleAction = (report, action, remark) => {
         const timelineEntry = { ts:new Date().toISOString(), role:user.role, name:user.name, action:action, remark };
         const newTimeline = [...(report.timeline||[]), timelineEntry];
@@ -796,10 +801,10 @@
             timeline: JSON.stringify(newTimeline)
         };
 
-        var datastore = window.catalyst.table;
+        var datastore = catalyst.table;
         var table = datastore.tableId('RajbhashaReports');
 
-        // Web SDK में table.updateRow() इस्तेमाल होता है
+        // Web SDK v4 में catalyst.table.updateRow() इस्तेमाल होता है
         table.updateRow([rowData])
           .then(() => {
             setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
