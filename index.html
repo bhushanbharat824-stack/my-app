@@ -18,7 +18,7 @@
 
   <script src="https://static.zohocdn.com/catalyst/sdk/js/4.4.0/catalystWebSDK.js"></script>
   <script>
-    // ✅ सही तरीका: बिना किसी वेरिएबल के सीधे चालू करें
+    // ✅ Zoho Initialization
     catalyst.initApp({
       projectID: "35852000000012084",
       zaid: "60047971666"
@@ -59,7 +59,8 @@
       REJECTED:        { id: "REJECTED",        label: "अस्वीकृत",        icon: "❌", color: "#dc2626", bg: "#fee2e2" },
     };
 
-    const SECTIONS_LIST = [
+    // डिफ़ॉल्ट अनुभाग (अगर डेटाबेस में कोई कस्टम लिस्ट नहीं मिलती है)
+    const DEFAULT_SECTIONS = [
       "आंतरिक नमूना लेखापरीक्षा", "सवनि I", "सवनि II", "समन्वय", "निरीक्षण", 
       "संगणक", "भंडार एवं निविदा", "स्थापना व व्यय", "एलएपी व कावभ लोअर परेल", 
       "रिपोर्ट", "मुंबई सेंट्रल आरएपी", "मुंबई सेंट्रल एलएपी", "एमआरवीसी", 
@@ -70,7 +71,7 @@
     ];
     
     const QUARTERS = [{ id: "Q1", label: "Q1 · अप्रैल–जून" },{ id: "Q2", label: "Q2 · जुलाई–सितंबर" },{ id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },{ id: "Q4", label: "Q4 · जनवरी–मार्च" }];
-    const YEARS = ["2022","2023","2024","2025","2026","2027","2028","2029","2030"];
+    const YEARS = ["2024","2025","2026","2027","2028","2029","2030"];
     const SECTION_COLORS = [{ bg:"#ede9fe", border:"#8b5cf6", text:"#5b21b6", icon:"📜" },{ bg:"#fce7f3", border:"#ec4899", text:"#9d174d", icon:"🏛️" },{ bg:"#fee2e2", border:"#ef4444", text:"#991b1b", icon:"📄" },{ bg:"#fff7ed", border:"#f97316", text:"#9a3412", icon:"📬" },{ bg:"#fefce8", border:"#eab308", text:"#854d0e", icon:"✉️" },{ bg:"#f0fdf4", border:"#22c55e", text:"#166534", icon:"📨" },{ bg:"#ecfeff", border:"#06b6d4", text:"#155e75", icon:"🗂️" },{ bg:"#eff6ff", border:"#3b82f6", text:"#1e40af", icon:"🎓" },{ bg:"#f0fdf4", border:"#10b981", text:"#065f46", icon:"🤝" },{ bg:"#fdf4ff", border:"#a855f7", text:"#581c87", icon:"📝" },{ bg:"#fff1f2", border:"#f43f5e", text:"#881337", icon:"🏆" },{ bg:"#f8fafc", border:"#64748b", text:"#0f172a", icon:"✅" }];
 
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
@@ -172,7 +173,7 @@
       );
     }
 
-    function LoginScreen({ onLogin }) {
+    function LoginScreen({ onLogin, sectionsList }) {
       const [step, setStep]       = useState("choice");
       const [section, setSection] = useState("");
       const [pass, setPass]       = useState("");
@@ -231,7 +232,7 @@
                   <div>
                     <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }}>
                       <option value="">-- अनुभाग चुनें --</option>
-                      {SECTIONS_LIST.map(s=><option key={s}>{s}</option>)}
+                      {sectionsList.map(s=><option key={s}>{s}</option>)}
                     </select>
                   </div>
                   {err && <ErrBox msg={err} />}
@@ -239,16 +240,16 @@
                   <BackBtn onClick={()=>{setStep("choice"); setErr(""); setSection("");}} />
                 </div>
               )}
-              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
-              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
-              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
+              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} sectionsList={sectionsList} />}
+              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} sectionsList={sectionsList} />}
+              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} sectionsList={sectionsList} />}
             </div>
           </div>
         </div>
       );
     }
 
-    function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection }) {
+    function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection, sectionsList }) {
       const r = ROLES[role];
       const needsSection = role === "AAO" || role === "SAO"; 
       return (
@@ -259,7 +260,7 @@
               <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>आप किस अनुभाग के {r.label} हैं?</label>
               <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none", marginBottom:4 }}>
                 <option value="">-- अपना अनुभाग चुनें --</option>
-                {SECTIONS_LIST.map(s=><option key={s}>{s}</option>)}
+                {sectionsList.map(s=><option key={s}>{s}</option>)}
               </select>
             </div>
           )}
@@ -274,7 +275,7 @@
     function BtnPrimary({ grad, onClick, children }) { return <button onClick={onClick} style={{ padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:grad, color:"#fff", fontWeight:800, fontSize:14, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{children}</button>; }
     function BackBtn({ onClick }) { return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>; }
 
-    function Navbar({ user, view, setView, onLogout, refreshData }) {
+    function Navbar({ user, view, setView, onLogout, refreshData, isRefreshing }) {
       const r = ROLES[user.role];
       const isHindiAdmin = user.role === "HINDI_CELL" || user.name === "हिंदी अनुभाग";
       const tabs = [
@@ -282,6 +283,7 @@
         ...(user.role==="SECTION" ? [{ id:"form", icon:"📝", label:"नई रिपोर्ट" }] : []),
         { id:"inbox", icon:"📥", label: user.role==="SECTION" ? "मेरी रिपोर्टें" : "आवक रिपोर्टें" },
         ...(isHindiAdmin ? [{ id:"consolidated", icon:"📑", label:"समेकित रिपोर्ट" }] : []),
+        ...(isHindiAdmin ? [{ id:"master", icon:"⚙️", label:"मास्टर कंट्रोल" }] : []),
       ];
 
       return (
@@ -295,8 +297,8 @@
                 <span style={{ fontSize:15 }}>{t.icon}</span><span>{t.label}</span>
               </button>
             ))}
-            <button onClick={refreshData} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", borderRadius:10, cursor:"pointer", fontSize:12, border:"1px solid rgba(255,255,255,0.3)", background:"transparent", color:"#fff" }}>
-               🔄 रिफ्रेश
+            <button onClick={refreshData} disabled={isRefreshing} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 12px", borderRadius:10, cursor: isRefreshing ? "wait" : "pointer", fontSize:12, border:"1px solid rgba(255,255,255,0.3)", background: isRefreshing ? "rgba(255,255,255,0.2)" : "transparent", color:"#fff", transition:"all 0.2s" }}>
+               {isRefreshing ? "⏳ हो रहा है..." : "🔄 रिफ्रेश"}
             </button>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -307,7 +309,7 @@
       );
     }
 
-    function Dashboard({ reports, user, setView }) {
+    function Dashboard({ reports, user, setView, sectionsList }) {
       const r = ROLES[user.role];
       const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
       
@@ -347,11 +349,11 @@
               </div>
               
               <div style={{ fontSize:13, fontWeight:700, color:"#475569", marginBottom:12 }}>
-                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r.year === trackY && r.quarter === trackQ).length}</span> / {SECTIONS_LIST.length}
+                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r.year === trackY && r.quarter === trackQ).length}</span> / {sectionsList.length}
               </div>
               
               <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
-                {SECTIONS_LIST.map(sec => {
+                {sectionsList.map(sec => {
                   const hasSubmitted = reports.some(r => r.sectionName === sec && r.year === trackY && r.quarter === trackQ);
                   return (
                     <div key={sec} style={{ 
@@ -707,105 +709,188 @@
       );
     }
 
+    // 🌟 नया फीचर: मास्टर कंट्रोल (Admin Panel) 🌟
+    function MasterControl({ reports, setReports, sectionsList, setSectionsList, settingsRowId, setSettingsRowId, setIsRefreshing, fetchReports }) {
+      const [newSec, setNewSec] = useState("");
+
+      const handleReset = async () => {
+        const pass = prompt("⚠️ डेंजर ज़ोन: क्या आप सच में सिस्टम की सभी रिपोर्ट डिलीट करना चाहते हैं?\nपुष्टि के लिए कैपिटल में 'RESET' टाइप करें:");
+        if(pass !== "RESET") return;
+
+        setIsRefreshing(true);
+        try {
+          const table = catalyst.table.tableId('RajbhashaReports');
+          // एक-एक करके सारी रिपोर्ट डिलीट करें
+          for (let r of reports) {
+            await table.deleteRow(r.ROWID);
+          }
+          setReports([]);
+          alert("✅ सिस्टम पूरी तरह से रीसेट हो गया है! सारा पुराना डेटा मिटा दिया गया है।");
+        } catch(e) {
+          alert("Error deleting: " + e.message);
+        }
+        setIsRefreshing(false);
+      };
+
+      const handleSaveSettings = async (newList) => {
+        setIsRefreshing(true);
+        try {
+          const table = catalyst.table.tableId('RajbhashaReports');
+          const rowData = { sectionName: "SYSTEM_CONFIG", status: "SETTINGS", formData: JSON.stringify({ sections: newList }) };
+          
+          if (settingsRowId) {
+             await table.updateRow([{ ROWID: settingsRowId, ...rowData }]);
+          } else {
+             const res = await table.addRow([rowData]);
+             setSettingsRowId(res[0].ROWID);
+          }
+          setSectionsList(newList);
+        } catch(e) {
+          alert("Error saving sections: " + e.message);
+        }
+        setIsRefreshing(false);
+      };
+
+      const handleAdd = () => {
+        if(!newSec.trim()) return;
+        if(sectionsList.includes(newSec.trim())) { alert("यह अनुभाग पहले से मौजूद है!"); return; }
+        const updated = [...sectionsList, newSec.trim()];
+        handleSaveSettings(updated);
+        setNewSec("");
+      };
+
+      const handleDel = (sec) => {
+        if(!window.confirm(`क्या आप सच में '${sec}' को मास्टर लिस्ट से हटाना चाहते हैं?`)) return;
+        const updated = sectionsList.filter(s => s !== sec);
+        handleSaveSettings(updated);
+      };
+
+      return (
+         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 16, padding: 24 }}>
+               <h2 style={{ color: "#1e293b", margin: "0 0 16px 0", fontSize: 18, fontWeight: 800 }}>⚙️ अनुभाग प्रबंधन (Master Data)</h2>
+               <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                  <input value={newSec} onChange={e=>setNewSec(e.target.value)} placeholder="नए अनुभाग का नाम टाइप करें..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #cbd5e1", outline: "none", fontSize: 14 }} />
+                  <button onClick={handleAdd} style={{ background: "#6366f1", color: "#fff", border: "none", padding: "0 24px", borderRadius: 10, fontWeight: "bold", cursor: "pointer", fontSize: 14 }}>+ जोड़ें</button>
+               </div>
+               
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+                  {sectionsList.map(s => (
+                     <div key={s} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 700, color: "#475569" }}>
+                        <span>{s}</span>
+                        <button onClick={()=>handleDel(s)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 20, lineHeight: 1 }}>×</button>
+                     </div>
+                  ))}
+               </div>
+            </div>
+
+            <div style={{ background: "#fee2e2", border: "2px solid #ef4444", borderRadius: 16, padding: 24 }}>
+               <h2 style={{ color: "#991b1b", margin: "0 0 10px 0", fontSize: 18, fontWeight: 800 }}>⚠️ डेंजर ज़ोन (मास्टर रीसेट)</h2>
+               <p style={{ color: "#7f1d1d", fontSize: 13, marginBottom: 20 }}>यह बटन सिस्टम से सभी अनुभागों की जमा की गई <b>सभी रिपोर्टों को हमेशा के लिए</b> डिलीट कर देगा। इसका इस्तेमाल केवल नई तिमाही (Quarter) शुरू करने से पहले करें। मास्टर डेटा (अनुभागों के नाम) डिलीट नहीं होंगे।</p>
+               <button onClick={handleReset} style={{ background: "#dc2626", color: "#fff", border: "none", padding: "12px 24px", borderRadius: 10, fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+                  <span style={{ fontSize: 18 }}>🗑️</span> पूरा सिस्टम रीसेट करें (Delete All Data)
+               </button>
+            </div>
+         </div>
+      )
+    }
+
     // ── ROOT ──────────────────────────────────────────────────────────────────────
     function App() {
       const [user, setUser]       = useState(()=>{ try { return JSON.parse(sessionStorage.getItem("rb_user_v4")); } catch { return null; } });
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
+      const [isRefreshing, setIsRefreshing] = useState(false); 
+      
+      // ✅ डायनामिक मास्टर डेटा स्टेट्स
+      const [sectionsList, setSectionsList] = useState(DEFAULT_SECTIONS);
+      const [settingsRowId, setSettingsRowId] = useState(null);
 
-      // 🌟 Zoho Catalyst Data Fetching (Web SDK v4 API) 🌟
+      // 🌟 Zoho Catalyst Data Fetching 🌟
       const fetchReports = () => {
         if(typeof catalyst === 'undefined') return;
         
+        setIsRefreshing(true); 
+
         catalyst.ZCatalystQL.executeQuery("SELECT * FROM RajbhashaReports").then((response) => {
           let rows = response.content || response; 
 
-          const data = rows.map(row => {
+          const validReports = [];
+          let fetchedSections = null;
+          let sRowId = null;
+
+          rows.forEach(row => {
             let dbRow = row.RajbhashaReports;
-            let parsedForm = {};
-            let parsedTimeline = [];
-            try { parsedForm = JSON.parse(dbRow.formData); } catch(e){}
-            try { parsedTimeline = JSON.parse(dbRow.timeline); } catch(e){}
             
-            return {
-                ROWID: dbRow.ROWID,
-                id: dbRow.ROWID, 
-                sectionName: dbRow.sectionName,
-                quarter: dbRow.quarter,
-                year: dbRow.year,
-                status: dbRow.status,
-                ackId: dbRow.ackId,
-                timestamp: dbRow.submittedAt, 
-                timeline: parsedTimeline,
-                ...parsedForm
-            };
+            // ✅ अगर यह मास्टर डेटा वाली रो है
+            if (dbRow.status === "SETTINGS" && dbRow.sectionName === "SYSTEM_CONFIG") {
+                sRowId = dbRow.ROWID;
+                try { fetchedSections = JSON.parse(dbRow.formData).sections; } catch(e){}
+            } 
+            // ✅ नॉर्मल रिपोर्ट है
+            else {
+                let parsedForm = {};
+                let parsedTimeline = [];
+                try { parsedForm = JSON.parse(dbRow.formData); } catch(e){}
+                try { parsedTimeline = JSON.parse(dbRow.timeline); } catch(e){}
+                
+                validReports.push({
+                    ROWID: dbRow.ROWID,
+                    id: dbRow.ROWID, 
+                    sectionName: dbRow.sectionName,
+                    quarter: dbRow.quarter,
+                    year: dbRow.year,
+                    status: dbRow.status,
+                    ackId: dbRow.ackId,
+                    timestamp: dbRow.submittedAt, 
+                    timeline: parsedTimeline,
+                    ...parsedForm
+                });
+            }
           });
-          data.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-          setReports(data);
+
+          // मास्टर डेटा सेट करें
+          if (fetchedSections) setSectionsList(fetchedSections);
+          setSettingsRowId(sRowId);
+
+          // रिपोर्ट सेट करें
+          validReports.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+          setReports(validReports);
+          setIsRefreshing(false);
+
         }).catch(err => {
             console.log("Zoho Data Fetch Error:", err);
+            setIsRefreshing(false);
         });
       };
 
-      useEffect(() => {
-        if(user) fetchReports();
-      }, [view, user]); 
+      // ✅ ऐप लोड होते ही डेटा लाएँ (ताकि लॉगिन स्क्रीन पर नए अनुभाग दिखें)
+      useEffect(() => { fetchReports(); }, []);
 
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
 
-      // 🌟 Zoho में Save करने का कोड (Web SDK API) 🌟
       const handleSave = (report) => {
-        if(typeof catalyst === 'undefined') {
-            alert("Zoho SDK लोड नहीं हो पाया है। कृपया इंटरनेट कनेक्शन चेक करें।");
-            return;
-        }
+        if(typeof catalyst === 'undefined') { alert("Zoho SDK लोड नहीं हो पाया है।"); return; }
 
         const formDataToSave = { ...report };
         delete formDataToSave.sectionName; delete formDataToSave.quarter; delete formDataToSave.year;
         delete formDataToSave.status; delete formDataToSave.ackId; delete formDataToSave.timestamp; delete formDataToSave.timeline;
 
-        const rowData = {
-            sectionName: report.sectionName,
-            quarter: report.quarter,
-            year: report.year,
-            status: report.status,
-            ackId: report.ackId,
-            submittedAt: report.timestamp, 
-            timeline: JSON.stringify(report.timeline || []),
-            formData: JSON.stringify(formDataToSave)
-        };
+        const rowData = { sectionName: report.sectionName, quarter: report.quarter, year: report.year, status: report.status, ackId: report.ackId, submittedAt: report.timestamp, timeline: JSON.stringify(report.timeline || []), formData: JSON.stringify(formDataToSave) };
 
-        // ✅ सही Web SDK Datastore कमांड
-        catalyst.table.tableId('RajbhashaReports').addRow(rowData)
-          .then(() => {
-            setView("inbox");
-            fetchReports(); // सेव होने के बाद लिस्ट अपडेट करें
-          })
-          .catch(err => alert("Zoho Save Error: " + err.message));
+        catalyst.table.tableId('RajbhashaReports').addRow([rowData]).then(() => { setView("inbox"); fetchReports(); }).catch(err => alert("Zoho Save Error: " + err.message));
       };
 
-      // 🌟 Zoho में Update करने का कोड (Web SDK API) 🌟
       const handleAction = (report, action, remark) => {
         const timelineEntry = { ts:new Date().toISOString(), role:user.role, name:user.name, action:action, remark };
         const newTimeline = [...(report.timeline||[]), timelineEntry];
+        const rowData = { ROWID: report.ROWID, status: action, timeline: JSON.stringify(newTimeline) };
 
-        const rowData = {
-            ROWID: report.ROWID,
-            status: action,
-            timeline: JSON.stringify(newTimeline)
-        };
-
-        // ✅ सही Web SDK Datastore अपडेट कमांड
-        catalyst.table.tableId('RajbhashaReports').updateRow(rowData)
-          .then(() => {
-            setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
-            setView("dashboard");
-          })
-          .catch(err => alert("Zoho Update Error: " + err.message));
+        catalyst.table.tableId('RajbhashaReports').updateRow([rowData]).then(() => { setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r)); setView("dashboard"); }).catch(err => alert("Zoho Update Error: " + err.message));
       };
 
-      if(!user) return <LoginScreen onLogin={handleLogin} />;
+      if(!user) return <LoginScreen onLogin={handleLogin} sectionsList={sectionsList} />;
 
       return (
         <div style={{ minHeight:"100vh", background:"#f8fafc", fontFamily:"'Noto Sans Devanagari','Inter',sans-serif" }}>
@@ -814,12 +899,17 @@
             <marquee scrollamount="5">रिपोर्ट भरने की अंतिम तिथि तिमाही समाप्ति से आगामी माह की 5 तारीख है। कृपया रिपोर्ट समय पर प्रस्तुत करें।</marquee>
           </div>
 
-          <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} refreshData={fetchReports} />
+          <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} refreshData={fetchReports} isRefreshing={isRefreshing} />
+          
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
-            {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} />}
+            {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} sectionsList={sectionsList} />}
             {view==="form"      && user.role==="SECTION" && <ReportForm onSave={handleSave} user={user} reports={reports} />}
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} user={user} />}
+            {/* ✅ नया मास्टर कंट्रोल व्यू */}
+            {view==="master" && user.role==="HINDI_CELL" && (
+                <MasterControl reports={reports} setReports={setReports} sectionsList={sectionsList} setSectionsList={setSectionsList} settingsRowId={settingsRowId} setSettingsRowId={setSettingsRowId} setIsRefreshing={setIsRefreshing} fetchReports={fetchReports} />
+            )}
           </main>
           <footer className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)" }}>
             <span>© 2026 Digital India · राजभाषा QPR v4.0</span>
