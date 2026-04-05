@@ -16,12 +16,12 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script src="https://cdn.zohostatic.com/catalyst/serverless/v3.0.0/catalystWebSDK.js"></script>
+  <script src="https://cdn.zohostatic.com/catalyst/serverless/3.0.0/catalystWebSDK.js"></script>
   <script>
-    // ✅ सही तरीका: इसे सीधे चालू करें, किसी Variable में सेव न करें
+    // ✅ सही तरीका: सीधा कनेक्शन (कोई फालतू zohoApp Variable नहीं)
     window.catalyst.initApp({
-      projectID: "35852000000012084",
-      zaid: "60047971666"
+      projectID: "यहाँ_अपना_PROJECT_ID_डालें",
+      zaid: "यहाँ_अपना_ZAID_डालें"
     });
   </script>
 
@@ -454,7 +454,7 @@
               {alreadySubmitted && (
                 <div style={{ background:"#fee2e2", color:"#991b1b", padding:"14px 18px", borderRadius:10, border:"1.5px solid #ef4444", fontSize:13, fontWeight:700, marginTop:16, display:"flex", gap:10, alignItems:"center" }}>
                   <span style={{fontSize:24}}>⛔</span>
-                  <div>आप <strong>{data.year}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा नहीं भर सकते।</div>
+                  <div>आप <strong>{data.year}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा full नहीं भर सकते।</div>
                 </div>
               )}
             </div>
@@ -713,11 +713,11 @@
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
 
-      // 🌟 Zoho Catalyst Data Fetching (सही API) 🌟
+      // 🌟 Zoho Catalyst Data Fetching 🌟
       const fetchReports = () => {
         if(!window.catalyst) return;
         
-        // ✅ सीधे 'window.catalyst' से डेटा लाएँ
+        // ✅ सीधा कनेक्शन
         window.catalyst.zcql().executeZCQLQuery("SELECT * FROM RajbhashaReports").then((response) => {
           const data = response.map(row => {
             let dbRow = row.RajbhashaReports;
@@ -753,7 +753,7 @@
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
 
-      // 🌟 Zoho में Save करने का कोड (सही API) 🌟
+      // 🌟 Zoho में Save करने का कोड 🌟
       const handleSave = (report) => {
         const formDataToSave = { ...report };
         delete formDataToSave.sectionName; delete formDataToSave.quarter; delete formDataToSave.year;
@@ -770,7 +770,7 @@
             formData: JSON.stringify(formDataToSave)
         };
 
-        // ✅ सीधे 'window.catalyst' से सेव करें
+        // ✅ सीधा कनेक्शन
         window.catalyst.datastore().table('RajbhashaReports').insertRow(rowData)
           .then(() => {
             setView("inbox");
@@ -778,7 +778,7 @@
           .catch(err => alert("Zoho Save Error: " + err.message));
       };
 
-      // 🌟 Zoho में Update करने का कोड (सही API) 🌟
+      // 🌟 Zoho में Update करने का कोड 🌟
       const handleAction = (report, action, remark) => {
         const timelineEntry = { ts:new Date().toISOString(), role:user.role, name:user.name, action:action, remark };
         const newTimeline = [...(report.timeline||[]), timelineEntry];
@@ -789,7 +789,7 @@
             timeline: JSON.stringify(newTimeline)
         };
 
-        // ✅ सीधे 'window.catalyst' से अपडेट करें
+        // ✅ सीधा कनेक्शन
         window.catalyst.datastore().table('RajbhashaReports').updateRow(rowData)
           .then(() => {
             setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
