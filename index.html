@@ -18,7 +18,7 @@
 
   <script src="https://static.zohocdn.com/catalyst/sdk/js/4.4.0/catalystWebSDK.js"></script>
   <script>
-    // ✅ Zoho Initialization
+    // ✅ Zoho Web SDK Initialization
     catalyst.initApp({
       projectID: "35852000000012084",
       zaid: "60047971666"
@@ -35,6 +35,13 @@
   </style>
 </head>
 <body>
+  <div id="startup-loader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#f8fafc; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Noto Sans Devanagari', sans-serif; transition:opacity 0.5s;">
+     <div style="width:50px; height:50px; border:5px solid #e2e8f0; border-top-color:#6366f1; border-radius:50%; animation:spin 1s linear infinite;"></div>
+     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+     <h2 style="color:#1e293b; margin-top:20px; font-weight:800; font-size:18px;">राजभाषा QPR लोड हो रहा है...</h2>
+     <p style="color:#64748b; font-size:13px; margin-top:5px;">सिक्योर सिस्टम तैयार किया जा रहा है</p>
+  </div>
+
   <div id="root"></div>
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
@@ -59,18 +66,19 @@
       REJECTED:        { id: "REJECTED",        label: "अस्वीकृत",        icon: "❌", color: "#dc2626", bg: "#fee2e2" },
     };
 
-    // डिफ़ॉल्ट अनुभाग (अगर डेटाबेस में कोई कस्टम लिस्ट नहीं मिलती है)
+    // डिफ़ॉल्ट अनुभाग (मास्टर डेटाबेस से लोड होंगे, नहीं तो ये दिखेंगे)
     const DEFAULT_SECTIONS = [
       "आंतरिक नमूना लेखापरीक्षा", "सवनि I", "सवनि II", "समन्वय", "निरीक्षण", 
       "संगणक", "भंडार एवं निविदा", "स्थापना व व्यय", "एलएपी व कावभ लोअर परेल", 
       "रिपोर्ट", "मुंबई सेंट्रल आरएपी", "मुंबई सेंट्रल एलएपी", "एमआरवीसी", 
       "बुक्स व बजट", "प्रशिक्षण", "एलएपी1", "प्रशासन", "वड़ोदरा मंडल", 
       "भावनगर मंडल", "राजकोट मंडल", "अहमदाबाद मंडल", "अजमेर यातायात", 
-      "इतर यातायात किशनगंज", "रतलाम मंडल", "लेखा", "सतर्कता", "हिंदी अनुभाग"
+      "इतर यातायात किशनगंज", "रतलाम मंडल", "लेखा", "सतर्कता", "हिंदी अनुभाग", 
+      "तकनीकी", "सुरक्षा", "आईटी"
     ];
     
     const QUARTERS = [{ id: "Q1", label: "Q1 · अप्रैल–जून" },{ id: "Q2", label: "Q2 · जुलाई–सितंबर" },{ id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },{ id: "Q4", label: "Q4 · जनवरी–मार्च" }];
-    const YEARS = ["2026","2027","2028","2029","2030"];
+    const YEARS = ["2024","2025","2026","2027","2028","2029","2030"];
     const SECTION_COLORS = [{ bg:"#ede9fe", border:"#8b5cf6", text:"#5b21b6", icon:"📜" },{ bg:"#fce7f3", border:"#ec4899", text:"#9d174d", icon:"🏛️" },{ bg:"#fee2e2", border:"#ef4444", text:"#991b1b", icon:"📄" },{ bg:"#fff7ed", border:"#f97316", text:"#9a3412", icon:"📬" },{ bg:"#fefce8", border:"#eab308", text:"#854d0e", icon:"✉️" },{ bg:"#f0fdf4", border:"#22c55e", text:"#166534", icon:"📨" },{ bg:"#ecfeff", border:"#06b6d4", text:"#155e75", icon:"🗂️" },{ bg:"#eff6ff", border:"#3b82f6", text:"#1e40af", icon:"🎓" },{ bg:"#f0fdf4", border:"#10b981", text:"#065f46", icon:"🤝" },{ bg:"#fdf4ff", border:"#a855f7", text:"#581c87", icon:"📝" },{ bg:"#fff1f2", border:"#f43f5e", text:"#881337", icon:"🏆" },{ bg:"#f8fafc", border:"#64748b", text:"#0f172a", icon:"✅" }];
 
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
@@ -282,7 +290,7 @@
         ...(user.role==="SECTION" ? [{ id:"form", icon:"📝", label:"नई रिपोर्ट" }] : []),
         { id:"inbox", icon:"📥", label: user.role==="SECTION" ? "मेरी रिपोर्टें" : "आवक रिपोर्टें" },
         ...(isHindiAdmin ? [{ id:"consolidated", icon:"📑", label:"समेकित रिपोर्ट" }] : []),
-        ...(isHindiAdmin ? [{ id:"master", icon:"⚙️", label:"मास्टर कंट्रोल" }] : []),
+        ...(isHindiAdmin ? [{ id:"master", icon:"⚙️", label:"मास्टर कंट्रोल" }] : []), // ✅ मास्टर कंट्रोल टैब
       ];
 
       return (
@@ -812,7 +820,7 @@
         setIsRefreshing(true); 
 
         catalyst.ZCatalystQL.executeQuery("SELECT * FROM RajbhashaReports").then((response) => {
-          let rows = response.content || response; 
+          let rows = response.content || response || []; 
 
           const validReports = [];
           let fetchedSections = null;
@@ -920,6 +928,15 @@
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
+
+    // 🔥 ऐप रेंडर होने के बाद लोडर को हटा दें
+    setTimeout(() => {
+      const loader = document.getElementById('startup-loader');
+      if(loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.style.display = 'none', 500); 
+      }
+    }, 1500); 
   </script>
 </body>
 </html>
