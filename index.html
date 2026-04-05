@@ -16,10 +16,10 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script src="https://cdn.zohostatic.com/catalyst/serverless/3.0.0/catalystWebSDK.js"></script>
+  <script src="https://cdn.zohostatic.com/catalyst/serverless/v3.0.0/catalystWebSDK.js"></script>
   <script>
-    // ⚠️ अपने ऐप को 'window.zohoApp' में सेव किया गया
-    window.zohoApp = catalyst.initApp({
+    // ✅ सही तरीका: इसे सीधे चालू करें, किसी Variable में सेव न करें
+    window.catalyst.initApp({
       projectID: "35852000000012084",
       zaid: "60047971666"
     });
@@ -713,11 +713,12 @@
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
 
-      // 🌟 Zoho Catalyst Data Fetching 🌟
+      // 🌟 Zoho Catalyst Data Fetching (सही API) 🌟
       const fetchReports = () => {
-        if(!window.zohoApp) return;
+        if(!window.catalyst) return;
         
-        window.zohoApp.zcql().executeZCQLQuery("SELECT * FROM RajbhashaReports").then((response) => {
+        // ✅ सीधे 'window.catalyst' से डेटा लाएँ
+        window.catalyst.zcql().executeZCQLQuery("SELECT * FROM RajbhashaReports").then((response) => {
           const data = response.map(row => {
             let dbRow = row.RajbhashaReports;
             let parsedForm = {};
@@ -752,7 +753,7 @@
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
 
-      // 🌟 Zoho में Save करने का कोड 🌟
+      // 🌟 Zoho में Save करने का कोड (सही API) 🌟
       const handleSave = (report) => {
         const formDataToSave = { ...report };
         delete formDataToSave.sectionName; delete formDataToSave.quarter; delete formDataToSave.year;
@@ -769,14 +770,15 @@
             formData: JSON.stringify(formDataToSave)
         };
 
-        window.zohoApp.datastore().table('RajbhashaReports').insertRow(rowData)
+        // ✅ सीधे 'window.catalyst' से सेव करें
+        window.catalyst.datastore().table('RajbhashaReports').insertRow(rowData)
           .then(() => {
             setView("inbox");
           })
           .catch(err => alert("Zoho Save Error: " + err.message));
       };
 
-      // 🌟 Zoho में Update करने का कोड 🌟
+      // 🌟 Zoho में Update करने का कोड (सही API) 🌟
       const handleAction = (report, action, remark) => {
         const timelineEntry = { ts:new Date().toISOString(), role:user.role, name:user.name, action:action, remark };
         const newTimeline = [...(report.timeline||[]), timelineEntry];
@@ -787,7 +789,8 @@
             timeline: JSON.stringify(newTimeline)
         };
 
-        window.zohoApp.datastore().table('RajbhashaReports').updateRow(rowData)
+        // ✅ सीधे 'window.catalyst' से अपडेट करें
+        window.catalyst.datastore().table('RajbhashaReports').updateRow(rowData)
           .then(() => {
             setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
             setView("dashboard");
