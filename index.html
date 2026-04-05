@@ -16,11 +16,10 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script src="https://cdn.zohostatic.com/catalyst/serverless/v3.0.0/catalystWebSDK.js"></script>
+  <script src="https://cdn.zohostatic.com/catalyst/serverless/3.0.0/catalystWebSDK.js"></script>
   <script>
-    // ⚠️ 'window.' लगाकर catalyst एरर ठीक किया गया
-    // कृपया नीचे अपना असली PROJECT_ID और ZAID डालें!
-    window.catalyst.initApp({
+    // ⚠️ अपने ऐप को 'window.zohoApp' में सेव किया गया
+    window.zohoApp = catalyst.initApp({
       projectID: "35852000000012084",
       zaid: "60047971666"
     });
@@ -716,9 +715,9 @@
 
       // 🌟 Zoho Catalyst Data Fetching 🌟
       const fetchReports = () => {
-        if(!window.catalyst) return;
-        // ⚠️ 'window.' लगाकर catalyst एरर ठीक किया गया
-        window.catalyst.app.zcql().executeZCQLQuery("SELECT * FROM RajbhashaReports").then((response) => {
+        if(!window.zohoApp) return;
+        
+        window.zohoApp.zcql().executeZCQLQuery("SELECT * FROM RajbhashaReports").then((response) => {
           const data = response.map(row => {
             let dbRow = row.RajbhashaReports;
             let parsedForm = {};
@@ -728,7 +727,7 @@
             
             return {
                 ROWID: dbRow.ROWID,
-                id: dbRow.ROWID, // React के लिए
+                id: dbRow.ROWID, 
                 sectionName: dbRow.sectionName,
                 quarter: dbRow.quarter,
                 year: dbRow.year,
@@ -742,7 +741,7 @@
           data.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
           setReports(data);
         }).catch(err => {
-            console.log("Zoho No Data / Error:", err);
+            console.log("Zoho Data Fetch Error:", err);
         });
       };
 
@@ -770,8 +769,7 @@
             formData: JSON.stringify(formDataToSave)
         };
 
-        // ⚠️ 'window.' लगाकर catalyst एरर ठीक किया गया
-        window.catalyst.app.datastore().table('RajbhashaReports').insertRow(rowData)
+        window.zohoApp.datastore().table('RajbhashaReports').insertRow(rowData)
           .then(() => {
             setView("inbox");
           })
@@ -789,8 +787,7 @@
             timeline: JSON.stringify(newTimeline)
         };
 
-        // ⚠️ 'window.' लगाकर catalyst एरर ठीक किया गया
-        window.catalyst.app.datastore().table('RajbhashaReports').updateRow(rowData)
+        window.zohoApp.datastore().table('RajbhashaReports').updateRow(rowData)
           .then(() => {
             setReports(prev => prev.map(r => r.ROWID === report.ROWID ? {...r, status:action, timeline:newTimeline} : r));
             setView("dashboard");
