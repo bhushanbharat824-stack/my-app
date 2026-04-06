@@ -67,7 +67,6 @@
       REJECTED:        { id: "REJECTED",        label: "अस्वीकृत",        icon: "❌", color: "#dc2626", bg: "#fee2e2" },
     };
 
-    // 🌟 समीक्षा के दौरान हिंदी में प्रदर्शित करने के लिए विशेष डिक्शनरी 🌟
     const FIELD_LABELS_HINDI = {
       officeNameAddress: "कार्यालय का नाम व पता",
       officerName: "अधिकारी का नाम",
@@ -220,28 +219,7 @@
     function ls(k, d = null) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
     function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 
-    const auditLog = {
-      add(user, action, details) {
-        const logs = ls(AUDIT_KEY, []);
-        lsSet(AUDIT_KEY, [{ id: Date.now(), ts: new Date().toISOString(), user: user.name, role: user.role, action, details }, ...logs].slice(0, 1000));
-      },
-      getAll: () => ls(AUDIT_KEY, []),
-      clear:  () => localStorage.removeItem(AUDIT_KEY),
-    };
-
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
-
-    function computeScore(r) {
-      if (!r) return 0;
-      const total6 = (parseFloat(r.b1_s6_ka_total)||0) + (parseFloat(r.b1_s6_kha_total)||0) + (parseFloat(r.b1_s6_ga_total)||0);
-      const hindi6 = (parseFloat(r.b1_s6_ka_hindi)||0) + (parseFloat(r.b1_s6_kha_hindi)||0) + (parseFloat(r.b1_s6_ga_hindi)||0);
-      const corrPct   = total6 > 0 ? hindi6 / total6 : 0;
-      const total7    = parseFloat(r.b1_s7_totalPages) || 0;
-      const hindi7    = parseFloat(r.b1_s7_hindiPages) || 0;
-      const notingPct = total7 > 0 ? hindi7 / total7 : 0;
-      const workshops = Math.min(parseFloat(r.b1_s8_workshops)||0, 4) / 4;
-      return Math.round((corrPct*0.40 + notingPct*0.30 + workshops*0.15 + (r.b1_s9_meetingDate?1:0)*0.10 + (r.b1_s10_meetingDate?1:0)*0.05)*100);
-    }
 
     function emptyForm() {
       return {
@@ -570,6 +548,7 @@
       const totalSteps = showPart2 ? 4 : 3;
 
       const disableBasicInfo = !isHindiSection;
+
       const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
       const validationErrors = useMemo(() => {
@@ -910,7 +889,7 @@
       );
     }
 
-    // ── 🖨️ REPORT DETAIL (यहाँ अंग्रेजी के बजाय अब हिंदी दिखेगी) ────────────
+    // ── 🖨️ REPORT DETAIL ─────────────────────────
     function ReportDetail({ report, user, remark, setRemark, onAction, onBack, onEdit }) {
       const r  = ROLES[user.role];
       const st = STATUS[report.status]||STATUS.DRAFT;
@@ -945,7 +924,17 @@
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
               {/* 🌟 यहाँ डिक्शनरी (FIELD_LABELS_HINDI) का इस्तेमाल करके नाम हिंदी में किए गए हैं 🌟 */}
               {Object.entries(report).map(([k,v]) => {
-                const excludeKeys = ["id", "ackId", "timestamp", "timeline", "status", "sectionName", "formData", "year", "quarter"];
+                const excludeKeys = ["id", "ackId", "timestamp", "timeline", "status", "sectionName", "formData", "year", "quarter", "region"];
+                
+                // 🌟 भाग-II को छिपाने का लॉजिक 🌟
+                const isPart2Key = k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_");
+                const isHindiSection = report.sectionName === "हिंदी अनुभाग";
+                const isQ4 = report.quarter === "Q4";
+
+                // अगर यह भाग-II की मद है, लेकिन अनुभाग 'हिंदी अनुभाग' नहीं है या तिमाही Q4 नहीं है, तो इसे रेंडर न करें
+                if (isPart2Key && (!isHindiSection || !isQ4)) return null;
+
+                // केवल भरा हुआ डेटा दिखाएं 
                 if(v !== null && v !== undefined && v !== "" && !excludeKeys.includes(k) && typeof v !== "object") {
                   
                   // अगर डिक्शनरी में हिंदी नाम है तो वो दिखाओ, वरना डिफ़ॉल्ट इंग्लिश दिखाओ
