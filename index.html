@@ -82,7 +82,6 @@
 
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
 
-    // 🌟 अपडेट: डिफ़ॉल्ट रूप से 2026, Q4 (जनवरी-मार्च) और क्षेत्र B सेट किया गया 🌟
     function emptyForm() {
       return {
         officeNameAddress:"", officerName:"", stdCode:"", phone:"", email:"", 
@@ -111,12 +110,13 @@
       };
     }
 
-    const Inp = ({ label, value, onChange, type="text", placeholder="" }) => (
-      <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+    const Inp = ({ label, value, onChange, type="text", placeholder="", disabled=false }) => (
+      <div style={{ display:"flex", flexDirection:"column", gap:4, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
-        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%" }} onFocus={e=>e.target.style.borderColor="#6366f1"} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
+        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} disabled={disabled} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} onFocus={e=>!disabled && (e.target.style.borderColor="#6366f1")} onBlur={e=>!disabled && (e.target.style.borderColor="#e2e8f0")} />
       </div>
     );
+
     const Num = ({ label, value, onChange }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", lineHeight:1.3 }}>{label}</label>}
@@ -132,6 +132,7 @@
       </div>
     );
     const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
+    
     const SecCard = ({ title, icon, color, children }) => {
       const [open, setOpen] = useState(true);
       return (
@@ -145,6 +146,7 @@
         </div>
       );
     };
+
     const TblInput = ({ headers, rows, data, onChange }) => (
       <div style={{ overflowX:"auto" }}>
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
@@ -395,7 +397,7 @@
       );
     }
 
-    // ── 📝 REPORT FORM (With Editing & VALIDATION) ─────────────────────────
+    // ── 📝 REPORT FORM (With Access Control & Validation) ─────────────────────────
     function ReportForm({ onSave, user, reports, initialData, onCancel }) {
       const [data, setData] = useState(initialData || emptyForm());
       const [step, setStep] = useState(0);
@@ -406,6 +408,9 @@
       const isHindiSection = data.sectionName === "हिंदी अनुभाग" || user.name === "हिंदी अनुभाग";
       const showPart2 = isQ4 && isHindiSection; 
       const totalSteps = showPart2 ? 4 : 3;
+
+      // 🌟 कार्यालय जानकारी सुरक्षा: हिंदी अनुभाग के अलावा बाकी सब के लिए निष्क्रिय (वर्ष, तिमाही और क्षेत्र को छोड़कर) 🌟
+      const disableBasicInfo = !isHindiSection;
 
       const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
@@ -439,7 +444,7 @@
       }, [data, showPart2]);
 
       const handleSubmit = () => {
-        if(validationErrors.length > 0) return; // सुरक्षा चेक
+        if(validationErrors.length > 0) return;
 
         const report = { ...data, timestamp:new Date().toISOString() };
         if (!report.sectionName) report.sectionName = user.name; 
@@ -502,12 +507,32 @@
                 icon="🏢" color={SECTION_COLORS[0]}
               >
                 <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                  <Inp label="कार्यालय का नाम और पूरा पता" value={data.officeNameAddress} onChange={v=>set("officeNameAddress",v)} placeholder="जैसे: प्र.नि.ले.प. रेलवे, मुंबई" />
-                  <Grid cols={3}><Inp label="अधिकारी का नाम" value={data.officerName} onChange={v=>set("officerName",v)} /><Inp label="एस.टी.डी. कोड" value={data.stdCode} onChange={v=>set("stdCode",v)} /><Inp label="फोन नं." value={data.phone} onChange={v=>set("phone",v)} /></Grid>
-                  <Grid><Inp label="ई-मेल" value={data.email} onChange={v=>set("email",v)} type="email" /><Inp label="राजभाषा अधिकारी का फोन/ईमेल" value={data.rbOfficerPhone} onChange={v=>set("rbOfficerPhone",v)} /></Grid>
+                  {/* 🌟 बेसिक इन्फो लॉक्ड है, लेकिन वर्ष/तिमाही/क्षेत्र खुले हैं 🌟 */}
+                  <Inp label="कार्यालय का नाम और पूरा पता" value={data.officeNameAddress} onChange={v=>set("officeNameAddress",v)} placeholder="जैसे: प्र.नि.ले.प. रेलवे, मुंबई" disabled={disableBasicInfo} />
                   <Grid cols={3}>
-                    <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>वर्ष</label><select value={data.year} onChange={e=>set("year",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{YEARS.map(y=><option key={y}>{y}</option>)}</select></div>
-                    <div><label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>तिमाही</label><select value={data.quarter} onChange={e=>set("quarter",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>{QUARTERS.map(q=><option key={q.id} value={q.id}>{q.label}</option>)}</select></div>
+                    <Inp label="अधिकारी का नाम" value={data.officerName} onChange={v=>set("officerName",v)} disabled={disableBasicInfo} />
+                    <Inp label="एस.टी.डी. कोड" value={data.stdCode} onChange={v=>set("stdCode",v)} disabled={disableBasicInfo} />
+                    <Inp label="फोन नं." value={data.phone} onChange={v=>set("phone",v)} disabled={disableBasicInfo} />
+                  </Grid>
+                  <Grid>
+                    <Inp label="ई-मेल" value={data.email} onChange={v=>set("email",v)} type="email" disabled={disableBasicInfo} />
+                    <Inp label="राजभाषा अधिकारी का फोन/ईमेल" value={data.rbOfficerPhone} onChange={v=>set("rbOfficerPhone",v)} disabled={disableBasicInfo} />
+                  </Grid>
+                  <Grid cols={3}>
+                    {/* ✅ वर्ष (Year) को सभी अनुभागों के लिए खोल दिया गया है */}
+                    <div>
+                      <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>वर्ष</label>
+                      <select value={data.year} onChange={e=>set("year",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>
+                        {YEARS.map(y=><option key={y}>{y}</option>)}
+                      </select>
+                    </div>
+                    {/* ✅ तिमाही और क्षेत्र भी खुले हैं */}
+                    <div>
+                      <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>तिमाही</label>
+                      <select value={data.quarter} onChange={e=>set("quarter",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>
+                        {QUARTERS.map(q=><option key={q.id} value={q.id}>{q.label}</option>)}
+                      </select>
+                    </div>
                     <Radio label="क्षेत्र" value={data.region} onChange={v=>set("region",v)} options={["A","B","C"]} />
                   </Grid>
                 </div>
@@ -765,7 +790,7 @@
             <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
               {Object.entries(report).slice(0, 20).map(([k,v]) => {
-                if(typeof v === 'string' && v.length > 0 && !k.includes("id")) return (
+                if(typeof v === 'string' && v.length > 0 && !k.includes("id") && k !== "formData") return (
                   <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
                     <div style={{ fontSize:10, color:"#94a3b8", fontWeight:700 }}>{k.replace('b1_','').replace('b2_','').replace('s1_','')}</div>
                     <div style={{ fontSize:12, color:"#1e293b", fontWeight:600 }}>{v}</div>
