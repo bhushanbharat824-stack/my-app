@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="राजभाषा QPR">
-  <title>राजभाषा तिमाही रिपोर्ट प्रबंधन</title>
+  <title>राजभाषा QPR</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -256,17 +256,18 @@
       </div>
     );
 
-    const Num = ({ label, value, onChange }) => (
-      <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+    // 🌟 अपडेट: Num और Radio में disabled सपोर्ट 🌟
+    const Num = ({ label, value, onChange, disabled=false }) => (
+      <div style={{ display:"flex", flexDirection:"column", gap:3, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", lineHeight:1.3 }}>{label}</label>}
-        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box" }} onFocus={e=>e.target.style.borderColor="#6366f1"} onBlur={e=>e.target.style.borderColor="#e2e8f0"} />
+        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} onFocus={e=>!disabled && (e.target.style.borderColor="#6366f1")} onBlur={e=>!disabled && (e.target.style.borderColor="#e2e8f0")} />
       </div>
     );
-    const Radio = ({ label, value, onChange, options }) => (
-      <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+    const Radio = ({ label, value, onChange, options, disabled=false }) => (
+      <div style={{ display:"flex", flexDirection:"column", gap:6, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-          {options.map(o=>(<button key={o} onClick={()=>onChange(o)} style={{ padding:"5px 14px", borderRadius:20, fontSize:12, fontWeight:600, cursor:"pointer", border:"1.5px solid", borderColor: value===o?"#6366f1":"#e2e8f0", background: value===o?"#6366f1":"#fff", color: value===o?"#fff":"#475569", }}>{o}</button>))}
+          {options.map(o=>(<button key={o} onClick={()=>onChange(o)} disabled={disabled} style={{ padding:"5px 14px", borderRadius:20, fontSize:12, fontWeight:600, cursor: disabled ? "not-allowed" : "pointer", border:"1.5px solid", borderColor: value===o?"#6366f1":"#e2e8f0", background: value===o?"#6366f1":"#fff", color: value===o?"#fff":"#475569", }}>{o}</button>))}
         </div>
       </div>
     );
@@ -682,17 +683,22 @@
 
           {step===1 && (
             <div>
-              <SecCard title="1. माननीय मंत्री जी को भेजी गई फाइलें" icon="📜" color={SECTION_COLORS[0]}><Grid><Num label="कुल फाइलें भेजी गईं" value={data.b1_s1_totalFiles} onChange={v=>set("b1_s1_totalFiles",v)} /><Num label="हिंदी में भेजी गईं" value={data.b1_s1_hindiFiles} onChange={v=>set("b1_s1_hindiFiles",v)} /></Grid></SecCard>
-              <SecCard title="2. सचिव/समकक्ष स्तर पर बैठकें/फाइलें" icon="🏛️" color={SECTION_COLORS[1]}><Grid><Num label="I. कुल बैठकें" value={data.b1_s2_totalMeetings} onChange={v=>set("b1_s2_totalMeetings",v)} /><Num label="II. हिंदी में कार्यवाही" value={data.b1_s2_hindiMinutes} onChange={v=>set("b1_s2_hindiMinutes",v)} /><Num label="III. कुल कागजात" value={data.b1_s2_totalDocs} onChange={v=>set("b1_s2_totalDocs",v)} /><Num label="IV. हिंदी में कागजात" value={data.b1_s2_hindiDocs} onChange={v=>set("b1_s2_hindiDocs",v)} /></Grid></SecCard>
+              {/* 🌟 मद 1 और 2 केवल हिंदी अनुभाग के लिए खुले हैं 🌟 */}
+              <SecCard title="1. माननीय मंत्री जी को भेजी गई फाइलें" icon="📜" color={SECTION_COLORS[0]}><Grid><Num label="कुल फाइलें भेजी गईं" value={data.b1_s1_totalFiles} onChange={v=>set("b1_s1_totalFiles",v)} disabled={!isHindiSection} /><Num label="हिंदी में भेजी गईं" value={data.b1_s1_hindiFiles} onChange={v=>set("b1_s1_hindiFiles",v)} disabled={!isHindiSection} /></Grid></SecCard>
+              <SecCard title="2. सचिव/समकक्ष स्तर पर बैठकें/फाइलें" icon="🏛️" color={SECTION_COLORS[1]}><Grid><Num label="I. कुल बैठकें" value={data.b1_s2_totalMeetings} onChange={v=>set("b1_s2_totalMeetings",v)} disabled={!isHindiSection} /><Num label="II. हिंदी में कार्यवाही" value={data.b1_s2_hindiMinutes} onChange={v=>set("b1_s2_hindiMinutes",v)} disabled={!isHindiSection} /><Num label="III. कुल कागजात" value={data.b1_s2_totalDocs} onChange={v=>set("b1_s2_totalDocs",v)} disabled={!isHindiSection} /><Num label="IV. हिंदी में कागजात" value={data.b1_s2_hindiDocs} onChange={v=>set("b1_s2_hindiDocs",v)} disabled={!isHindiSection} /></Grid></SecCard>
+              
+              {/* मद 3, 4, 5, 6, 7 सभी के लिए खुले हैं */}
               <SecCard title="3. धारा 3(3) के अंतर्गत जारी दस्तावेज" icon="📄" color={SECTION_COLORS[2]}><Grid><Num label="(क) कुल जारी" value={data.b1_s3_totalIssued} onChange={v=>set("b1_s3_totalIssued",v)} /><Num label="(ख) द्विभाषी" value={data.b1_s3_bilingual} onChange={v=>set("b1_s3_bilingual",v)} /><Num label="(ग) केवल अंग्रेजी" value={data.b1_s3_englishOnly} onChange={v=>set("b1_s3_englishOnly",v)} /><Num label="(घ) केवल हिंदी" value={data.b1_s3_hindiOnly} onChange={v=>set("b1_s3_hindiOnly",v)} /></Grid></SecCard>
               <SecCard title="4. हिंदी में प्राप्त पत्र (राजभाषा नियम-5)" icon="📬" color={SECTION_COLORS[3]}><Grid><Num label="(क) कुल प्राप्त" value={data.b1_s4_totalReceived} onChange={v=>set("b1_s4_totalReceived",v)} /><Num label="(ख) उत्तर अपेक्षित नहीं" value={data.b1_s4_noReplyNeeded} onChange={v=>set("b1_s4_noReplyNeeded",v)} /><Num label="(ग) हिंदी/द्विभाषी उत्तर" value={data.b1_s4_hindiReply} onChange={v=>set("b1_s4_hindiReply",v)} /><Num label="(घ) अंग्रेजी में उत्तर" value={data.b1_s4_englishReply} onChange={v=>set("b1_s4_englishReply",v)} /></Grid></SecCard>
               <SecCard title="5. अंग्रेजी पत्रों के उत्तर हिंदी में (क/ख क्षेत्र)" icon="✉️" color={SECTION_COLORS[4]}><TblInput headers={["क्षेत्र","अंग्रेजी में प्राप्त","हिंदी में उत्तर","अंग्रेजी में उत्तर","उत्तर अपेक्षित नहीं"]} rows={[[{label:"'क' क्षेत्र"},{key:"b1_s5_ka_total"},{key:"b1_s5_ka_hindiReply"},{key:"b1_s5_ka_engReply"},{key:"b1_s5_ka_noReply"}],[{label:"'ख' क्षेत्र"},{key:"b1_s5_kha_total"},{key:"b1_s5_kha_hindiReply"},{key:"b1_s5_kha_engReply"},{key:"b1_s5_kha_noReply"}]]} data={data} onChange={(k,v)=>set(k,v)} /></SecCard>
               <SecCard title="6. मूल पत्राचार का ब्यौरा" icon="📨" color={SECTION_COLORS[5]}><TblInput headers={["क्षेत्र","हिंदी में","अंग्रेजी में","कुल","हिंदी %"]} rows={[[{label:"'क' क्षेत्र"},{key:"b1_s6_ka_hindi"},{key:"b1_s6_ka_english"},{key:"b1_s6_ka_total"},{label: data.b1_s6_ka_total>0?`${Math.round((data.b1_s6_ka_hindi/data.b1_s6_ka_total)*100)||0}%`:"-"}],[{label:"'ख' क्षेत्र"},{key:"b1_s6_kha_hindi"},{key:"b1_s6_kha_english"},{key:"b1_s6_kha_total"},{label: data.b1_s6_kha_total>0?`${Math.round((data.b1_s6_kha_hindi/data.b1_s6_kha_total)*100)||0}%`:"-"}],[{label:"'ग' क्षेत्र"},{key:"b1_s6_ga_hindi"},{key:"b1_s6_ga_english"},{key:"b1_s6_ga_total"},{label: data.b1_s6_ga_total>0?`${Math.round((data.b1_s6_ga_hindi/data.b1_s6_ga_total)*100)||0}%`:"-"}]]} data={data} onChange={(k,v)=>set(k,v)} /></SecCard>
               <SecCard title="7. फाइल टिप्पण लेखन" icon="🗂️" color={SECTION_COLORS[6]}><Grid><Num label="हिंदी में पृष्ठ" value={data.b1_s7_hindiPages} onChange={v=>set("b1_s7_hindiPages",v)} /><Num label="अंग्रेजी में पृष्ठ" value={data.b1_s7_engPages} onChange={v=>set("b1_s7_engPages",v)} /><Num label="कुल पृष्ठ" value={data.b1_s7_totalPages} onChange={v=>set("b1_s7_totalPages",v)} /><Num label="ई-ऑफिस टिप्पणियाँ" value={data.b1_s7_eoffice} onChange={v=>set("b1_s7_eoffice",v)} /></Grid></SecCard>
-              <SecCard title="8. हिंदी कार्यशालाएं" icon="🎓" color={SECTION_COLORS[7]}><Grid cols={3}><Num label="कार्यशालाएं" value={data.b1_s8_workshops} onChange={v=>set("b1_s8_workshops",v)} /><Num label="प्रशिक्षित अधिकारी" value={data.b1_s8_officers} onChange={v=>set("b1_s8_officers",v)} /><Num label="प्रशिक्षित कर्मचारी" value={data.b1_s8_staff} onChange={v=>set("b1_s8_staff",v)} /></Grid></SecCard>
-              <SecCard title="9. राजभाषा कार्यान्वयन समिति बैठक" icon="🤝" color={SECTION_COLORS[8]}><Grid><Inp label="(क) बैठक की तिथि" value={data.b1_s9_meetingDate} onChange={v=>set("b1_s9_meetingDate",v)} type="date" /><Num label="(ख) अधीनस्थ समितियां" value={data.b1_s9_subOfficeCmtes} onChange={v=>set("b1_s9_subOfficeCmtes",v)} /><Num label="(ग) आयोजित बैठकें" value={data.b1_s9_subOfficeMeetings} onChange={v=>set("b1_s9_subOfficeMeetings",v)} /><Radio label="(घ) कार्यसूची हिंदी में?" value={data.b1_s9_agendaHindi} onChange={v=>set("b1_s9_agendaHindi",v)} options={["हाँ","नहीं"]} /></Grid></SecCard>
-              <SecCard title="10. हिंदी सलाहकार समिति बैठक" icon="💡" color={SECTION_COLORS[9]}><Inp label="बैठक की तिथि" value={data.b1_s10_meetingDate} onChange={v=>set("b1_s10_meetingDate",v)} type="date" /></SecCard>
-              <SecCard title="11. उल्लेखनीय कार्य/उपलब्धियाँ" icon="🏆" color={SECTION_COLORS[10]}><div style={{ display:"flex", flexDirection:"column", gap:10 }}>{[["b1_s11_innovation","i) नवोन्मेषी कार्य"],["b1_s11_special","ii) विशिष्ट आयोजन"],["b1_s11_other","iii) अन्य आयोजन"]].map(([k,l])=>(<div key={k}><label style={{ fontSize:11, fontWeight:700, color:"#475569", display:"block", marginBottom:4 }}>{l}</label><textarea value={data[k]} onChange={e=>set(k,e.target.value)} maxLength={500} rows={2} style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:12, resize:"vertical" }} /></div>))}</div></SecCard>
+              
+              {/* 🌟 मद 8, 9, 10, 11 केवल हिंदी अनुभाग के लिए खुले हैं 🌟 */}
+              <SecCard title="8. हिंदी कार्यशालाएं" icon="🎓" color={SECTION_COLORS[7]}><Grid cols={3}><Num label="कार्यशालाएं" value={data.b1_s8_workshops} onChange={v=>set("b1_s8_workshops",v)} disabled={!isHindiSection} /><Num label="प्रशिक्षित अधिकारी" value={data.b1_s8_officers} onChange={v=>set("b1_s8_officers",v)} disabled={!isHindiSection} /><Num label="प्रशिक्षित कर्मचारी" value={data.b1_s8_staff} onChange={v=>set("b1_s8_staff",v)} disabled={!isHindiSection} /></Grid></SecCard>
+              <SecCard title="9. राजभाषा कार्यान्वयन समिति बैठक" icon="🤝" color={SECTION_COLORS[8]}><Grid><Inp label="(क) बैठक की तिथि" value={data.b1_s9_meetingDate} onChange={v=>set("b1_s9_meetingDate",v)} type="date" disabled={!isHindiSection} /><Num label="(ख) अधीनस्थ समितियां" value={data.b1_s9_subOfficeCmtes} onChange={v=>set("b1_s9_subOfficeCmtes",v)} disabled={!isHindiSection} /><Num label="(ग) आयोजित बैठकें" value={data.b1_s9_subOfficeMeetings} onChange={v=>set("b1_s9_subOfficeMeetings",v)} disabled={!isHindiSection} /><Radio label="(घ) कार्यसूची हिंदी में?" value={data.b1_s9_agendaHindi} onChange={v=>set("b1_s9_agendaHindi",v)} options={["हाँ","नहीं"]} disabled={!isHindiSection} /></Grid></SecCard>
+              <SecCard title="10. हिंदी सलाहकार समिति बैठक" icon="💡" color={SECTION_COLORS[9]}><Inp label="बैठक की तिथि" value={data.b1_s10_meetingDate} onChange={v=>set("b1_s10_meetingDate",v)} type="date" disabled={!isHindiSection} /></SecCard>
+              <SecCard title="11. उल्लेखनीय कार्य/उपलब्धियाँ" icon="🏆" color={SECTION_COLORS[10]}><div style={{ display:"flex", flexDirection:"column", gap:10 }}>{[["b1_s11_innovation","i) नवोन्मेषी कार्य"],["b1_s11_special","ii) विशिष्ट आयोजन"],["b1_s11_other","iii) अन्य आयोजन"]].map(([k,l])=>(<div key={k}><label style={{ fontSize:11, fontWeight:700, color:"#475569", display:"block", marginBottom:4 }}>{l}</label><textarea value={data[k]} onChange={e=>set(k,e.target.value)} maxLength={500} rows={2} disabled={!isHindiSection} style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:12, resize:"vertical", background: !isHindiSection ? "#f8fafc" : "#fff", cursor: !isHindiSection ? "not-allowed" : "text", opacity: !isHindiSection ? 0.7 : 1 }} /></div>))}</div></SecCard>
             </div>
           )}
 
@@ -922,24 +928,16 @@
           <div className="print-box" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
             <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-              {/* 🌟 यहाँ डिक्शनरी (FIELD_LABELS_HINDI) का इस्तेमाल करके नाम हिंदी में किए गए हैं 🌟 */}
               {Object.entries(report).map(([k,v]) => {
                 const excludeKeys = ["id", "ackId", "timestamp", "timeline", "status", "sectionName", "formData", "year", "quarter", "region"];
-                
-                // 🌟 भाग-II को छिपाने का लॉजिक 🌟
                 const isPart2Key = k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_");
                 const isHindiSection = report.sectionName === "हिंदी अनुभाग";
                 const isQ4 = report.quarter === "Q4";
 
-                // अगर यह भाग-II की मद है, लेकिन अनुभाग 'हिंदी अनुभाग' नहीं है या तिमाही Q4 नहीं है, तो इसे रेंडर न करें
                 if (isPart2Key && (!isHindiSection || !isQ4)) return null;
 
-                // केवल भरा हुआ डेटा दिखाएं 
                 if(v !== null && v !== undefined && v !== "" && !excludeKeys.includes(k) && typeof v !== "object") {
-                  
-                  // अगर डिक्शनरी में हिंदी नाम है तो वो दिखाओ, वरना डिफ़ॉल्ट इंग्लिश दिखाओ
                   let formattedKey = FIELD_LABELS_HINDI[k] || k.replace('b1_','').replace('b2_','').replace('s1_','').replace(/_/g, ' ').toUpperCase();
-                  
                   return (
                     <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
                       <div style={{ fontSize:11, color:"#64748b", fontWeight:700, wordBreak:"break-word", marginBottom:2 }}>{formattedKey}</div>
