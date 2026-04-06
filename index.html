@@ -66,15 +66,18 @@
       REJECTED:        { id: "REJECTED",        label: "अस्वीकृत",        icon: "❌", color: "#dc2626", bg: "#fee2e2" },
     };
 
+    // 🌟 अपडेट: डिफ़ॉल्ट अनुभागों से 5 अनुभाग हटा दिए गए हैं 🌟
     const SECTIONS_LIST = [
       "आंतरिक नमूना लेखापरीक्षा", "सवनि I", "सवनि II", "समन्वय", "निरीक्षण", 
       "संगणक", "भंडार एवं निविदा", "स्थापना व व्यय", "एलएपी व कावभ लोअर परेल", 
       "रिपोर्ट", "मुंबई सेंट्रल आरएपी", "मुंबई सेंट्रल एलएपी", "एमआरवीसी", 
       "बुक्स व बजट", "प्रशिक्षण", "एलएपी1", "प्रशासन", "वड़ोदरा मंडल", 
       "भावनगर मंडल", "राजकोट मंडल", "अहमदाबाद मंडल", "अजमेर यातायात", 
-      "इतर यातायात किशनगंज", "रतलाम मंडल", "लेखा", "सतर्कता", "हिंदी अनुभाग", 
-      "तकनीकी", "सुरक्षा", "आईटी"
+      "इतर यातायात किशनगंज", "रतलाम मंडल", "हिंदी अनुभाग"
     ];
+    
+    // इनिशियल स्टेट के लिए भी इसी अपडेटेड लिस्ट का इस्तेमाल होगा
+    const DEFAULT_SECTIONS = SECTIONS_LIST;
     
     const QUARTERS = [{ id: "Q1", label: "Q1 · अप्रैल–जून" },{ id: "Q2", label: "Q2 · जुलाई–सितंबर" },{ id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },{ id: "Q4", label: "Q4 · जनवरी–मार्च" }];
     const YEARS = ["2022","2023","2024","2025","2026","2027","2028","2029","2030"];
@@ -183,7 +186,7 @@
       );
     }
 
-    function LoginScreen({ onLogin }) {
+    function LoginScreen({ onLogin, sectionsList }) {
       const [step, setStep]       = useState("choice");
       const [section, setSection] = useState("");
       const [pass, setPass]       = useState("");
@@ -242,7 +245,7 @@
                   <div>
                     <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }}>
                       <option value="">-- अनुभाग चुनें --</option>
-                      {SECTIONS_LIST.map(s=><option key={s}>{s}</option>)}
+                      {sectionsList.map(s=><option key={s}>{s}</option>)}
                     </select>
                   </div>
                   {err && <ErrBox msg={err} />}
@@ -250,16 +253,16 @@
                   <BackBtn onClick={()=>{setStep("choice"); setErr(""); setSection("");}} />
                 </div>
               )}
-              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
-              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
-              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} />}
+              {step==="aao" && <PwdLogin role="AAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("AAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} sectionsList={sectionsList} />}
+              {step==="sao" && <PwdLogin role="SAO" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("SAO")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} sectionsList={sectionsList} />}
+              {step==="hindi" && <PwdLogin role="HINDI_CELL" pass={pass} setPass={setPass} err={err} setErr={setErr} section={section} setSection={setSection} onLogin={()=>tryLogin("HINDI_CELL")} onBack={()=>{setStep("choice"); setPass(""); setErr(""); setSection("");}} sectionsList={sectionsList} />}
             </div>
           </div>
         </div>
       );
     }
 
-    function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection }) {
+    function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection, sectionsList }) {
       const r = ROLES[role];
       const needsSection = role === "AAO" || role === "SAO"; 
       return (
@@ -270,7 +273,7 @@
               <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>आप किस अनुभाग के {r.label} हैं?</label>
               <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none", marginBottom:4 }}>
                 <option value="">-- अपना अनुभाग चुनें --</option>
-                {SECTIONS_LIST.map(s=><option key={s}>{s}</option>)}
+                {sectionsList.map(s=><option key={s}>{s}</option>)}
               </select>
             </div>
           )}
@@ -317,7 +320,7 @@
       );
     }
 
-    function Dashboard({ reports, user, setView }) {
+    function Dashboard({ reports, user, setView, sectionsList }) {
       const r = ROLES[user.role];
       const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
       
@@ -357,11 +360,11 @@
               </div>
               
               <div style={{ fontSize:13, fontWeight:700, color:"#475569", marginBottom:12 }}>
-                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r.year === trackY && r.quarter === trackQ).length}</span> / {SECTIONS_LIST.length}
+                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r.year === trackY && r.quarter === trackQ).length}</span> / {sectionsList.length}
               </div>
               
               <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
-                {SECTIONS_LIST.map(sec => {
+                {sectionsList.map(sec => {
                   const hasSubmitted = reports.some(r => r.sectionName === sec && r.year === trackY && r.quarter === trackQ);
                   return (
                     <div key={sec} style={{ 
@@ -519,14 +522,13 @@
                     <Inp label="राजभाषा अधिकारी का फोन/ईमेल" value={data.rbOfficerPhone} onChange={v=>set("rbOfficerPhone",v)} disabled={disableBasicInfo} />
                   </Grid>
                   <Grid cols={3}>
-                    {/* ✅ वर्ष (Year) को सभी अनुभागों के लिए खोल दिया गया है */}
+                    {/* ✅ वर्ष (Year), तिमाही और क्षेत्र को सभी अनुभागों के लिए खोल दिया गया है */}
                     <div>
                       <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>वर्ष</label>
                       <select value={data.year} onChange={e=>set("year",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>
                         {YEARS.map(y=><option key={y}>{y}</option>)}
                       </select>
                     </div>
-                    {/* ✅ तिमाही और क्षेत्र भी खुले हैं */}
                     <div>
                       <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", display:"block", marginBottom:6 }}>तिमाही</label>
                       <select value={data.quarter} onChange={e=>set("quarter",e.target.value)} style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }}>
@@ -816,8 +818,9 @@
     }
 
     // 🌟 मास्टर कंट्रोल (Admin Panel) Firebase के लिए 🌟
-    function MasterControl({ reports }) {
+    function MasterControl({ reports, sectionsList }) {
       const [isClearing, setIsClearing] = useState(false);
+      const [newSec, setNewSec] = useState("");
 
       const handleReset = async () => {
         const pass = prompt("⚠️ डेंजर ज़ोन: क्या आप सच में सिस्टम की सभी रिपोर्ट डिलीट करना चाहते हैं?\nपुष्टि के लिए कैपिटल में 'RESET' टाइप करें:");
@@ -826,7 +829,10 @@
         setIsClearing(true);
         try {
           for (let r of reports) {
-            await db.collection("reports").doc(r.id).delete();
+            // मास्टर डेटा की सेटिंग फाइल को डिलीट मत करो, सिर्फ रिपोर्ट डिलीट करो
+            if (r.status !== "SETTINGS") {
+               await db.collection("reports").doc(r.id).delete();
+            }
           }
           alert("✅ सिस्टम पूरी तरह से रीसेट हो गया है! सारा पुराना डेटा मिटा दिया गया है।");
         } catch(e) {
@@ -835,8 +841,56 @@
         setIsClearing(false);
       };
 
+      const handleSaveSettings = async (newList) => {
+        setIsClearing(true);
+        try {
+          const settingsDoc = reports.find(r => r.status === "SETTINGS" && r.sectionName === "SYSTEM_CONFIG");
+          const rowData = { sectionName: "SYSTEM_CONFIG", status: "SETTINGS", formData: JSON.stringify({ sections: newList }) };
+          
+          if (settingsDoc) {
+             await db.collection("reports").doc(settingsDoc.id).update(rowData);
+          } else {
+             await db.collection("reports").add(rowData);
+          }
+        } catch(e) {
+          alert("Error saving sections: " + e.message);
+        }
+        setIsClearing(false);
+      };
+
+      const handleAdd = () => {
+        if(!newSec.trim()) return;
+        if(sectionsList.includes(newSec.trim())) { alert("यह अनुभाग पहले से मौजूद है!"); return; }
+        const updated = [...sectionsList, newSec.trim()];
+        handleSaveSettings(updated);
+        setNewSec("");
+      };
+
+      const handleDel = (sec) => {
+        if(!window.confirm(`क्या आप सच में '${sec}' को मास्टर लिस्ट से हटाना चाहते हैं?`)) return;
+        const updated = sectionsList.filter(s => s !== sec);
+        handleSaveSettings(updated);
+      };
+
       return (
-         <div style={{ maxWidth:800, margin:"0 auto" }}>
+         <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth:800, margin:"0 auto" }}>
+            <div style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 16, padding: 24 }}>
+               <h2 style={{ color: "#1e293b", margin: "0 0 16px 0", fontSize: 18, fontWeight: 800 }}>⚙️ अनुभाग प्रबंधन (Master Data)</h2>
+               <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                  <input value={newSec} onChange={e=>setNewSec(e.target.value)} placeholder="नए अनुभाग का नाम टाइप करें..." style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1.5px solid #cbd5e1", outline: "none", fontSize: 14 }} />
+                  <button onClick={handleAdd} disabled={isClearing} style={{ background: "#6366f1", color: "#fff", border: "none", padding: "0 24px", borderRadius: 10, fontWeight: "bold", cursor: isClearing ? "not-allowed" : "pointer", fontSize: 14 }}>+ जोड़ें</button>
+               </div>
+               
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+                  {sectionsList.map(s => (
+                     <div key={s} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 700, color: "#475569" }}>
+                        <span>{s}</span>
+                        <button onClick={()=>handleDel(s)} disabled={isClearing} style={{ background: "none", border: "none", color: "#ef4444", cursor: isClearing ? "not-allowed" : "pointer", fontSize: 20, lineHeight: 1 }}>×</button>
+                     </div>
+                  ))}
+               </div>
+            </div>
+
             <div style={{ background: "#fee2e2", border: "2px solid #ef4444", borderRadius: 16, padding: 24 }}>
                <h2 style={{ color: "#991b1b", margin: "0 0 10px 0", fontSize: 18, fontWeight: 800 }}>⚠️ डेंजर ज़ोन (मास्टर रीसेट)</h2>
                <p style={{ color: "#7f1d1d", fontSize: 13, marginBottom: 20 }}>यह बटन सिस्टम से सभी अनुभागों की जमा की गई <b>सभी रिपोर्टों को हमेशा के लिए</b> डिलीट कर देगा। इसका इस्तेमाल केवल नए वित्तीय वर्ष / नई तिमाही (Quarter) को बिल्कुल फ्रेश शुरू करने से पहले करें।</p>
@@ -854,14 +908,26 @@
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
       const [editingReport, setEditingReport] = useState(null); 
+      const [sectionsList, setSectionsList] = useState(DEFAULT_SECTIONS);
 
       const clearEdit = () => setEditingReport(null);
 
       useEffect(() => {
         const unsubscribe = db.collection("reports").onSnapshot((snapshot) => {
           const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          data.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-          setReports(data);
+          
+          // मास्टर डेटा लिस्ट निकालें
+          const settingsDoc = data.find(r => r.status === "SETTINGS" && r.sectionName === "SYSTEM_CONFIG");
+          if (settingsDoc) {
+             try { setSectionsList(JSON.parse(settingsDoc.formData).sections || DEFAULT_SECTIONS); } catch(e) {}
+          } else {
+             setSectionsList(DEFAULT_SECTIONS);
+          }
+
+          // रिपोर्ट लिस्ट (सेटिंग्स को हटाकर)
+          const validReports = data.filter(r => r.status !== "SETTINGS");
+          validReports.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+          setReports(validReports);
         });
         return () => unsubscribe();
       }, []);
@@ -886,7 +952,7 @@
         db.collection("reports").doc(report.id).update({ status: action, timeline: [...(report.timeline||[]), timelineEntry] });
       };
 
-      if(!user) return <LoginScreen onLogin={handleLogin} />;
+      if(!user) return <LoginScreen onLogin={handleLogin} sectionsList={sectionsList} />;
 
       return (
         <div style={{ minHeight:"100vh", background:"#f8fafc", fontFamily:"'Noto Sans Devanagari','Inter',sans-serif" }}>
@@ -898,14 +964,14 @@
 
           <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} clearEdit={clearEdit} />
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
-            {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} />}
+            {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} sectionsList={sectionsList} />}
             
             {view==="form" && <ReportForm key={editingReport ? editingReport.id : 'new'} onSave={handleSave} user={user} reports={reports} initialData={editingReport} onCancel={() => { setEditingReport(null); setView("inbox"); }} />}
             
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} onEdit={(r) => { setEditingReport(r); setView("form"); }} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} user={user} />}
             
-            {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} />}
+            {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} sectionsList={sectionsList} />}
           </main>
           <footer className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)" }}>
             <span>© 2026 Digital India · राजभाषा QPR v4.0</span>
