@@ -46,7 +46,6 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    const AUDIT_KEY   = "rajbhasha_audit_v4";
     const ROLES = {
       SECTION:    { id: "SECTION",    label: "अनुभाग",        labelEn: "Section",     icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
       AAO:        { id: "AAO",        label: "AAO",            labelEn: "AAO",         icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
@@ -73,29 +72,17 @@
       "रिपोर्ट", "मुंबई सेंट्रल आरएपी", "मुंबई सेंट्रल एलएपी", "एमआरवीसी", 
       "बुक्स व बजट", "प्रशिक्षण", "एलएपी1", "प्रशासन", "वड़ोदरा मंडल", 
       "भावनगर मंडल", "राजकोट मंडल", "अहमदाबाद मंडल", "अजमेर यातायात", 
-      "इतर यातायात किशनगंज", "रतलाम मंडल","हिंदी अनुभाग", 
-  
+      "इतर यातायात किशनगंज", "रतलाम मंडल", "लेखा", "सतर्कता", "हिंदी अनुभाग", 
+      "तकनीकी", "सुरक्षा", "आईटी"
     ];
     
     const QUARTERS = [{ id: "Q1", label: "Q1 · अप्रैल–जून" },{ id: "Q2", label: "Q2 · जुलाई–सितंबर" },{ id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },{ id: "Q4", label: "Q4 · जनवरी–मार्च" }];
     const YEARS = ["2022","2023","2024","2025","2026","2027","2028","2029","2030"];
     const SECTION_COLORS = [{ bg:"#ede9fe", border:"#8b5cf6", text:"#5b21b6", icon:"📜" },{ bg:"#fce7f3", border:"#ec4899", text:"#9d174d", icon:"🏛️" },{ bg:"#fee2e2", border:"#ef4444", text:"#991b1b", icon:"📄" },{ bg:"#fff7ed", border:"#f97316", text:"#9a3412", icon:"📬" },{ bg:"#fefce8", border:"#eab308", text:"#854d0e", icon:"✉️" },{ bg:"#f0fdf4", border:"#22c55e", text:"#166534", icon:"📨" },{ bg:"#ecfeff", border:"#06b6d4", text:"#155e75", icon:"🗂️" },{ bg:"#eff6ff", border:"#3b82f6", text:"#1e40af", icon:"🎓" },{ bg:"#f0fdf4", border:"#10b981", text:"#065f46", icon:"🤝" },{ bg:"#fdf4ff", border:"#a855f7", text:"#581c87", icon:"📝" },{ bg:"#fff1f2", border:"#f43f5e", text:"#881337", icon:"🏆" },{ bg:"#f8fafc", border:"#64748b", text:"#0f172a", icon:"✅" }];
 
-    function ls(k, d = null) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
-    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-
-    const auditLog = {
-      add(user, action, details) {
-        const logs = ls(AUDIT_KEY, []);
-        lsSet(AUDIT_KEY, [{ id: Date.now(), ts: new Date().toISOString(), user: user.name, role: user.role, action, details }, ...logs].slice(0, 1000));
-      },
-      getAll: () => ls(AUDIT_KEY, []),
-      clear:  () => localStorage.removeItem(AUDIT_KEY),
-    };
-
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
 
-    // 🌟 अपडेट: डिफ़ॉल्ट रूप से 2026, Q4 और क्षेत्र B सेट किया गया है 🌟
+    // 🌟 अपडेट: डिफ़ॉल्ट रूप से 2026, Q4 (जनवरी-मार्च) और क्षेत्र B सेट किया गया 🌟
     function emptyForm() {
       return {
         officeNameAddress:"", officerName:"", stdCode:"", phone:"", email:"", 
@@ -124,7 +111,6 @@
       };
     }
 
-    // ── UI Components ────────────────────────────────────────────────────────────
     const Inp = ({ label, value, onChange, type="text", placeholder="" }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
@@ -146,7 +132,6 @@
       </div>
     );
     const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
-    
     const SecCard = ({ title, icon, color, children }) => {
       const [open, setOpen] = useState(true);
       return (
@@ -160,7 +145,6 @@
         </div>
       );
     };
-
     const TblInput = ({ headers, rows, data, onChange }) => (
       <div style={{ overflowX:"auto" }}>
         <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
@@ -197,7 +181,6 @@
       );
     }
 
-    // ── LOGIN ────────────────────────────────────────────────────────────────────
     function LoginScreen({ onLogin }) {
       const [step, setStep]       = useState("choice");
       const [section, setSection] = useState("");
@@ -300,7 +283,6 @@
     function BtnPrimary({ grad, onClick, children }) { return <button onClick={onClick} style={{ padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:grad, color:"#fff", fontWeight:800, fontSize:14, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{children}</button>; }
     function BackBtn({ onClick }) { return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>; }
 
-    // ── NAVBAR ───────────────────────────────────────────────────────────────────
     function Navbar({ user, view, setView, onLogout, clearEdit }) {
       const r = ROLES[user.role];
       const isHindiAdmin = user.role === "HINDI_CELL" || user.name === "हिंदी अनुभाग";
@@ -310,7 +292,7 @@
         ...(user.role==="SECTION" ? [{ id:"form", icon:"📝", label:"नई रिपोर्ट" }] : []),
         { id:"inbox", icon:"📥", label: user.role==="SECTION" ? "मेरी रिपोर्टें" : "आवक रिपोर्टें" },
         ...(isHindiAdmin ? [{ id:"consolidated", icon:"📑", label:"समेकित रिपोर्ट" }] : []),
-        ...(isHindiAdmin ? [{ id:"master", icon:"⚙️", label:"मास्टर कंट्रोल" }] : []), // 🌟 नया टैब 🌟
+        ...(isHindiAdmin ? [{ id:"master", icon:"⚙️", label:"मास्टर कंट्रोल" }] : []),
       ];
 
       return (
@@ -333,7 +315,6 @@
       );
     }
 
-    // ── DASHBOARD ────────────────────────────────────────────────────────────────
     function Dashboard({ reports, user, setView }) {
       const r = ROLES[user.role];
       const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
@@ -414,7 +395,7 @@
       );
     }
 
-    // ── 📝 REPORT FORM (With Editing Capability) ────────────────────────────────
+    // ── 📝 REPORT FORM (With Editing & VALIDATION) ─────────────────────────
     function ReportForm({ onSave, user, reports, initialData, onCancel }) {
       const [data, setData] = useState(initialData || emptyForm());
       const [step, setStep] = useState(0);
@@ -426,10 +407,40 @@
       const showPart2 = isQ4 && isHindiSection; 
       const totalSteps = showPart2 ? 4 : 3;
 
-      // 🌟 एडिट मोड में "Already Submitted" चेक को बाईपास करें 🌟
       const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
+      // 🌟 स्मार्ट डेटा वैलिडेशन लॉजिक 🌟
+      const validationErrors = useMemo(() => {
+        const errs = [];
+        const num = (v) => parseFloat(v) || 0;
+
+        if(num(data.b1_s1_hindiFiles) > num(data.b1_s1_totalFiles)) errs.push("भाग 1(1): हिंदी फाइलें कुल फाइलों से अधिक नहीं हो सकतीं।");
+        if(num(data.b1_s2_hindiMinutes) > num(data.b1_s2_totalMeetings)) errs.push("भाग 1(2): हिंदी बैठकें कुल बैठकों से अधिक नहीं हो सकतीं।");
+        if(num(data.b1_s2_hindiDocs) > num(data.b1_s2_totalDocs)) errs.push("भाग 1(2): हिंदी कागजात कुल कागजातों से अधिक नहीं हो सकते।");
+        
+        const sum3 = num(data.b1_s3_bilingual) + num(data.b1_s3_englishOnly) + num(data.b1_s3_hindiOnly);
+        if(num(data.b1_s3_totalIssued) > 0 && sum3 !== num(data.b1_s3_totalIssued)) errs.push(`भाग 1(3): जारी दस्तावेजों का योग (${sum3}) कुल (${data.b1_s3_totalIssued}) के बराबर होना चाहिए।`);
+
+        const sum4Reply = num(data.b1_s4_hindiReply) + num(data.b1_s4_englishReply) + num(data.b1_s4_noReplyNeeded);
+        if(num(data.b1_s4_totalReceived) > 0 && sum4Reply > num(data.b1_s4_totalReceived)) errs.push("भाग 1(4): कुल उत्तर दिए गए पत्र प्राप्त पत्रों से अधिक नहीं हो सकते।");
+
+        if(num(data.b1_s6_ka_hindi) > num(data.b1_s6_ka_total)) errs.push("भाग 1(6): 'क' क्षेत्र में हिंदी पत्राचार कुल से अधिक है।");
+        if(num(data.b1_s6_kha_hindi) > num(data.b1_s6_kha_total)) errs.push("भाग 1(6): 'ख' क्षेत्र में हिंदी पत्राचार कुल से अधिक है।");
+        if(num(data.b1_s6_ga_hindi) > num(data.b1_s6_ga_total)) errs.push("भाग 1(6): 'ग' क्षेत्र में हिंदी पत्राचार कुल से अधिक है।");
+
+        if(num(data.b1_s7_hindiPages) + num(data.b1_s7_engPages) !== num(data.b1_s7_totalPages) && num(data.b1_s7_totalPages) > 0) errs.push("भाग 1(7): हिंदी और अंग्रेजी पृष्ठों का योग कुल पृष्ठों के बराबर होना चाहिए।");
+
+        if(showPart2) {
+            if(num(data.b2_comp_trained) > num(data.b2_comp_total)) errs.push("भाग 2(3): प्रशिक्षित कार्मिक कुल कार्मिकों से अधिक नहीं हो सकते।");
+            if(num(data.b2_comp_working) > num(data.b2_comp_trained)) errs.push("भाग 2(3): हिंदी में काम करने वाले लोग प्रशिक्षित लोगों से अधिक नहीं हो सकते।");
+            if(num(data.b2_s4_unicode) > num(data.b2_s4_totalLaptops)) errs.push("भाग 2(4): यूनिकोड सक्षम लैपटॉप कुल लैपटॉप से अधिक नहीं हो सकते।");
+        }
+        return errs;
+      }, [data, showPart2]);
+
       const handleSubmit = () => {
+        if(validationErrors.length > 0) return; // सुरक्षा चेक
+
         const report = { ...data, timestamp:new Date().toISOString() };
         if (!report.sectionName) report.sectionName = user.name; 
 
@@ -437,7 +448,6 @@
             report.status = "PENDING_AAO";
             report.timeline = [{ ts:new Date().toISOString(), role:"SECTION", name:user.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }];
         } else {
-            // एडिट करने पर टाइमलाइन में एंट्री जोड़ें
             report.timeline = [...(report.timeline||[]), { ts:new Date().toISOString(), role:user.role, name:user.name, action:"रिपोर्ट में संशोधन किया गया (Edited)", remark:"" }];
         }
         
@@ -478,7 +488,7 @@
               {!showPart2 && (
                 <div style={{ background:"#fff7ed", border:"1.5px solid #f97316", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
                   <span style={{fontSize:24}}>📌</span>
-                  <div style={{ fontSize:12, color:"#9a3412", fontWeight:600 }}>राजभाषा रिपोर्ट भाग-II केवल <strong>"हिंदी अनुभाग"</strong> द्वारा <strong>Q4</strong> में भरा जाना है। आपके लिए यह निष्क्रिय है।</div>
+                  <div style={{ fontSize:12, color:"#9a3412", fontWeight:600 }}>राजभाषा रिपोर्ट भाग-II (वार्षिक रिपोर्ट) केवल <strong>"हिंदी अनुभाग"</strong> द्वारा <strong>Q4 (जनवरी-मार्च)</strong> में भरा जाना है। आपके लिए यह निष्क्रिय है।</div>
                 </div>
               )}
               
@@ -550,10 +560,25 @@
           {((step===2&&!showPart2)||(step===3&&showPart2)) && (
             <div className="no-print" style={{ background:"#fff", borderRadius:16, padding:24, border:"1.5px solid #e2e8f0", marginBottom:16 }}>
               <h3 style={{ fontSize:15, fontWeight:800, margin:"0 0 16px", color:"#1e293b" }}>👁️ पूर्वावलोकन एवं प्रमाण-पत्र</h3>
+              
+              {/* 🌟 स्मार्ट वैलिडेशन एरर बॉक्स 🌟 */}
+              {validationErrors.length > 0 && (
+                <div style={{ background:"#fee2e2", borderRadius:12, padding:16, border:"1.5px solid #ef4444", marginBottom:16 }}>
+                  <h4 style={{ color:"#991b1b", margin:"0 0 8px", fontSize:14, fontWeight:800 }}>⚠️ कृपया फॉर्म जमा करने से पहले निम्नलिखित गलतियाँ सुधारें:</h4>
+                  <ul style={{ margin:0, paddingLeft:20, color:"#7f1d1d", fontSize:13, fontWeight:600 }}>
+                    {validationErrors.map((e,i)=><li key={i} style={{marginBottom:4}}>{e}</li>)}
+                  </ul>
+                </div>
+              )}
+
               <div style={{ background:"#f8fafc", borderRadius:12, padding:16, border:"1px solid #e2e8f0", fontSize:13, color:"#475569", lineHeight:1.8, marginBottom:16 }}>
                 <strong>प्रमाण-पत्र:</strong> मैं यह प्रमाणित करता/करती हूं कि इस रिपोर्ट में दी गई सूचना उपलब्ध अभिलेखों के आधार पर बनाई गई है तथा पूर्णतया सत्य है।
               </div>
-              <button onClick={handleSubmit} style={{ width:"100%", padding:"14px 0", borderRadius:14, border:"none", cursor:"pointer", background:"linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", fontWeight:800, fontSize:15, boxShadow:"0 6px 20px rgba(99,102,241,0.4)" }}>
+              <button 
+                onClick={handleSubmit} 
+                disabled={validationErrors.length > 0}
+                style={{ width:"100%", padding:"14px 0", borderRadius:14, border:"none", cursor: validationErrors.length > 0 ? "not-allowed" : "pointer", background: validationErrors.length > 0 ? "#cbd5e1" : "linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", fontWeight:800, fontSize:15, boxShadow: validationErrors.length > 0 ? "none" : "0 6px 20px rgba(99,102,241,0.4)" }}
+              >
                 {initialData ? "✅ रिपोर्ट अपडेट करें" : "✅ रिपोर्ट अंतिम रूप से जमा करें"}
               </button>
             </div>
@@ -723,7 +748,6 @@
           <div className="no-print" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
             <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700 }}>← वापस सूची में</button>
             <div style={{ display:"flex", gap:10 }}>
-               {/* 🌟 नया: रिपोर्ट एडिट करने का यूनिवर्सल बटन 🌟 */}
                <button onClick={() => onEdit(report)} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>✏️ रिपोर्ट एडिट करें</button>
                <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>🖨️ PDF में सेव करें</button>
             </div>
@@ -766,7 +790,7 @@
       );
     }
 
-    // 🌟 नया फीचर: मास्टर कंट्रोल (Admin Panel) Firebase के लिए 🌟
+    // 🌟 मास्टर कंट्रोल (Admin Panel) Firebase के लिए 🌟
     function MasterControl({ reports }) {
       const [isClearing, setIsClearing] = useState(false);
 
@@ -776,7 +800,6 @@
 
         setIsClearing(true);
         try {
-          // Firebase में सभी रिपोर्ट्स एक-एक करके डिलीट करें
           for (let r of reports) {
             await db.collection("reports").doc(r.id).delete();
           }
@@ -805,7 +828,7 @@
       const [user, setUser]       = useState(()=>{ try { return JSON.parse(sessionStorage.getItem("rb_user_v4")); } catch { return null; } });
       const [view, setView]       = useState("dashboard");
       const [reports, setReports] = useState([]);
-      const [editingReport, setEditingReport] = useState(null); // 🌟 एडिट के लिए नई स्टेट 🌟
+      const [editingReport, setEditingReport] = useState(null); 
 
       const clearEdit = () => setEditingReport(null);
 
@@ -821,22 +844,15 @@
       const handleLogin = u => { setUser(u); sessionStorage.setItem("rb_user_v4", JSON.stringify(u)); };
       const handleLogout = () => { setUser(null); sessionStorage.removeItem("rb_user_v4"); setView("dashboard"); };
 
-      // 🌟 अपडेटेड सेव लॉजिक (नया + अपडेट दोनों संभालेगा) 🌟
       const handleSave = (report) => {
         const reportToSave = { ...report }; 
         const docId = reportToSave.id;
         delete reportToSave.id; 
         
         if (docId) {
-          // अगर यह एडिट है, तो Firebase में अपडेट करें
-          db.collection("reports").doc(docId).update(reportToSave).then(() => {
-            // Success स्क्रीन ReportForm खुद दिखाएगा
-          });
+          db.collection("reports").doc(docId).update(reportToSave).then(() => {});
         } else {
-          // अगर नया फॉर्म है, तो Firebase में ऐड करें
-          db.collection("reports").add(reportToSave).then(() => {
-            // Success स्क्रीन ReportForm खुद दिखाएगा
-          });
+          db.collection("reports").add(reportToSave).then(() => {});
         }
       };
 
@@ -859,13 +875,11 @@
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
             {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} />}
             
-            {/* 🌟 अपडेटेड: अब कोई भी रोल फॉर्म खोल सकता है अगर वह एडिट कर रहा हो 🌟 */}
             {view==="form" && <ReportForm key={editingReport ? editingReport.id : 'new'} onSave={handleSave} user={user} reports={reports} initialData={editingReport} onCancel={() => { setEditingReport(null); setView("inbox"); }} />}
             
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} onEdit={(r) => { setEditingReport(r); setView("form"); }} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} user={user} />}
             
-            {/* 🌟 मास्टर कंट्रोल 🌟 */}
             {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} />}
           </main>
           <footer className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)" }}>
