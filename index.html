@@ -33,7 +33,7 @@
   </script>
 
   <style>
-    /* 🌟 एडवांस्ड प्रिंटिंग CSS - जो आधिकारिक लेआउट बनाएगी 🌟 */
+    /* 🌟 एडवांस्ड प्रिंटिंग CSS - शुद्ध सरकारी प्रारूप के लिए 🌟 */
     @media screen {
       .print-only { display: none !important; }
     }
@@ -41,31 +41,38 @@
       .no-print, .screen-only { display: none !important; }
       .print-only { display: block !important; }
       
-      @page { margin: 15mm; }
+      @page { margin: 12mm 15mm; size: A4; }
       body { 
-         font-family: 'Noto Sans Devanagari', sans-serif; 
+         font-family: 'Noto Sans Devanagari', 'Times New Roman', serif; 
          font-size: 11pt; color: #000; 
          background: #fff !important; 
          margin: 0; padding: 0; 
       }
       
-      .official-print { width: 100%; line-height: 1.4; }
+      .official-print { width: 100%; line-height: 1.4; color: #000; }
+      
+      /* आधिकारिक टेबल डिज़ाइन */
       .official-print table { 
          width: 100%; border-collapse: collapse; 
          margin-bottom: 12px; page-break-inside: auto; 
+         border: 1px solid #000;
       }
       .official-print tr { page-break-inside: avoid; page-break-after: auto; }
       .official-print th, .official-print td { 
-         border: 1px solid #000; padding: 6px 8px; 
+         border: 1px solid #000; padding: 5px 6px; 
          text-align: left; vertical-align: middle; 
-         font-size: 10.5pt; 
+         font-size: 10.5pt; color: #000;
       }
       .official-print th { 
-         background-color: #f2f2f2 !important; 
-         -webkit-print-color-adjust: exact; 
-         print-color-adjust: exact; 
          font-weight: bold; text-align: center;
       }
+      
+      /* आधिकारिक हेडिंग्स */
+      .official-print h2 { text-align: center; font-size: 14pt; margin: 0 0 4px 0; color: #000; font-weight: bold; text-decoration: underline; }
+      .official-print h3 { text-align: center; font-size: 12pt; margin: 0 0 15px 0; color: #000; font-weight: normal; }
+      .official-print h4 { font-size: 12pt; margin: 15px 0 8px 0; color: #000; text-decoration: underline; font-weight: bold; text-align: center;}
+      .official-print .field-title { font-weight: bold; margin: 10px 0 4px 0; display: block; font-size: 11pt;}
+      
       .page-break { page-break-before: always; }
       .print-box { border: none !important; box-shadow: none !important; }
     }
@@ -231,7 +238,7 @@
       b2_website_langOption: "14. भाषा चयन का विकल्प?"
     };
 
-    const SECTIONS_LIST = [
+    const DEFAULT_SECTIONS = [
       "आंतरिक नमूना लेखापरीक्षा", "सवनि I", "सवनि II", "समन्वय", "निरीक्षण", 
       "संगणक", "भंडार एवं निविदा", "स्थापना व व्यय", "एलएपी व कावभ लोअर परेल", 
       "रिपोर्ट", "मुंबई सेंट्रल आरएपी", "मुंबई सेंट्रल एलएपी", "एमआरवीसी", 
@@ -239,8 +246,6 @@
       "भावनगर मंडल", "राजकोट मंडल", "अहमदाबाद मंडल", "अजमेर यातायात", 
       "इतर यातायात किशनगंज", "रतलाम मंडल", "हिंदी अनुभाग", 
     ];
-    
-    const DEFAULT_SECTIONS = SECTIONS_LIST;
     
     const QUARTERS = [{ id: "Q1", label: "Q1 · अप्रैल–जून" },{ id: "Q2", label: "Q2 · जुलाई–सितंबर" },{ id: "Q3", label: "Q3 · अक्टूबर–दिसंबर" },{ id: "Q4", label: "Q4 · जनवरी–मार्च" }];
     const YEARS = ["2022","2023","2024","2025","2026","2027","2028","2029","2030"];
@@ -272,21 +277,20 @@
         b12_bl_total:"", b12_bl_knowHindi:"", b12_bl_notDoing:"", b12_bl_25:"", b12_bl_50:"", b12_bl_75:"", b12_bl_more:"", b12_bl_100:"",
         b13_postName:"", b13_hqSanc:"", b13_hqVac:"", b13_subSanc:"", b13_subVac:"",
         b2_website_url:"", b2_website_type:"केवल अंग्रेजी", b2_website_langOption:"नहीं",
-        b2_hindi_diwas:"", b2_hindi_sangoshti:"", b2_other_programs:"", b2_innovation:"", b2_narakas:"नहीं", b2_narakas_lastMeeting:"", b2_narakas_participation:"नहीं",
       };
     }
 
     const Inp = ({ label, value, onChange, type="text", placeholder="", disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:4, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
-        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} disabled={disabled} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} onFocus={e=>!disabled && (e.target.style.borderColor="#6366f1")} onBlur={e=>!disabled && (e.target.style.borderColor="#e2e8f0")} />
+        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} disabled={disabled} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
 
     const Num = ({ label, value, onChange, disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:3, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", lineHeight:1.3 }}>{label}</label>}
-        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} onFocus={e=>!disabled && (e.target.style.borderColor="#6366f1")} onBlur={e=>!disabled && (e.target.style.borderColor="#e2e8f0")} />
+        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
     const Radio = ({ label, value, onChange, options, disabled=false }) => (
@@ -307,7 +311,6 @@
             <div style={{ display:"flex", alignItems:"center", gap:8 }}><span style={{ fontSize:20 }}>{icon}</span><span style={{ fontSize:13, fontWeight:700, color:color.text }}>{title}</span></div>
             <span style={{ color:color.text, transform: open?"rotate(180deg)":"rotate(0)", display:"inline-block", transition:"transform 0.2s" }}>▾</span>
           </div>
-          <div style={{ display:"none", padding:"10px", background:"#f1f5f9", fontWeight:"bold", borderBottom:"1px solid #ccc" }} className="print-only-header">{title}</div>
           {open && <div style={{ background:"#fff", padding:18 }}>{children}</div>}
         </div>
       );
@@ -784,7 +787,6 @@
       );
     }
 
-    // ── 📑 CONSOLIDATED REPORT ─────────────────────────────────────────
     function ConsolidatedView({ reports }) {
       const [q, setQ] = useState("Q4");
       const [y, setY] = useState("2026");
@@ -918,163 +920,165 @@
 
     // ── 🖨️ OFFICIAL PRINT VIEW (HIDDEN ON SCREEN, VISIBLE ON PRINT) ────────
     function OfficialPrintView({ report }) {
-       const isPart2 = report.quarter === "Q4" && report.b2_s1_notified !== undefined && report.b2_s1_notified !== "";
+       // 🌟 कड़ा चेक: भाग 2 तभी छपेगा जब अनुभाग हिंदी हो, तिमाही Q4 हो, और कोई भी एक महत्वपूर्ण डेटा (जैसे अधिकारी संख्या) भरा गया हो। 🌟
+       const hasPart2Data = Boolean(report.b2_s1_subOfficesTotal || report.b2_s2_off_total || report.b2_comp_total);
+       const isPart2Filled = report.quarter === "Q4" && report.sectionName === "हिंदी अनुभाग" && hasPart2Data;
        
        return (
-         <div className="print-only official-print" style={{fontFamily: "'Noto Sans Devanagari', Arial, sans-serif", fontSize: "11pt", color: "#000", background: "#fff", lineHeight: "1.4"}}>
+         <div className="print-only official-print">
             <div style={{textAlign: "center", marginBottom: "15px"}}>
-                <h2 style={{fontSize: "14pt", fontWeight: "bold", margin: "0 0 5px 0", textDecoration: "underline"}}>राजभाषा के प्रगामी प्रयोग के संबंध में तिमाही प्रगति रिपोर्ट</h2>
-                <h3 style={{fontSize: "12pt", fontWeight: "bold", margin: "0"}}>(अनुलग्नक-2)</h3>
+                <h2>राजभाषा के प्रगामी प्रयोग के संबंध में तिमाही प्रगति रिपोर्ट</h2>
+                <h3>(अनुलग्नक-2)</h3>
             </div>
             
-            <table style={{width: "100%", marginBottom: "15px", borderCollapse: "collapse"}}>
+            <table>
                <tbody>
                   <tr>
-                     <td style={{padding: "4px", border: "none", width: "50%"}}><strong>कार्यालय का नाम व पता:</strong> {report.officeNameAddress || '-'}</td>
-                     <td style={{padding: "4px", border: "none", width: "25%"}}><strong>तिमाही:</strong> {QUARTERS.find(q=>q.id===report.quarter)?.label || report.quarter}</td>
-                     <td style={{padding: "4px", border: "none", width: "25%"}}><strong>वर्ष:</strong> {report.year}</td>
+                     <td style={{width: "50%"}}><strong>कार्यालय का नाम व पता:</strong> {report.officeNameAddress || '-'}</td>
+                     <td style={{width: "25%"}}><strong>तिमाही:</strong> {QUARTERS.find(q=>q.id===report.quarter)?.label || report.quarter}</td>
+                     <td style={{width: "25%"}}><strong>वर्ष:</strong> {report.year}</td>
                   </tr>
                   <tr>
-                     <td style={{padding: "4px", border: "none"}}><strong>अधिकारी का नाम व पदनाम:</strong> {report.officerName || '-'}</td>
-                     <td style={{padding: "4px", border: "none"}}><strong>फोन नं.:</strong> {report.phone || '-'}</td>
-                     <td style={{padding: "4px", border: "none"}}><strong>ई-मेल:</strong> {report.email || '-'}</td>
+                     <td><strong>अधिकारी का नाम व पदनाम:</strong> {report.officerName || '-'}</td>
+                     <td><strong>फोन नं.:</strong> {report.phone || '-'}</td>
+                     <td><strong>ई-मेल:</strong> {report.email || '-'}</td>
                   </tr>
                   <tr>
-                     <td style={{padding: "4px", border: "none"}}><strong>राजभाषा अधिकारी का नाम:</strong> - </td>
-                     <td style={{padding: "4px", border: "none"}}><strong>फोन नं.:</strong> {report.rbOfficerPhone || '-'}</td>
-                     <td style={{padding: "4px", border: "none"}}><strong>ई-मेल:</strong> {report.rbOfficerEmail || '-'}</td>
+                     <td><strong>राजभाषा अधिकारी का नाम:</strong> - </td>
+                     <td><strong>फोन नं.:</strong> {report.rbOfficerPhone || '-'}</td>
+                     <td><strong>ई-मेल:</strong> {report.rbOfficerEmail || '-'}</td>
                   </tr>
                   <tr>
-                     <td style={{padding: "4px", border: "none"}}><strong>अनुभाग का नाम:</strong> {report.sectionName}</td>
-                     <td style={{padding: "4px", border: "none"}} colSpan="2"><strong>क्षेत्र:</strong> '{report.region}'</td>
+                     <td><strong>अनुभाग का नाम:</strong> {report.sectionName}</td>
+                     <td colSpan="2"><strong>क्षेत्र:</strong> '{report.region}'</td>
                   </tr>
                </tbody>
             </table>
 
-            <h4 style={{fontSize: "12pt", fontWeight: "bold", background: "#f0f0f0", padding: "5px", border: "1px solid #000", margin: "0 0 10px 0"}}>भाग-I (केवल तिमाही आधार पर भरा जाना है)</h4>
+            <h4>भाग-I (केवल तिमाही आधार पर भरा जाना है)</h4>
             
-            <table style={{width: "100%", borderCollapse: "collapse", marginBottom: "10px"}}>
+            <table>
                <tbody>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "55%"}}>माननीय मंत्री जी को प्रस्तुत की गई कुल फाइलों की संख्या</td>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "20%"}}>कुल: {report.b1_s1_totalFiles || '0'}</td>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "20%"}}>हिंदी में: {report.b1_s1_hindiFiles || '0'}</td>
+                     <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
+                     <td style={{width: "55%"}}>माननीय मंत्री जी को प्रस्तुत की गई कुल फाइलों की संख्या</td>
+                     <td style={{width: "20%"}}>कुल: {report.b1_s1_totalFiles || '0'}</td>
+                     <td style={{width: "20%"}}>हिंदी में: {report.b1_s1_hindiFiles || '0'}</td>
                   </tr>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>2.</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>सचिव/समकक्ष स्तर पर आयोजित कुल बैठकें व प्रस्तुत कागजात</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>कुल बैठकें: {report.b1_s2_totalMeetings || '0'}<br/>कुल कागजात: {report.b1_s2_totalDocs || '0'}</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>हिंदी कार्यवाही: {report.b1_s2_hindiMinutes || '0'}<br/>हिंदी कागजात: {report.b1_s2_hindiDocs || '0'}</td>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>2.</td>
+                     <td>सचिव/समकक्ष स्तर पर आयोजित कुल बैठकें व प्रस्तुत कागजात</td>
+                     <td>कुल बैठकें: {report.b1_s2_totalMeetings || '0'}<br/>कुल कागजात: {report.b1_s2_totalDocs || '0'}</td>
+                     <td>हिंदी कार्यवाही: {report.b1_s2_hindiMinutes || '0'}<br/>हिंदी कागजात: {report.b1_s2_hindiDocs || '0'}</td>
                   </tr>
                </tbody>
             </table>
 
             <div style={{marginBottom: "10px"}}>
-                <strong>3. राजभाषा अधिनियम की धारा 3(3) के अंतर्गत जारी दस्तावेजों की स्थिति:</strong>
-                <table style={{width: "100%", borderCollapse: "collapse", marginTop: "5px"}}>
+                <span className="field-title">3. राजभाषा अधिनियम की धारा 3(3) के अंतर्गत जारी दस्तावेजों की स्थिति:</span>
+                <table>
                    <thead>
                       <tr>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(क) कुल जारी</th>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(ख) द्विभाषी</th>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(ग) केवल अंग्रेजी</th>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(घ) केवल हिंदी</th>
+                        <th>(क) कुल जारी</th>
+                        <th>(ख) द्विभाषी</th>
+                        <th>(ग) केवल अंग्रेजी</th>
+                        <th>(घ) केवल हिंदी</th>
                       </tr>
                    </thead>
                    <tbody>
                       <tr>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s3_totalIssued || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s3_bilingual || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s3_englishOnly || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s3_hindiOnly || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s3_totalIssued || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s3_bilingual || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s3_englishOnly || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s3_hindiOnly || '0'}</td>
                       </tr>
                    </tbody>
                 </table>
             </div>
 
             <div style={{marginBottom: "10px"}}>
-                <strong>4. हिंदी में प्राप्त पत्रों की स्थिति (राजभाषा नियम-5 के अनुपालन सहित):</strong>
-                <table style={{width: "100%", borderCollapse: "collapse", marginTop: "5px"}}>
+                <span className="field-title">4. हिंदी में प्राप्त पत्रों की स्थिति (राजभाषा नियम-5 के अनुपालन सहित):</span>
+                <table>
                    <thead>
                       <tr>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(क) कुल प्राप्त</th>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(ख) उत्तर अपेक्षित नहीं</th>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(ग) हिंदी/द्विभाषी में उत्तर</th>
-                        <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>(घ) अंग्रेजी में उत्तर</th>
+                        <th>(क) कुल प्राप्त</th>
+                        <th>(ख) उत्तर अपेक्षित नहीं</th>
+                        <th>(ग) हिंदी/द्विभाषी में उत्तर</th>
+                        <th>(घ) अंग्रेजी में उत्तर</th>
                       </tr>
                    </thead>
                    <tbody>
                       <tr>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s4_totalReceived || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s4_noReplyNeeded || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s4_hindiReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "6px", textAlign: "center"}}>{report.b1_s4_englishReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s4_totalReceived || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s4_noReplyNeeded || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s4_hindiReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s4_englishReply || '0'}</td>
                       </tr>
                    </tbody>
                 </table>
             </div>
 
             <div style={{marginBottom: "10px"}}>
-                <strong>5 व 6. अंग्रेजी पत्रों के उत्तर हिंदी में देने एवं मूल पत्राचार का ब्यौरा:</strong>
-                <table style={{width: "100%", borderCollapse: "collapse", marginTop: "5px"}}>
+                <span className="field-title">5 व 6. अंग्रेजी पत्रों के उत्तर हिंदी में देने एवं मूल पत्राचार का ब्यौरा:</span>
+                <table>
                    <thead>
                       <tr>
-                         <th rowSpan="2" style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", verticalAlign: "middle"}}>क्षेत्र</th>
-                         <th colSpan="4" style={{border: "1px solid #000", padding: "4px", background: "#eef2ff"}}>अंग्रेजी पत्रों के उत्तर (मद 5)</th>
-                         <th colSpan="4" style={{border: "1px solid #000", padding: "4px", background: "#ecfdf5"}}>मूल पत्राचार (मद 6)</th>
+                         <th rowSpan="2" style={{verticalAlign: "middle"}}>क्षेत्र</th>
+                         <th colSpan="4">अंग्रेजी पत्रों के उत्तर (मद 5)</th>
+                         <th colSpan="4">मूल पत्राचार (मद 6)</th>
                       </tr>
                       <tr>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>अंग्रेजी में प्राप्त</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>हिंदी में उत्तर</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>अंग्रेजी में उत्तर</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>उत्तर अपेक्षित नहीं</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>कुल</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>हिंदी में</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>अंग्रेजी में</th>
-                         <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9", fontSize:"9pt"}}>हिंदी %</th>
+                         <th style={{fontSize:"9pt"}}>अंग्रेजी में प्राप्त</th>
+                         <th style={{fontSize:"9pt"}}>हिंदी में उत्तर</th>
+                         <th style={{fontSize:"9pt"}}>अंग्रेजी में उत्तर</th>
+                         <th style={{fontSize:"9pt"}}>उत्तर अपेक्षित नहीं</th>
+                         <th style={{fontSize:"9pt"}}>कुल</th>
+                         <th style={{fontSize:"9pt"}}>हिंदी में</th>
+                         <th style={{fontSize:"9pt"}}>अंग्रेजी में</th>
+                         <th style={{fontSize:"9pt"}}>हिंदी %</th>
                       </tr>
                    </thead>
                    <tbody>
                       <tr>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center", fontWeight: "bold"}}>'क'</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_ka_total || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_ka_hindiReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_ka_engReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_ka_noReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ka_total || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ka_hindi || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ka_english || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ka_total>0 ? Math.round((report.b1_s6_ka_hindi/report.b1_s6_ka_total)*100)+'%' : '-'}</td>
+                         <td style={{textAlign: "center", fontWeight: "bold"}}>'क'</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_hindiReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_engReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_noReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_hindi || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_english || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_total>0 ? Math.round((report.b1_s6_ka_hindi/report.b1_s6_ka_total)*100)+'%' : '-'}</td>
                       </tr>
                       <tr>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center", fontWeight: "bold"}}>'ख'</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_kha_total || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_kha_hindiReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_kha_engReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s5_kha_noReply || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_kha_total || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_kha_hindi || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_kha_english || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_kha_total>0 ? Math.round((report.b1_s6_kha_hindi/report.b1_s6_kha_total)*100)+'%' : '-'}</td>
+                         <td style={{textAlign: "center", fontWeight: "bold"}}>'ख'</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_hindiReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_engReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_noReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_hindi || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_english || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_total>0 ? Math.round((report.b1_s6_kha_hindi/report.b1_s6_kha_total)*100)+'%' : '-'}</td>
                       </tr>
                       <tr>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center", fontWeight: "bold"}}>'ग'</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}} colSpan="4">-</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ga_total || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ga_hindi || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ga_english || '0'}</td>
-                         <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b1_s6_ga_total>0 ? Math.round((report.b1_s6_ga_hindi/report.b1_s6_ga_total)*100)+'%' : '-'}</td>
+                         <td style={{textAlign: "center", fontWeight: "bold"}}>'ग'</td>
+                         <td style={{textAlign: "center"}} colSpan="4">-</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_hindi || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_english || '0'}</td>
+                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_total>0 ? Math.round((report.b1_s6_ga_hindi/report.b1_s6_ga_total)*100)+'%' : '-'}</td>
                       </tr>
                    </tbody>
                 </table>
             </div>
 
-            <table style={{width: "100%", borderCollapse: "collapse", marginBottom: "10px"}}>
+            <table>
                <tbody>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "5%", textAlign: "center", fontWeight: "bold"}}>7.</td>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "25%"}}><strong>फाइल टिप्पण कार्य</strong></td>
-                     <td style={{border: "1px solid #000", padding: "6px", width: "70%"}}>
+                     <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>7.</td>
+                     <td style={{width: "25%"}}><strong>फाइल टिप्पण कार्य</strong></td>
+                     <td style={{width: "70%"}}>
                         कुल पृष्ठ: {report.b1_s7_totalPages||'0'} &nbsp;|&nbsp; 
                         हिंदी में: {report.b1_s7_hindiPages||'0'} &nbsp;|&nbsp; 
                         अंग्रेजी में: {report.b1_s7_engPages||'0'} &nbsp;|&nbsp; 
@@ -1082,18 +1086,18 @@
                      </td>
                   </tr>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>8.</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}><strong>हिंदी कार्यशालाएं</strong></td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
+                     <td><strong>हिंदी कार्यशालाएं</strong></td>
+                     <td>
                         आयोजित कार्यशालाएं: {report.b1_s8_workshops||'0'} &nbsp;|&nbsp; 
                         प्रशिक्षित अधिकारी: {report.b1_s8_officers||'0'} &nbsp;|&nbsp; 
                         प्रशिक्षित कर्मचारी: {report.b1_s8_staff||'0'}
                      </td>
                   </tr>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>9.</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}><strong>रा.भा.का.स. बैठकें</strong></td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
+                     <td><strong>रा.भा.का.स. बैठकें</strong></td>
+                     <td>
                         बैठक की तिथि: {report.b1_s9_meetingDate||'-'} &nbsp;|&nbsp; 
                         अधीनस्थ समितियां: {report.b1_s9_subOfficeCmtes||'0'} &nbsp;|&nbsp; 
                         आयोजित बैठकें: {report.b1_s9_subOfficeMeetings||'0'} &nbsp;|&nbsp; 
@@ -1101,14 +1105,14 @@
                      </td>
                   </tr>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>10.</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}><strong>हिंदी सलाहकार समिति</strong></td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>बैठक की तिथि: {report.b1_s10_meetingDate||'-'}</td>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>10.</td>
+                     <td><strong>हिंदी सलाहकार समिति</strong></td>
+                     <td>बैठक की तिथि: {report.b1_s10_meetingDate||'-'}</td>
                   </tr>
                   <tr>
-                     <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>11.</td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}><strong>उल्लेखनीय कार्य/उपलब्धियाँ</strong></td>
-                     <td style={{border: "1px solid #000", padding: "6px"}}>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>11.</td>
+                     <td><strong>उल्लेखनीय कार्य/उपलब्धियाँ</strong></td>
+                     <td>
                         <strong>नवोन्मेषी कार्य:</strong> {report.b1_s11_innovation||'-'}<br/>
                         <strong>विशिष्ट आयोजन:</strong> {report.b1_s11_special||'-'}<br/>
                         <strong>अन्य:</strong> {report.b1_s11_other||'-'}
@@ -1117,16 +1121,17 @@
                </tbody>
             </table>
 
-            {isPart2 && (
-               <div style={{pageBreakBefore: "always", paddingTop: "20px"}}>
-                  <h4 style={{fontSize: "12pt", fontWeight: "bold", background: "#f0f0f0", padding: "5px", border: "1px solid #000", margin: "0 0 10px 0"}}>भाग-II (वार्षिक मूल्यांकन - केवल Q4 में देय)</h4>
+            {/* 🌟 भाग-II तभी छपेगा जब यह भरा गया हो (isPart2Filled == true) 🌟 */}
+            {isPart2Filled && (
+               <div className="page-break">
+                  <h4>भाग-II (वार्षिक मूल्यांकन - केवल Q4 में देय)</h4>
                   
-                  <table style={{width: "100%", borderCollapse: "collapse", marginBottom: "10px"}}>
+                  <table>
                     <tbody>
                       <tr>
-                        <td style={{border: "1px solid #000", padding: "6px", width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
-                        <td style={{border: "1px solid #000", padding: "6px", width: "45%"}}>नियम 10(4) के अंतर्गत अधिसूचना</td>
-                        <td style={{border: "1px solid #000", padding: "6px", width: "50%"}}>
+                        <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
+                        <td style={{width: "35%"}}><strong>नियम 10(4) अधिसूचना</strong></td>
+                        <td style={{width: "60%"}}>
                            अधिसूचित: {report.b2_s1_notified} &nbsp;|&nbsp; 
                            कुल कार्यालय: {report.b2_s1_subOfficesTotal||'0'} &nbsp;|&nbsp; 
                            अधिसूचित कार्यालय: {report.b2_s1_subOfficesNotified||'0'}<br/>
@@ -1137,130 +1142,128 @@
                   </table>
                   
                   <div style={{marginBottom: "10px"}}>
-                     <strong>2(i). अधिकारियों/कर्मचारियों को हिंदी का ज्ञान:</strong>
-                     <table style={{width: "100%", borderCollapse: "collapse", marginTop: "5px"}}>
+                     <span className="field-title">2(i). अधिकारियों/कर्मचारियों को हिंदी का ज्ञान:</span>
+                     <table>
                        <thead>
                          <tr>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>श्रेणी</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>कुल</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>अनुसचिवीय कार्य</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>प्रवीणता प्राप्त</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>कार्यसाधक ज्ञान</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>प्रशिक्षण ले रहे</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>प्रशिक्षण शेष</th>
+                           <th>श्रेणी</th>
+                           <th>कुल</th>
+                           <th>अनुसचिवीय कार्य</th>
+                           <th>प्रवीणता प्राप्त</th>
+                           <th>कार्यसाधक ज्ञान</th>
+                           <th>प्रशिक्षण ले रहे</th>
+                           <th>प्रशिक्षण शेष</th>
                          </tr>
                        </thead>
                        <tbody>
                          <tr>
-                           <td style={{border: "1px solid #000", padding: "4px"}}>अधिकारी</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_off_total||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_off_ministerial||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_off_pravinta||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_off_karyasadhak||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_off_training||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_off_remaining||'0'}</td>
+                           <td>अधिकारी</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_off_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_off_ministerial||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_off_pravinta||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_off_karyasadhak||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_off_training||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_off_remaining||'0'}</td>
                          </tr>
                          <tr>
-                           <td style={{border: "1px solid #000", padding: "4px"}}>कर्मचारी</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_staff_total||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_staff_ministerial||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_staff_pravinta||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_staff_karyasadhak||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_staff_training||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_s2_staff_remaining||'0'}</td>
+                           <td>कर्मचारी</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_ministerial||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_pravinta||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_karyasadhak||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_training||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_remaining||'0'}</td>
                          </tr>
                        </tbody>
                      </table>
                   </div>
 
                   <div style={{marginBottom: "10px"}}>
-                     <strong>2(ii & iii). आशुलिपि, टंकण एवं अनुवाद का ज्ञान:</strong>
-                     <table style={{width: "100%", borderCollapse: "collapse", marginTop: "5px"}}>
+                     <span className="field-title">2(ii & iii). आशुलिपि, टंकण एवं अनुवाद का ज्ञान:</span>
+                     <table>
                        <thead>
                          <tr>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>श्रेणी</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>कुल</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>प्रशिक्षित</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>हिंदी में कार्य कर रहे</th>
-                           <th style={{border: "1px solid #000", padding: "4px", background: "#f9f9f9"}}>प्रशिक्षण शेष</th>
+                           <th>श्रेणी</th>
+                           <th>कुल</th>
+                           <th>प्रशिक्षित</th>
+                           <th>हिंदी में कार्य कर रहे</th>
+                           <th>प्रशिक्षण शेष</th>
                          </tr>
                        </thead>
                        <tbody>
                          <tr>
-                           <td style={{border: "1px solid #000", padding: "4px"}}>आशुलिपिक</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_shorthand_total||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_shorthand_trained||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_shorthand_working||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_shorthand_pending||'0'}</td>
+                           <td>आशुलिपिक</td>
+                           <td style={{textAlign: "center"}}>{report.b2_shorthand_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_shorthand_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_shorthand_working||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_shorthand_pending||'0'}</td>
                          </tr>
                          <tr>
-                           <td style={{border: "1px solid #000", padding: "4px"}}>टंकक/लिपिक/निजी सहायक</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_typing_total||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_typing_trained||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_typing_working||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_typing_pending||'0'}</td>
+                           <td>टंकक/लिपिक/निजी सहायक</td>
+                           <td style={{textAlign: "center"}}>{report.b2_typing_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_typing_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_typing_working||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_typing_pending||'0'}</td>
                          </tr>
                          <tr>
-                           <td style={{border: "1px solid #000", padding: "4px"}}>अनुवादक</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_translation_total||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_translation_trained||'0'}</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>-</td>
-                           <td style={{border: "1px solid #000", padding: "4px", textAlign: "center"}}>{report.b2_translation_pending||'0'}</td>
+                           <td>अनुवादक</td>
+                           <td style={{textAlign: "center"}}>{report.b2_translation_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{report.b2_translation_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>-</td>
+                           <td style={{textAlign: "center"}}>{report.b2_translation_pending||'0'}</td>
                          </tr>
                        </tbody>
                      </table>
                   </div>
 
-                  <table style={{width: "100%", borderCollapse: "collapse", marginBottom: "10px"}}>
+                  <table>
                      <tbody>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", width: "5%", textAlign: "center", fontWeight: "bold"}}>3.</td>
-                           <td style={{border: "1px solid #000", padding: "6px", width: "45%"}}>कंप्यूटर टंकण प्रशिक्षण</td>
-                           <td style={{border: "1px solid #000", padding: "6px", width: "50%"}}>कुल कार्मिक: {report.b2_comp_total||'0'} | प्रशिक्षित: {report.b2_comp_trained||'0'} | कार्यरत: {report.b2_comp_working||'0'}</td>
+                           <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>3.</td>
+                           <td style={{width: "45%"}}><strong>कंप्यूटर टंकण प्रशिक्षण</strong></td>
+                           <td style={{width: "50%"}}>कुल कार्मिक: {report.b2_comp_total||'0'} | प्रशिक्षित: {report.b2_comp_trained||'0'} | कार्यरत: {report.b2_comp_working||'0'}</td>
                         </tr>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>4.</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>कंप्यूटर/लैपटॉप की स्थिति</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>कुल: {report.b2_s4_totalLaptops||'0'} | यूनिकोड सक्षम: {report.b2_s4_unicode||'0'} | हिंदी कार्य %: {report.b2_s4_hindiPct||'0'}%</td>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>4.</td>
+                           <td><strong>कंप्यूटर/लैपटॉप की स्थिति</strong></td>
+                           <td>कुल: {report.b2_s4_totalLaptops||'0'} | यूनिकोड सक्षम: {report.b2_s4_unicode||'0'} | हिंदी कार्य %: {report.b2_s4_hindiPct||'0'}%</td>
                         </tr>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>5.</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>कोड/मैनुअल/प्रपत्र</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>कुल मैनुअल: {report.b2_s5_manualsTotal||'0'} | द्विभाषी: {report.b2_s5_manualsBilingual||'0'}<br/>कुल प्रपत्र: {report.b2_s5_formsTotal||'0'} | द्विभाषी: {report.b2_s5_formsBilingual||'0'}</td>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>5.</td>
+                           <td><strong>कोड/मैनुअल/प्रपत्र</strong></td>
+                           <td>कुल मैनुअल: {report.b2_s5_manualsTotal||'0'} | द्विभाषी: {report.b2_s5_manualsBilingual||'0'}<br/>कुल प्रपत्र: {report.b2_s5_formsTotal||'0'} | द्विभाषी: {report.b2_s5_formsBilingual||'0'}</td>
                         </tr>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>6.</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>नियम 8(4) के अंतर्गत आदेश</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>जारी आदेश: {report.b2_rule84_ordered||'0'} | शेष: {report.b2_rule84_pending||'0'}</td>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>6.</td>
+                           <td><strong>नियम 8(4) के अंतर्गत आदेश</strong></td>
+                           <td>जारी आदेश: {report.b2_rule84_ordered||'0'} | शेष: {report.b2_rule84_pending||'0'}</td>
                         </tr>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>7.</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>प्रशिक्षण कार्यक्रम (संस्थानों हेतु)</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>नाम: {report.b2_s7_name||'-'} | अवधि: {report.b2_s7_duration||'0'} घंटे<br/>हिंदी: {report.b2_s7_hindi||'0'} | अंग्रेजी: {report.b2_s7_eng||'0'} | मिश्रित: {report.b2_s7_mixed||'0'}</td>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>7.</td>
+                           <td><strong>प्रशिक्षण कार्यक्रम (संस्थानों हेतु)</strong></td>
+                           <td>नाम: {report.b2_s7_name||'-'} | अवधि: {report.b2_s7_duration||'0'} घंटे<br/>हिंदी: {report.b2_s7_hindi||'0'} | अंग्रेजी: {report.b2_s7_eng||'0'} | मिश्रित: {report.b2_s7_mixed||'0'}</td>
                         </tr>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>8.</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>निरीक्षण</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>कुल अनुभाग: {report.b2_inspection_sections_total||'0'} | निरीक्षित: {report.b2_inspection_sections_inspected||'0'}<br/>कार्यालय कुल: {report.b2_inspection_offices_total||'0'} | निरीक्षित: {report.b2_inspection_offices_inspected||'0'}</td>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
+                           <td><strong>निरीक्षण</strong></td>
+                           <td>कुल अनुभाग: {report.b2_inspection_sections_total||'0'} | निरीक्षित: {report.b2_inspection_sections_inspected||'0'}<br/>कार्यालय कुल: {report.b2_inspection_offices_total||'0'} | निरीक्षित: {report.b2_inspection_offices_inspected||'0'}</td>
                         </tr>
                         <tr>
-                           <td style={{border: "1px solid #000", padding: "6px", textAlign: "center", fontWeight: "bold"}}>14.</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>वेबसाइट की स्थिति</td>
-                           <td style={{border: "1px solid #000", padding: "6px"}}>URL: {report.b2_website_url||'-'} <br/>भाषा: {report.b2_website_type||'-'} <br/>विकल्प उपलब्ध: {report.b2_website_langOption||'-'}</td>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>14.</td>
+                           <td><strong>वेबसाइट की स्थिति</strong></td>
+                           <td>URL: {report.b2_website_url||'-'} <br/>भाषा: {report.b2_website_type||'-'} <br/>विकल्प उपलब्ध: {report.b2_website_langOption||'-'}</td>
                         </tr>
                      </tbody>
                   </table>
                </div>
             )}
 
-            <div style={{marginTop: "40px", display: "flex", justifyContent: "space-between"}}>
+            <div style={{marginTop: "50px", display: "flex", justifyContent: "space-between"}}>
                <div style={{width: "40%", textAlign: "left"}}>
-                  <br/><br/>
                   <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>हस्ताक्षर:</strong> _______________________</p>
                   <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>नाम:</strong> {report.officerName || '...........................................'}</p>
                </div>
                <div style={{width: "40%", textAlign: "right"}}>
-                  <br/><br/>
                   <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>पदनाम:</strong> राजभाषा अधिकारी / अनुभाग प्रभारी</p>
                   <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>दिनांक:</strong> {new Date(report.timestamp).toLocaleDateString('en-GB')}</p>
                </div>
@@ -1287,7 +1290,6 @@
             <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700 }}>← वापस सूची में</button>
             <div style={{ display:"flex", gap:10 }}>
                <button onClick={() => onEdit(report)} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>✏️ रिपोर्ट एडिट करें</button>
-               {/* 🌟 प्रिंट बटन 🌟 */}
                <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>🖨️ PDF में सेव करें</button>
             </div>
           </div>
@@ -1300,7 +1302,7 @@
             <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:13, fontWeight:700, color:"#fff" }}>{st.icon} {st.label}</div>
           </div>
 
-          {/* 🌟 यह हिस्सा केवल स्क्रीन पर दिखेगा (प्रिंट में छिप जाएगा) 🌟 */}
+          {/* 🌟 स्क्रीन व्यू 🌟 */}
           <div className="print-box screen-only" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
             <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण (स्क्रीन व्यू)</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
@@ -1326,7 +1328,7 @@
             </div>
           </div>
 
-          {/* 🌟 यहाँ बैकग्राउंड में आपका नया "आधिकारिक PDF फॉर्मेट" छिपा हुआ है 🌟 */}
+          {/* 🌟 छिपा हुआ प्रिंट व्यू 🌟 */}
           <OfficialPrintView report={report} />
 
           {canAct && (
