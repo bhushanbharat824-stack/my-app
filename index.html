@@ -223,7 +223,7 @@
       b12_bl_total: "12. उप सचिव से नीचे (कुल)",
       b12_bl_knowHindi: "12. उप सचिव से नीचे (हिंदी ज्ञाता)",
       b12_bl_notDoing: "12. उप सचिव से नीचे (0% कार्य)",
-      b12_bl_25: "12. उप सचिव से नीचे (<25%)",
+      b12_bl_25: "12. उप सचिव से নিচে (<25%)",
       b12_bl_50: "12. उप सचिव से नीचे (26-50%)",
       b12_bl_75: "12. उप सचिव से नीचे (51-75%)",
       b12_bl_more: "12. उप सचिव से नीचे (>76%)",
@@ -787,11 +787,35 @@
       );
     }
 
-    function ConsolidatedView({ reports }) {
+    // ── 📑 CONSOLIDATED REPORT (WITH SECTION FILTER) ───────────────────────
+    function ConsolidatedView({ reports, sectionsList }) {
       const [q, setQ] = useState("Q4");
       const [y, setY] = useState("2026");
 
-      const filtered = reports.filter(r => r.quarter === q && r.year === y);
+      // 🌟 नया: किन अनुभागों को समेकित रिपोर्ट से बाहर रखना है 🌟
+      const [excludedSections, setExcludedSections] = useState([]);
+
+      const reportsForPeriod = reports.filter(r => r.quarter === q && r.year === y);
+      const availableSections = Array.from(new Set(reportsForPeriod.map(r => r.sectionName)));
+
+      // जब भी तिमाही/वर्ष बदले, तो फ़िल्टर रीसेट कर दें
+      useEffect(() => {
+        setExcludedSections([]);
+      }, [q, y]);
+
+      const handleToggle = (sec) => {
+        if (excludedSections.includes(sec)) {
+          setExcludedSections(excludedSections.filter(s => s !== sec));
+        } else {
+          setExcludedSections([...excludedSections, sec]);
+        }
+      };
+
+      const handleSelectAll = () => setExcludedSections([]);
+      const handleDeselectAll = () => setExcludedSections(availableSections);
+
+      // फ़ाइनल रिपोर्ट जिन्हें जोड़ा जाएगा
+      const filtered = reportsForPeriod.filter(r => !excludedSections.includes(r.sectionName));
       
       const agg = {};
       filtered.forEach(r => {
@@ -804,7 +828,7 @@
       });
 
       const fieldsToShow = [
-        ["कुल जमा रिपोर्टें (अनुभागों की संख्या)", filtered.length],
+        ["कुल जमा रिपोर्टें (चयनित अनुभाग)", filtered.length],
         ["1. मंत्री फाइलें (कुल)", agg.b1_s1_totalFiles||0],
         ["1. मंत्री फाइलें (हिंदी)", agg.b1_s1_hindiFiles||0],
         ["2. सचिव बैठकें (कुल)", agg.b1_s2_totalMeetings||0],
@@ -845,6 +869,31 @@
                <label style={{fontSize:11, fontWeight:"bold", display:"block"}}>वर्ष चुनें</label>
                <select value={y} onChange={e=>setY(e.target.value)} style={{padding:6, borderRadius:6, border:"1px solid #ccc", outline:"none"}}>{YEARS.map(x=><option key={x} value={x}>{x}</option>)}</select>
              </div>
+          </div>
+
+          {/* 🌟 समेकित करने के लिए अनुभाग चयन 🌟 */}
+          <div className="no-print" style={{ background:"#fff", padding:16, borderRadius:12, marginBottom:16, border:"1.5px solid #e2e8f0" }}>
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
+              <label style={{fontSize:13, fontWeight:"bold", color:"#1e293b"}}>समेकित करने के लिए अनुभाग चुनें ({filtered.length}/{availableSections.length}):</label>
+              <div style={{display:"flex", gap:6}}>
+                <button onClick={handleSelectAll} style={{fontSize:11, padding:"4px 8px", background:"#f1f5f9", border:"1px solid #cbd5e1", borderRadius:6, cursor:"pointer"}}>सभी चुनें</button>
+                <button onClick={handleDeselectAll} style={{fontSize:11, padding:"4px 8px", background:"#f1f5f9", border:"1px solid #cbd5e1", borderRadius:6, cursor:"pointer"}}>सभी हटाएँ</button>
+              </div>
+            </div>
+            {availableSections.length === 0 ? (
+               <div style={{fontSize:12, color:"#dc2626"}}>इस तिमाही/वर्ष के लिए कोई रिपोर्ट उपलब्ध नहीं है।</div>
+            ) : (
+               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                 {availableSections.map(sec => {
+                   const isSel = !excludedSections.includes(sec);
+                   return (
+                     <button key={sec} onClick={() => handleToggle(sec)} style={{ padding:"6px 12px", borderRadius:20, fontSize:11, fontWeight:700, cursor:"pointer", border:"1px solid", background: isSel ? "#10b981" : "#f8fafc", color: isSel ? "#fff" : "#94a3b8", borderColor: isSel ? "#10b981" : "#e2e8f0", transition:"all 0.2s" }}>
+                        {isSel ? "✓ " : "+ "}{sec}
+                     </button>
+                   )
+                 })}
+               </div>
+            )}
           </div>
 
           <div className="print-box" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:20 }}>
@@ -920,7 +969,6 @@
 
     // ── 🖨️ OFFICIAL PRINT VIEW (HIDDEN ON SCREEN, VISIBLE ON PRINT) ────────
     function OfficialPrintView({ report }) {
-       // 🌟 कड़ा चेक: भाग 2 तभी छपेगा जब अनुभाग हिंदी हो, तिमाही Q4 हो, और कोई भी एक महत्वपूर्ण डेटा (जैसे अधिकारी संख्या) भरा गया हो। 🌟
        const hasPart2Data = Boolean(report.b2_s1_subOfficesTotal || report.b2_s2_off_total || report.b2_comp_total);
        const isPart2Filled = report.quarter === "Q4" && report.sectionName === "हिंदी अनुभाग" && hasPart2Data;
        
@@ -1121,7 +1169,6 @@
                </tbody>
             </table>
 
-            {/* 🌟 भाग-II तभी छपेगा जब यह भरा गया हो (isPart2Filled == true) 🌟 */}
             {isPart2Filled && (
                <div className="page-break">
                   <h4>भाग-II (वार्षिक मूल्यांकन - केवल Q4 में देय)</h4>
@@ -1498,7 +1545,7 @@
             {view==="form" && <ReportForm key={editingReport ? editingReport.id : 'new'} onSave={handleSave} user={user} reports={reports} initialData={editingReport} onCancel={() => { setEditingReport(null); setView("inbox"); }} />}
             
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} onEdit={(r) => { setEditingReport(r); setView("form"); }} />}
-            {view==="consolidated" && <ConsolidatedView reports={reports} user={user} />}
+            {view==="consolidated" && <ConsolidatedView reports={reports} sectionsList={sectionsList} />}
             
             {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} sectionsList={sectionsList} settingsId={settingsId} />}
           </main>
