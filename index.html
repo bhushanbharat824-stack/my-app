@@ -223,7 +223,7 @@
       b12_bl_total: "12. उप सचिव से नीचे (कुल)",
       b12_bl_knowHindi: "12. उप सचिव से नीचे (हिंदी ज्ञाता)",
       b12_bl_notDoing: "12. उप सचिव से नीचे (0% कार्य)",
-      b12_bl_25: "12. उप सचिव से নিচে (<25%)",
+      b12_bl_25: "12. उप सचिव से नीचे (<25%)",
       b12_bl_50: "12. उप सचिव से नीचे (26-50%)",
       b12_bl_75: "12. उप सचिव से नीचे (51-75%)",
       b12_bl_more: "12. उप सचिव से नीचे (>76%)",
@@ -253,6 +253,7 @@
 
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
 
+    // 🌟 अपडेट: मद 9 का डिफ़ॉल्ट 'हाँ' कर दिया गया है 🌟
     function emptyForm() {
       return {
         officeNameAddress:"", officerName:"", stdCode:"", phone:"", email:"", 
@@ -262,7 +263,7 @@
         b1_s5_ka_total:"", b1_s5_ka_hindiReply:"", b1_s5_ka_engReply:"", b1_s5_ka_noReply:"", b1_s5_kha_total:"", b1_s5_kha_hindiReply:"", b1_s5_kha_engReply:"", b1_s5_kha_noReply:"",
         b1_s6_ka_hindi:"", b1_s6_ka_english:"", b1_s6_ka_total:"", b1_s6_kha_hindi:"", b1_s6_kha_english:"", b1_s6_kha_total:"", b1_s6_ga_hindi:"", b1_s6_ga_english:"", b1_s6_ga_total:"",
         b1_s7_hindiPages:"", b1_s7_engPages:"", b1_s7_totalPages:"", b1_s7_eoffice:"", b1_s8_workshops:"", b1_s8_officers:"", b1_s8_staff:"",
-        b1_s9_meetingDate:"", b1_s9_subOfficeCmtes:"", b1_s9_subOfficeMeetings:"", b1_s9_agendaHindi:"नहीं", b1_s10_meetingDate:"", b1_s11_innovation:"", b1_s11_special:"", b1_s11_other:"",
+        b1_s9_meetingDate:"", b1_s9_subOfficeCmtes:"", b1_s9_subOfficeMeetings:"", b1_s9_agendaHindi:"हाँ", b1_s10_meetingDate:"", b1_s11_innovation:"", b1_s11_special:"", b1_s11_other:"",
         b2_s1_notified:"नहीं", b2_s1_subOfficesTotal:"", b2_s1_subOfficesNotified:"", b2_s1_subOfficesAction:"",
         b2_s2_off_total:"", b2_s2_off_ministerial:"", b2_s2_off_pravinta:"", b2_s2_off_karyasadhak:"", b2_s2_off_training:"", b2_s2_off_remaining:"",
         b2_s2_staff_total:"", b2_s2_staff_ministerial:"", b2_s2_staff_pravinta:"", b2_s2_staff_karyasadhak:"", b2_s2_staff_training:"", b2_s2_staff_remaining:"",
@@ -792,13 +793,11 @@
       const [q, setQ] = useState("Q4");
       const [y, setY] = useState("2026");
 
-      // 🌟 नया: किन अनुभागों को समेकित रिपोर्ट से बाहर रखना है 🌟
       const [excludedSections, setExcludedSections] = useState([]);
 
       const reportsForPeriod = reports.filter(r => r.quarter === q && r.year === y);
       const availableSections = Array.from(new Set(reportsForPeriod.map(r => r.sectionName)));
 
-      // जब भी तिमाही/वर्ष बदले, तो फ़िल्टर रीसेट कर दें
       useEffect(() => {
         setExcludedSections([]);
       }, [q, y]);
@@ -814,7 +813,6 @@
       const handleSelectAll = () => setExcludedSections([]);
       const handleDeselectAll = () => setExcludedSections(availableSections);
 
-      // फ़ाइनल रिपोर्ट जिन्हें जोड़ा जाएगा
       const filtered = reportsForPeriod.filter(r => !excludedSections.includes(r.sectionName));
       
       const agg = {};
@@ -871,7 +869,6 @@
              </div>
           </div>
 
-          {/* 🌟 समेकित करने के लिए अनुभाग चयन 🌟 */}
           <div className="no-print" style={{ background:"#fff", padding:16, borderRadius:12, marginBottom:16, border:"1.5px solid #e2e8f0" }}>
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
               <label style={{fontSize:13, fontWeight:"bold", color:"#1e293b"}}>समेकित करने के लिए अनुभाग चुनें ({filtered.length}/{availableSections.length}):</label>
