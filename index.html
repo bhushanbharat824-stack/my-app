@@ -37,42 +37,37 @@
     @media screen {
       .print-only { display: none !important; }
     }
+    
+    /* 🌟 स्क्रीन और प्रिंट दोनों पर आधिकारिक लेआउट के लिए 🌟 */
+    .standard-doc { 
+       width: 100%; line-height: 1.4; color: #000; 
+       font-family: 'Noto Sans Devanagari', 'Times New Roman', serif; 
+       background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #cbd5e1;
+       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+       box-sizing: border-box;
+    }
+    .standard-doc table { 
+       width: 100%; border-collapse: collapse; 
+       margin-bottom: 15px; page-break-inside: auto; border: 1px solid #000;
+    }
+    .standard-doc tr { page-break-inside: avoid; page-break-after: auto; }
+    .standard-doc th, .standard-doc td { 
+       border: 1px solid #000; padding: 6px 8px; 
+       text-align: left; vertical-align: middle; 
+       font-size: 10.5pt; color: #000;
+    }
+    .standard-doc th { font-weight: bold; text-align: center; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;}
+    .standard-doc h2 { text-align: center; font-size: 15pt; margin: 0 0 6px 0; color: #000; font-weight: bold; text-decoration: underline; }
+    .standard-doc h3 { text-align: center; font-size: 13pt; margin: 0 0 20px 0; color: #000; font-weight: normal; }
+    .standard-doc h4 { font-size: 12pt; margin: 20px 0 10px 0; color: #000; text-decoration: underline; font-weight: bold; text-align: left; background: #e2e8f0; padding: 5px; -webkit-print-color-adjust: exact; }
+    .standard-doc .field-title { font-weight: bold; margin: 15px 0 6px 0; display: block; font-size: 11pt;}
+
     @media print {
       .no-print, .screen-only { display: none !important; }
       .print-only { display: block !important; }
-      
       @page { margin: 12mm 15mm; size: A4; }
-      body { 
-         font-family: 'Noto Sans Devanagari', 'Times New Roman', serif; 
-         font-size: 11pt; color: #000; 
-         background: #fff !important; 
-         margin: 0; padding: 0; 
-      }
-      
-      .official-print { width: 100%; line-height: 1.4; color: #000; }
-      
-      /* आधिकारिक टेबल डिज़ाइन */
-      .official-print table { 
-         width: 100%; border-collapse: collapse; 
-         margin-bottom: 12px; page-break-inside: auto; 
-         border: 1px solid #000;
-      }
-      .official-print tr { page-break-inside: avoid; page-break-after: auto; }
-      .official-print th, .official-print td { 
-         border: 1px solid #000; padding: 5px 6px; 
-         text-align: left; vertical-align: middle; 
-         font-size: 10.5pt; color: #000;
-      }
-      .official-print th { 
-         font-weight: bold; text-align: center;
-      }
-      
-      /* आधिकारिक हेडिंग्स */
-      .official-print h2 { text-align: center; font-size: 14pt; margin: 0 0 4px 0; color: #000; font-weight: bold; text-decoration: underline; }
-      .official-print h3 { text-align: center; font-size: 12pt; margin: 0 0 15px 0; color: #000; font-weight: normal; }
-      .official-print h4 { font-size: 12pt; margin: 15px 0 8px 0; color: #000; text-decoration: underline; font-weight: bold; text-align: center;}
-      .official-print .field-title { font-weight: bold; margin: 10px 0 4px 0; display: block; font-size: 11pt;}
-      
+      body { background: #fff !important; margin: 0; padding: 0; }
+      .standard-doc { padding: 0; border: none; box-shadow: none; border-radius: 0; }
       .page-break { page-break-before: always; }
       .print-box { border: none !important; box-shadow: none !important; }
     }
@@ -105,137 +100,17 @@
     };
 
     const FIELD_LABELS_HINDI = {
-      officeNameAddress: "कार्यालय का नाम व पता",
-      officerName: "अधिकारी का नाम",
-      stdCode: "एस.टी.डी. कोड",
-      phone: "फोन नं.",
-      email: "ई-मेल",
-      region: "क्षेत्र",
-      rbOfficerPhone: "राजभाषा अधिकारी का फोन",
-      rbOfficerEmail: "राजभाषा अधिकारी का ई-मेल",
-      b1_s1_totalFiles: "1. कुल फाइलें (मंत्री जी को)",
-      b1_s1_hindiFiles: "1. हिंदी में फाइलें",
-      b1_s2_totalMeetings: "2(I). कुल बैठकें (सचिव स्तर)",
-      b1_s2_hindiMinutes: "2(II). हिंदी में कार्यवाही",
-      b1_s2_totalDocs: "2(III). कुल कागजात",
-      b1_s2_hindiDocs: "2(IV). हिंदी में कागजात",
-      b1_s3_totalIssued: "3(क). कुल जारी दस्तावेज (धारा 3(3))",
-      b1_s3_bilingual: "3(ख). द्विभाषी",
-      b1_s3_englishOnly: "3(ग). केवल अंग्रेजी",
-      b1_s3_hindiOnly: "3(घ). केवल हिंदी",
-      b1_s4_totalReceived: "4(क). हिंदी में कुल प्राप्त पत्र",
-      b1_s4_noReplyNeeded: "4(ख). उत्तर अपेक्षित नहीं",
-      b1_s4_hindiReply: "4(ग). हिंदी/द्विभाषी उत्तर",
-      b1_s4_englishReply: "4(घ). अंग्रेजी में उत्तर",
-      b1_s5_ka_total: "5. अंग्रेजी पत्र प्राप्त ('क' क्षेत्र)",
-      b1_s5_ka_hindiReply: "5. हिंदी में उत्तर ('क')",
-      b1_s5_ka_engReply: "5. अंग्रेजी में उत्तर ('क')",
-      b1_s5_ka_noReply: "5. उत्तर अपेक्षित नहीं ('क')",
-      b1_s5_kha_total: "5. अंग्रेजी पत्र प्राप्त ('ख' क्षेत्र)",
-      b1_s5_kha_hindiReply: "5. हिंदी में उत्तर ('ख')",
-      b1_s5_kha_engReply: "5. अंग्रेजी में उत्तर ('ख')",
-      b1_s5_kha_noReply: "5. उत्तर अपेक्षित नहीं ('ख')",
-      b1_s6_ka_hindi: "6. हिंदी पत्राचार ('क' क्षेत्र)",
-      b1_s6_ka_english: "6. अंग्रेजी पत्राचार ('क')",
-      b1_s6_ka_total: "6. कुल पत्राचार ('क')",
-      b1_s6_kha_hindi: "6. हिंदी पत्राचार ('ख' क्षेत्र)",
-      b1_s6_kha_english: "6. अंग्रेजी पत्राचार ('ख')",
-      b1_s6_kha_total: "6. कुल पत्राचार ('ख')",
-      b1_s6_ga_hindi: "6. हिंदी पत्राचार ('ग' क्षेत्र)",
-      b1_s6_ga_english: "6. अंग्रेजी पत्राचार ('ग')",
-      b1_s6_ga_total: "6. कुल पत्राचार ('ग')",
-      b1_s7_hindiPages: "7. टिप्पण (हिंदी पृष्ठ)",
-      b1_s7_engPages: "7. टिप्पण (अंग्रेजी पृष्ठ)",
-      b1_s7_totalPages: "7. टिप्पण (कुल पृष्ठ)",
-      b1_s7_eoffice: "7. ई-ऑफिस टिप्पणियाँ",
-      b1_s8_workshops: "8. कार्यशालाओं की संख्या",
-      b1_s8_officers: "8. प्रशिक्षित अधिकारी",
-      b1_s8_staff: "8. प्रशिक्षित कर्मचारी",
-      b1_s9_meetingDate: "9(क). रा.भा.का.स. बैठक तिथि",
-      b1_s9_subOfficeCmtes: "9(ख). रा.भा.का.स. अधीनस्थ समितियां",
-      b1_s9_subOfficeMeetings: "9(ग). रा.भा.का.स. आयोजित बैठकें",
-      b1_s9_agendaHindi: "9(घ). रा.भा.का.स. कार्यसूची हिंदी में?",
-      b1_s10_meetingDate: "10. हिंदी सलाहकार समिति बैठक",
-      b1_s11_innovation: "11(i). नवोन्मेषी कार्य",
-      b1_s11_special: "11(ii). विशिष्ट आयोजन",
-      b1_s11_other: "11(iii). अन्य आयोजन",
-      b2_s1_notified: "भाग II-1(i). नियम 10(4) में अधिसूचित?",
-      b2_s1_subOfficesTotal: "भाग II-1. कुल अधीनस्थ कार्यालय",
-      b2_s1_subOfficesNotified: "भाग II-1. अधिसूचित कार्यालय",
-      b2_s1_subOfficesAction: "भाग II-1. शेष हेतु कार्रवाई",
-      b2_s2_off_total: "2(i). अधिकारी (कुल)",
-      b2_s2_off_ministerial: "2(i). अधिकारी (अनुसचिवीय)",
-      b2_s2_off_pravinta: "2(i). अधिकारी (प्रवीणता)",
-      b2_s2_off_karyasadhak: "2(i). अधिकारी (कार्यसाधक)",
-      b2_s2_off_training: "2(i). अधिकारी (प्रशिक्षण ले रहे)",
-      b2_s2_off_remaining: "2(i). अधिकारी (प्रशिक्षण शेष)",
-      b2_s2_staff_total: "2(i). कर्मचारी (कुल)",
-      b2_s2_staff_ministerial: "2(i). कर्मचारी (अनुसचिवीय)",
-      b2_s2_staff_pravinta: "2(i). कर्मचारी (प्रवीणता)",
-      b2_s2_staff_karyasadhak: "2(i). कर्मचारी (कार्यसाधक)",
-      b2_s2_staff_training: "2(i). कर्मचारी (प्रशिक्षण ले रहे)",
-      b2_s2_staff_remaining: "2(i). कर्मचारी (प्रशिक्षण शेष)",
-      b2_shorthand_total: "2(ii). आशुलिपिक (कुल)",
-      b2_shorthand_trained: "2(ii). आशुलिपिक (प्रशिक्षित)",
-      b2_shorthand_working: "2(ii). आशुलिपिक (हिंदी कार्य)",
-      b2_shorthand_pending: "2(ii). आशुलिपिक (प्रशिक्षण शेष)",
-      b2_typing_total: "2(ii). टंकक/लिपिक (कुल)",
-      b2_typing_trained: "2(ii). टंकक/लिपिक (प्रशिक्षित)",
-      b2_typing_working: "2(ii). टंकक/लिपिक (हिंदी कार्य)",
-      b2_typing_pending: "2(ii). टंकक/लिपिक (प्रशिक्षण शेष)",
-      b2_tax_total: "2(ii). कर/पोस्टल सहायक (कुल)",
-      b2_tax_trained: "2(ii). कर/पोस्टल (प्रशिक्षित)",
-      b2_tax_working: "2(ii). कर/पोस्टल (हिंदी कार्य)",
-      b2_tax_pending: "2(ii). कर/पोस्टल (प्रशिक्षण शेष)",
-      b2_translation_total: "2(iii). अनुवादक (कुल)",
-      b2_translation_trained: "2(iii). अनुवादक (प्रशिक्षित)",
-      b2_translation_pending: "2(iii). अनुवादक (प्रशिक्षण शेष)",
-      b2_comp_total: "3. कंप्यूटर कार्मिक (कुल)",
-      b2_comp_trained: "3. कंप्यूटर कार्मिक (प्रशिक्षित)",
-      b2_comp_working: "3. कंप्यूटर कार्मिक (हिंदी कार्य)",
-      b2_s4_totalLaptops: "4. कुल कंप्यूटर/लैपटॉप",
-      b2_s4_unicode: "4. यूनिकोड सक्षम",
-      b2_s4_hindiPct: "4. कंप्यूटर पर हिंदी कार्य %",
-      b2_s5_manualsTotal: "5. कुल अधिनियम/मैनुअल",
-      b2_s5_manualsBilingual: "5. द्विभाषी अधिनियम/मैनुअल",
-      b2_s5_formsTotal: "5. कुल मानकीकृत प्रपत्र",
-      b2_s5_formsBilingual: "5. द्विभाषी प्रपत्र",
-      b2_rule84_ordered: "6. नियम 8(4) के आदेश जारी",
-      b2_rule84_pending: "6. नियम 8(4) शेष कार्मिक",
-      b2_s7_name: "7. प्रशिक्षण कार्यक्रम का नाम",
-      b2_s7_duration: "7. प्रशिक्षण अवधि (घंटे)",
-      b2_s7_hindi: "7. हिंदी में प्रशिक्षण",
-      b2_s7_eng: "7. अंग्रेजी में प्रशिक्षण",
-      b2_s7_mixed: "7. मिली-जुली भाषा में प्रशिक्षण",
-      b2_inspection_sections_total: "8. कुल अनुभाग (निरीक्षण)",
-      b2_inspection_sections_inspected: "8. निरीक्षित अनुभाग",
-      b2_s8_hindiSections: "8. हिंदी कार्य हेतु निर्दिष्ट अनुभाग",
-      b2_inspection_offices_total: "8. कुल अधीनस्थ कार्यालय",
-      b2_inspection_offices_inspected: "8. निरीक्षित कार्यालय",
-      b11_ds_total: "11. उप सचिव व उच्च (कुल)",
-      b11_ds_knowHindi: "11. उप सचिव व उच्च (हिंदी ज्ञाता)",
-      b11_ds_notDoing: "11. उप सचिव व उच्च (0% कार्य)",
-      b11_ds_25: "11. उप सचिव व उच्च (<25%)",
-      b11_ds_50: "11. उप सचिव व उच्च (26-50%)",
-      b11_ds_75: "11. उप सचिव व उच्च (51-75%)",
-      b11_ds_more: "11. उप सचिव व उच्च (>76%)",
-      b11_ds_100: "11. उप सचिव व उच्च (100%)",
-      b12_bl_total: "12. उप सचिव से नीचे (कुल)",
-      b12_bl_knowHindi: "12. उप सचिव से नीचे (हिंदी ज्ञाता)",
-      b12_bl_notDoing: "12. उप सचिव से नीचे (0% कार्य)",
-      b12_bl_25: "12. उप सचिव से नीचे (<25%)",
-      b12_bl_50: "12. उप सचिव से नीचे (26-50%)",
-      b12_bl_75: "12. उप सचिव से नीचे (51-75%)",
-      b12_bl_more: "12. उप सचिव से नीचे (>76%)",
-      b12_bl_100: "12. उप सचिव से नीचे (100%)",
-      b13_postName: "13. हिंदी के पदनाम",
-      b13_hqSanc: "13. HQ स्वीकृत",
-      b13_hqVac: "13. HQ रिक्त",
-      b13_subSanc: "13. Sub स्वीकृत",
-      b13_subVac: "13. Sub रिक्त",
-      b2_website_url: "14. वेबसाइट URL",
-      b2_website_type: "14. वेबसाइट भाषा स्थिति",
-      b2_website_langOption: "14. भाषा चयन का विकल्प?"
+      officeNameAddress: "कार्यालय का नाम व पता", officerName: "अधिकारी का नाम", stdCode: "एस.टी.डी. कोड", phone: "फोन नं.", email: "ई-मेल", region: "क्षेत्र", rbOfficerPhone: "राजभाषा अधिकारी का फोन", rbOfficerEmail: "राजभाषा अधिकारी का ई-मेल",
+      b1_s1_totalFiles: "1. कुल फाइलें (मंत्री जी को)", b1_s1_hindiFiles: "1. हिंदी में फाइलें", b1_s2_totalMeetings: "2(I). कुल बैठकें (सचिव स्तर)", b1_s2_hindiMinutes: "2(II). हिंदी में कार्यवाही", b1_s2_totalDocs: "2(III). कुल कागजात", b1_s2_hindiDocs: "2(IV). हिंदी में कागजात", b1_s3_totalIssued: "3(क). कुल जारी दस्तावेज (धारा 3(3))", b1_s3_bilingual: "3(ख). द्विभाषी", b1_s3_englishOnly: "3(ग). केवल अंग्रेजी", b1_s3_hindiOnly: "3(घ). केवल हिंदी", b1_s4_totalReceived: "4(क). हिंदी में कुल प्राप्त पत्र", b1_s4_noReplyNeeded: "4(ख). उत्तर अपेक्षित नहीं", b1_s4_hindiReply: "4(ग). हिंदी/द्विभाषी उत्तर", b1_s4_englishReply: "4(घ). अंग्रेजी में उत्तर",
+      b1_s5_ka_total: "5. अंग्रेजी पत्र प्राप्त ('क' क्षेत्र)", b1_s5_ka_hindiReply: "5. हिंदी में उत्तर ('क')", b1_s5_ka_engReply: "5. अंग्रेजी में उत्तर ('क')", b1_s5_ka_noReply: "5. उत्तर अपेक्षित नहीं ('क')", b1_s5_kha_total: "5. अंग्रेजी पत्र प्राप्त ('ख' क्षेत्र)", b1_s5_kha_hindiReply: "5. हिंदी में उत्तर ('ख')", b1_s5_kha_engReply: "5. अंग्रेजी में उत्तर ('ख')", b1_s5_kha_noReply: "5. उत्तर अपेक्षित नहीं ('ख')",
+      b1_s6_ka_hindi: "6. हिंदी पत्राचार ('क' क्षेत्र)", b1_s6_ka_english: "6. अंग्रेजी पत्राचार ('क')", b1_s6_ka_total: "6. कुल पत्राचार ('क')", b1_s6_kha_hindi: "6. हिंदी पत्राचार ('ख' क्षेत्र)", b1_s6_kha_english: "6. अंग्रेजी पत्राचार ('ख')", b1_s6_kha_total: "6. कुल पत्राचार ('ख')", b1_s6_ga_hindi: "6. हिंदी पत्राचार ('ग' क्षेत्र)", b1_s6_ga_english: "6. अंग्रेजी पत्राचार ('ग')", b1_s6_ga_total: "6. कुल पत्राचार ('ग')",
+      b1_s7_hindiPages: "7. टिप्पण (हिंदी पृष्ठ)", b1_s7_engPages: "7. टिप्पण (अंग्रेजी पृष्ठ)", b1_s7_totalPages: "7. टिप्पण (कुल पृष्ठ)", b1_s7_eoffice: "7. ई-ऑफिस टिप्पणियाँ", b1_s8_workshops: "8. कार्यशालाओं की संख्या", b1_s8_officers: "8. प्रशिक्षित अधिकारी", b1_s8_staff: "8. प्रशिक्षित कर्मचारी",
+      b1_s9_meetingDate: "9(क). रा.भा.का.स. बैठक तिथि", b1_s9_subOfficeCmtes: "9(ख). रा.भा.का.स. अधीनस्थ समितियां", b1_s9_subOfficeMeetings: "9(ग). रा.भा.का.स. आयोजित बैठकें", b1_s9_agendaHindi: "9(घ). रा.भा.का.स. कार्यसूची हिंदी में?", b1_s10_meetingDate: "10. हिंदी सलाहकार समिति बैठक", b1_s11_innovation: "11(i). नवोन्मेषी कार्य", b1_s11_special: "11(ii). विशिष्ट आयोजन", b1_s11_other: "11(iii). अन्य आयोजन",
+      b2_s1_notified: "भाग II-1(i). नियम 10(4) में अधिसूचित?", b2_s1_subOfficesTotal: "भाग II-1. कुल अधीनस्थ कार्यालय", b2_s1_subOfficesNotified: "भाग II-1. अधिसूचित कार्यालय", b2_s1_subOfficesAction: "भाग II-1. शेष हेतु कार्रवाई",
+      b2_s2_off_total: "2(i). अधिकारी (कुल)", b2_s2_off_ministerial: "2(i). अधिकारी (अनुसचिवीय)", b2_s2_off_pravinta: "2(i). अधिकारी (प्रवीणता)", b2_s2_off_karyasadhak: "2(i). अधिकारी (कार्यसाधक)", b2_s2_off_training: "2(i). अधिकारी (प्रशिक्षण ले रहे)", b2_s2_off_remaining: "2(i). अधिकारी (प्रशिक्षण शेष)", b2_s2_staff_total: "2(i). कर्मचारी (कुल)", b2_s2_staff_ministerial: "2(i). कर्मचारी (अनुसचिवीय)", b2_s2_staff_pravinta: "2(i). कर्मचारी (प्रवीणता)", b2_s2_staff_karyasadhak: "2(i). कर्मचारी (कार्यसाधक)", b2_s2_staff_training: "2(i). कर्मचारी (प्रशिक्षण ले रहे)", b2_s2_staff_remaining: "2(i). कर्मचारी (प्रशिक्षण शेष)",
+      b2_shorthand_total: "2(ii). आशुलिपिक (कुल)", b2_shorthand_trained: "2(ii). आशुलिपिक (प्रशिक्षित)", b2_shorthand_working: "2(ii). आशुलिपिक (हिंदी कार्य)", b2_shorthand_pending: "2(ii). आशुलिपिक (प्रशिक्षण शेष)", b2_typing_total: "2(ii). टंकक/लिपिक (कुल)", b2_typing_trained: "2(ii). टंकक/लिपिक (प्रशिक्षित)", b2_typing_working: "2(ii). टंकक/लिपिक (हिंदी कार्य)", b2_typing_pending: "2(ii). टंकक/लिपिक (प्रशिक्षण शेष)", b2_tax_total: "2(ii). कर/पोस्टल सहायक (कुल)", b2_tax_trained: "2(ii). कर/पोस्टल (प्रशिक्षित)", b2_tax_working: "2(ii). कर/पोस्टल (हिंदी कार्य)", b2_tax_pending: "2(ii). कर/पोस्टल (प्रशिक्षण शेष)", b2_translation_total: "2(iii). अनुवादक (कुल)", b2_translation_trained: "2(iii). अनुवादक (प्रशिक्षित)", b2_translation_pending: "2(iii). अनुवादक (प्रशिक्षण शेष)",
+      b2_comp_total: "3. कंप्यूटर कार्मिक (कुल)", b2_comp_trained: "3. कंप्यूटर कार्मिक (प्रशिक्षित)", b2_comp_working: "3. कंप्यूटर कार्मिक (हिंदी कार्य)", b2_s4_totalLaptops: "4. कुल कंप्यूटर/लैपटॉप", b2_s4_unicode: "4. यूनिकोड सक्षम", b2_s4_hindiPct: "4. कंप्यूटर पर हिंदी कार्य %", b2_s5_manualsTotal: "5. कुल अधिनियम/मैनुअल", b2_s5_manualsBilingual: "5. द्विभाषी अधिनियम/मैनुअल", b2_s5_formsTotal: "5. कुल मानकीकृत प्रपत्र", b2_s5_formsBilingual: "5. द्विभाषी प्रपत्र", b2_rule84_ordered: "6. नियम 8(4) के आदेश जारी", b2_rule84_pending: "6. नियम 8(4) शेष कार्मिक", b2_s7_name: "7. प्रशिक्षण कार्यक्रम का नाम", b2_s7_duration: "7. प्रशिक्षण अवधि (घंटे)", b2_s7_hindi: "7. हिंदी में प्रशिक्षण", b2_s7_eng: "7. अंग्रेजी में प्रशिक्षण", b2_s7_mixed: "7. मिली-जुली भाषा में प्रशिक्षण", b2_inspection_sections_total: "8. कुल अनुभाग (निरीक्षण)", b2_inspection_sections_inspected: "8. निरीक्षित अनुभाग", b2_s8_hindiSections: "8. हिंदी कार्य हेतु निर्दिष्ट अनुभाग", b2_inspection_offices_total: "8. कुल अधीनस्थ कार्यालय", b2_inspection_offices_inspected: "8. निरीक्षित कार्यालय",
+      b11_ds_total: "11. उप सचिव व उच्च (कुल)", b11_ds_knowHindi: "11. उप सचिव व उच्च (हिंदी ज्ञाता)", b11_ds_notDoing: "11. उप सचिव व उच्च (0% कार्य)", b11_ds_25: "11. उप सचिव व उच्च (<25%)", b11_ds_50: "11. उप सचिव व उच्च (26-50%)", b11_ds_75: "11. उप सचिव व उच्च (51-75%)", b11_ds_more: "11. उप सचिव व उच्च (>76%)", b11_ds_100: "11. उप सचिव व उच्च (100%)", b12_bl_total: "12. उप सचिव से नीचे (कुल)", b12_bl_knowHindi: "12. उप सचिव से नीचे (हिंदी ज्ञाता)", b12_bl_notDoing: "12. उप सचिव से नीचे (0% कार्य)", b12_bl_25: "12. उप सचिव से नीचे (<25%)", b12_bl_50: "12. उप सचिव से नीचे (26-50%)", b12_bl_75: "12. उप सचिव से नीचे (51-75%)", b12_bl_more: "12. उप सचिव से नीचे (>76%)", b12_bl_100: "12. उप सचिव से नीचे (100%)", b13_postName: "13. हिंदी के पदनाम", b13_hqSanc: "13. HQ स्वीकृत", b13_hqVac: "13. HQ रिक्त", b13_subSanc: "13. Sub स्वीकृत", b13_subVac: "13. Sub रिक्त", b2_website_url: "14. वेबसाइट URL", b2_website_type: "14. वेबसाइट भाषा स्थिति", b2_website_langOption: "14. भाषा चयन का विकल्प?"
     };
 
     const DEFAULT_SECTIONS = [
@@ -253,7 +128,6 @@
 
     function genId() { return `RAJ-${Date.now().toString(36).toUpperCase().slice(-7)}`; }
 
-    // 🌟 अपडेट: मद 9 का डिफ़ॉल्ट 'हाँ' कर दिया गया है 🌟
     function emptyForm() {
       return {
         officeNameAddress:"", officerName:"", stdCode:"", phone:"", email:"", 
@@ -492,7 +366,7 @@
       const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
       
       const inboxCount = { 
-        AAO: reports.filter(x=>x.status==="PENDING_AAO" && x.sectionName===user.mappedSection).length, 
+        AAO: reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x.status) && x.sectionName===user.mappedSection).length, 
         SAO: reports.filter(x=>x.status==="AAO_APPROVED" && x.sectionName===user.mappedSection).length, 
         HINDI_CELL: reports.filter(x=>x.status==="SAO_APPROVED").length 
       };
@@ -620,6 +494,8 @@
             report.status = "PENDING_AAO";
             report.timeline = [{ ts:new Date().toISOString(), role:"SECTION", name:user.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }];
         } else {
+            if (user.role === "SECTION" && report.status === "AAO_RETURNED") report.status = "PENDING_AAO";
+            if (user.role === "AAO" && report.status === "SAO_RETURNED") report.status = "AAO_APPROVED";
             report.timeline = [...(report.timeline||[]), { ts:new Date().toISOString(), role:user.role, name:user.name, action:"रिपोर्ट में संशोधन किया गया (Edited)", remark:"" }];
         }
         
@@ -631,7 +507,7 @@
         <div style={{ textAlign:"center", padding:"60px 20px", background:"#fff", borderRadius:20, border:"2px solid #d1fae5" }}>
           <div style={{ fontSize:56 }}>🎉</div>
           <h2 style={{ fontSize:20, fontWeight:800, color:"#065f46", margin:"16px 0 8px" }}>
-             {initialData ? "रिपोर्ट सफलतापूर्वक अपडेट हो गई!" : "रिपोर्ट AAO के पास भेज दी गई!"}
+             {initialData ? "रिपोर्ट सफलतापूर्वक अपडेट होकर आगे भेज दी गई है!" : "रिपोर्ट AAO के पास भेज दी गई है!"}
           </h2>
           <div style={{ fontSize:18, fontWeight:800, color:"#6366f1", background:"#eef2ff", display:"inline-block", padding:"8px 20px", borderRadius:10 }}>{data.ackId}</div>
           <br/>
@@ -769,7 +645,7 @@
                 disabled={validationErrors.length > 0}
                 style={{ width:"100%", padding:"14px 0", borderRadius:14, border:"none", cursor: validationErrors.length > 0 ? "not-allowed" : "pointer", background: validationErrors.length > 0 ? "#cbd5e1" : "linear-gradient(135deg,#6366f1,#8b5cf6)", color:"#fff", fontWeight:800, fontSize:15, boxShadow: validationErrors.length > 0 ? "none" : "0 6px 20px rgba(99,102,241,0.4)" }}
               >
-                {initialData ? "✅ रिपोर्ट अपडेट करें" : "✅ रिपोर्ट अंतिम रूप से जमा करें"}
+                {initialData ? "✅ रिपोर्ट अपडेट करें (और आगे भेजें)" : "✅ रिपोर्ट अंतिम रूप से जमा करें"}
               </button>
             </div>
           )}
@@ -788,7 +664,7 @@
       );
     }
 
-    // ── 📑 CONSOLIDATED REPORT (WITH SECTION FILTER) ───────────────────────
+    // ── 📑 CONSOLIDATED REPORT (OFFICIAL FORMAT ON SCREEN & PRINT) ────────
     function ConsolidatedView({ reports, sectionsList }) {
       const [q, setQ] = useState("Q4");
       const [y, setY] = useState("2026");
@@ -818,41 +694,19 @@
       const agg = {};
       filtered.forEach(r => {
         Object.keys(r).forEach(k => {
-          if (k.startsWith("b1_") || k.startsWith("b2_")) {
+          if (k.startsWith("b1_") || k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_")) {
              const v = parseFloat(r[k]);
              if (!isNaN(v)) agg[k] = (agg[k] || 0) + v;
           }
         });
       });
 
-      const fieldsToShow = [
-        ["कुल जमा रिपोर्टें (चयनित अनुभाग)", filtered.length],
-        ["1. मंत्री फाइलें (कुल)", agg.b1_s1_totalFiles||0],
-        ["1. मंत्री फाइलें (हिंदी)", agg.b1_s1_hindiFiles||0],
-        ["2. सचिव बैठकें (कुल)", agg.b1_s2_totalMeetings||0],
-        ["2. हिंदी कार्यवाही", agg.b1_s2_hindiMinutes||0],
-        ["3. धारा 3(3) कुल जारी", agg.b1_s3_totalIssued||0],
-        ["3. धारा 3(3) द्विभाषी + हिंदी", (agg.b1_s3_bilingual||0) + (agg.b1_s3_hindiOnly||0)],
-        ["4. प्राप्त पत्र कुल", agg.b1_s4_totalReceived||0],
-        ["4. हिंदी में उत्तर", agg.b1_s4_hindiReply||0],
-        ["6. पत्राचार 'क' क्षेत्र (कुल)", agg.b1_s6_ka_total||0],
-        ["6. पत्राचार 'क' क्षेत्र (हिंदी)", agg.b1_s6_ka_hindi||0],
-        ["6. पत्राचार 'ख' क्षेत्र (कुल)", agg.b1_s6_kha_total||0],
-        ["6. पत्राचार 'ख' क्षेत्र (हिंदी)", agg.b1_s6_kha_hindi||0],
-        ["6. पत्राचार 'ग' क्षेत्र (कुल)", agg.b1_s6_ga_total||0],
-        ["6. पत्राचार 'ग' क्षेत्र (हिंदी)", agg.b1_s6_ga_hindi||0],
-        ["7. टिप्पण (कुल पृष्ठ)", agg.b1_s7_totalPages||0],
-        ["7. टिप्पण (हिंदी पृष्ठ)", agg.b1_s7_hindiPages||0],
-        ["8. हिंदी कार्यशालाएं", agg.b1_s8_workshops||0],
-        ["8. प्रशिक्षित अधिकारी/कर्मचारी", (agg.b1_s8_officers||0) + (agg.b1_s8_staff||0)],
-        ["13. कंप्यूटर (कुल)", agg.b2_comp_total||0],
-        ["13. कंप्यूटर (प्रशिक्षित)", agg.b2_comp_trained||0],
-      ];
+      const isPart2Filled = q === "Q4" && Boolean(agg.b2_s1_subOfficesTotal || agg.b2_s2_off_total || agg.b2_comp_total);
 
       return (
         <div style={{ maxWidth:800, margin:"0 auto" }}>
           <div className="no-print" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-            <h2 style={{ fontSize:18, fontWeight:800, margin:0, color:"#1e293b" }}>📑 कार्यालय की समेकित रिपोर्ट</h2>
+            <h2 style={{ fontSize:18, fontWeight:800, margin:0, color:"#1e293b" }}>📑 समेकित रिपोर्ट जनरेटर</h2>
             <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>
               🖨️ PDF में सेव करें / प्रिंट करें
             </button>
@@ -893,20 +747,306 @@
             )}
           </div>
 
-          <div className="print-box" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:20 }}>
-            <div style={{ textAlign:"center", marginBottom:20, borderBottom:"2px solid #1e293b", paddingBottom:10 }}>
-               <h2 style={{ margin:0, fontSize:20, color:"#1e293b" }}>राजभाषा तिमाही प्रगति समेकित (Consolidated) रिपोर्ट</h2>
-               <p style={{ margin:"4px 0 0", color:"#475569", fontSize:14 }}>{QUARTERS.find(x=>x.id===q)?.label} · {y} · पश्चिम रेलवे</p>
+          {/* 🌟 समेकित रिपोर्ट का आधिकारिक व्यू (स्क्रीन और प्रिंट दोनों के लिए) 🌟 */}
+          <div className="standard-doc print-only" style={{display: 'block'}}>
+            <h2>राजभाषा के प्रगामी प्रयोग के संबंध में समेकित तिमाही प्रगति रिपोर्ट</h2>
+            <h3>(अनुलग्नक-2)</h3>
+            
+            <table>
+               <tbody>
+                  <tr>
+                     <td style={{width: "50%"}}><strong>कार्यालय का नाम:</strong> पश्चिम रेलवे (विभिन्न अनुभाग)</td>
+                     <td style={{width: "25%"}}><strong>तिमाही:</strong> {QUARTERS.find(x=>x.id===q)?.label}</td>
+                     <td style={{width: "25%"}}><strong>वर्ष:</strong> {y}</td>
+                  </tr>
+                  <tr>
+                     <td><strong>समेकित अनुभागों की संख्या:</strong> {filtered.length}</td>
+                     <td colSpan="2"><strong>क्षेत्र:</strong> 'क', 'ख' एवं 'ग'</td>
+                  </tr>
+               </tbody>
+            </table>
+
+            <h4>भाग-I (केवल तिमाही आधार पर भरा जाना है)</h4>
+            
+            <table>
+               <tbody>
+                  <tr>
+                     <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
+                     <td style={{width: "55%"}}>माननीय मंत्री जी को प्रस्तुत की गई कुल फाइलों की संख्या</td>
+                     <td style={{width: "20%"}}>कुल: {agg.b1_s1_totalFiles || '0'}</td>
+                     <td style={{width: "20%"}}>हिंदी में: {agg.b1_s1_hindiFiles || '0'}</td>
+                  </tr>
+                  <tr>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>2.</td>
+                     <td>सचिव/समकक्ष स्तर पर आयोजित कुल बैठकें व प्रस्तुत कागजात</td>
+                     <td>कुल बैठकें: {agg.b1_s2_totalMeetings || '0'}<br/>कुल कागजात: {agg.b1_s2_totalDocs || '0'}</td>
+                     <td>हिंदी कार्यवाही: {agg.b1_s2_hindiMinutes || '0'}<br/>हिंदी कागजात: {agg.b1_s2_hindiDocs || '0'}</td>
+                  </tr>
+               </tbody>
+            </table>
+
+            <div style={{marginBottom: "10px"}}>
+                <span className="field-title">3. राजभाषा अधिनियम की धारा 3(3) के अंतर्गत जारी दस्तावेजों की स्थिति:</span>
+                <table>
+                   <thead>
+                      <tr>
+                        <th>(क) कुल जारी</th>
+                        <th>(ख) द्विभाषी</th>
+                        <th>(ग) केवल अंग्रेजी</th>
+                        <th>(घ) केवल हिंदी</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      <tr>
+                         <td style={{textAlign: "center"}}>{agg.b1_s3_totalIssued || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s3_bilingual || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s3_englishOnly || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s3_hindiOnly || '0'}</td>
+                      </tr>
+                   </tbody>
+                </table>
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-              {fieldsToShow.map(([k,v], i)=>(
-                <div key={i} style={{ background:"#f8fafc", borderRadius:8, padding:"10px 14px", border:"1px solid #f1f5f9", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                  <span style={{ fontSize:12, color:"#475569", fontWeight:700 }}>{k}</span>
-                  <span style={{ fontSize:15, color:"#1e293b", fontWeight:800 }}>{v}</span>
-                </div>
-              ))}
+
+            <div style={{marginBottom: "10px"}}>
+                <span className="field-title">4. हिंदी में प्राप्त पत्रों की स्थिति (राजभाषा नियम-5 के अनुपालन सहित):</span>
+                <table>
+                   <thead>
+                      <tr>
+                        <th>(क) कुल प्राप्त</th>
+                        <th>(ख) उत्तर अपेक्षित नहीं</th>
+                        <th>(ग) हिंदी/द्विभाषी में उत्तर</th>
+                        <th>(घ) अंग्रेजी में उत्तर</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      <tr>
+                         <td style={{textAlign: "center"}}>{agg.b1_s4_totalReceived || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s4_noReplyNeeded || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s4_hindiReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s4_englishReply || '0'}</td>
+                      </tr>
+                   </tbody>
+                </table>
+            </div>
+
+            <div style={{marginBottom: "10px"}}>
+                <span className="field-title">5 व 6. अंग्रेजी पत्रों के उत्तर हिंदी में देने एवं मूल पत्राचार का ब्यौरा:</span>
+                <table>
+                   <thead>
+                      <tr>
+                         <th rowSpan="2" style={{verticalAlign: "middle"}}>क्षेत्र</th>
+                         <th colSpan="4">अंग्रेजी पत्रों के उत्तर (मद 5)</th>
+                         <th colSpan="4">मूल पत्राचार (मद 6)</th>
+                      </tr>
+                      <tr>
+                         <th style={{fontSize:"9pt"}}>अंग्रेजी में प्राप्त</th>
+                         <th style={{fontSize:"9pt"}}>हिंदी में उत्तर</th>
+                         <th style={{fontSize:"9pt"}}>अंग्रेजी में उत्तर</th>
+                         <th style={{fontSize:"9pt"}}>उत्तर अपेक्षित नहीं</th>
+                         <th style={{fontSize:"9pt"}}>कुल</th>
+                         <th style={{fontSize:"9pt"}}>हिंदी में</th>
+                         <th style={{fontSize:"9pt"}}>अंग्रेजी में</th>
+                         <th style={{fontSize:"9pt"}}>हिंदी %</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      <tr>
+                         <td style={{textAlign: "center", fontWeight: "bold"}}>'क'</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_hindiReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_engReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_noReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_hindi || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_english || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_total>0 ? Math.round((agg.b1_s6_ka_hindi/agg.b1_s6_ka_total)*100)+'%' : '-'}</td>
+                      </tr>
+                      <tr>
+                         <td style={{textAlign: "center", fontWeight: "bold"}}>'ख'</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_hindiReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_engReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_noReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_hindi || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_english || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_total>0 ? Math.round((agg.b1_s6_kha_hindi/agg.b1_s6_kha_total)*100)+'%' : '-'}</td>
+                      </tr>
+                      <tr>
+                         <td style={{textAlign: "center", fontWeight: "bold"}}>'ग'</td>
+                         <td style={{textAlign: "center"}} colSpan="4">-</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_total || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_hindi || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_english || '0'}</td>
+                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_total>0 ? Math.round((agg.b1_s6_ga_hindi/agg.b1_s6_ga_total)*100)+'%' : '-'}</td>
+                      </tr>
+                   </tbody>
+                </table>
+            </div>
+
+            <table>
+               <tbody>
+                  <tr>
+                     <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>7.</td>
+                     <td style={{width: "25%"}}><strong>फाइल टिप्पण कार्य</strong></td>
+                     <td style={{width: "70%"}}>
+                        कुल पृष्ठ: {agg.b1_s7_totalPages||'0'} &nbsp;|&nbsp; 
+                        हिंदी में: {agg.b1_s7_hindiPages||'0'} &nbsp;|&nbsp; 
+                        अंग्रेजी में: {agg.b1_s7_engPages||'0'} &nbsp;|&nbsp; 
+                        ई-ऑफिस टिप्पणियाँ: {agg.b1_s7_eoffice||'0'}
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
+                     <td><strong>हिंदी कार्यशालाएं</strong></td>
+                     <td>
+                        आयोजित कार्यशालाएं: {agg.b1_s8_workshops||'0'} &nbsp;|&nbsp; 
+                        प्रशिक्षित अधिकारी: {agg.b1_s8_officers||'0'} &nbsp;|&nbsp; 
+                        प्रशिक्षित कर्मचारी: {agg.b1_s8_staff||'0'}
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
+                     <td><strong>रा.भा.का.स. बैठकें</strong></td>
+                     <td>
+                        अधीनस्थ समितियां: {agg.b1_s9_subOfficeCmtes||'0'} &nbsp;|&nbsp; 
+                        आयोजित बैठकें: {agg.b1_s9_subOfficeMeetings||'0'}
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+
+            {isPart2Filled && (
+               <div className="page-break" style={{marginTop: "20px"}}>
+                  <h4>भाग-II (वार्षिक मूल्यांकन - केवल Q4 में देय)</h4>
+                  
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
+                        <td style={{width: "35%"}}><strong>नियम 10(4) अधिसूचना</strong></td>
+                        <td style={{width: "60%"}}>
+                           कुल कार्यालय: {agg.b2_s1_subOfficesTotal||'0'} &nbsp;|&nbsp; 
+                           अधिसूचित कार्यालय: {agg.b2_s1_subOfficesNotified||'0'}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  <div style={{marginBottom: "10px"}}>
+                     <span className="field-title">2(i). अधिकारियों/कर्मचारियों को हिंदी का ज्ञान:</span>
+                     <table>
+                       <thead>
+                         <tr>
+                           <th>श्रेणी</th>
+                           <th>कुल</th>
+                           <th>अनुसचिवीय कार्य</th>
+                           <th>प्रवीणता प्राप्त</th>
+                           <th>कार्यसाधक ज्ञान</th>
+                           <th>प्रशिक्षण ले रहे</th>
+                           <th>प्रशिक्षण शेष</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         <tr>
+                           <td>अधिकारी</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_ministerial||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_pravinta||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_karyasadhak||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_training||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_remaining||'0'}</td>
+                         </tr>
+                         <tr>
+                           <td>कर्मचारी</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_ministerial||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_pravinta||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_karyasadhak||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_training||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_remaining||'0'}</td>
+                         </tr>
+                       </tbody>
+                     </table>
+                  </div>
+
+                  <div style={{marginBottom: "10px"}}>
+                     <span className="field-title">2(ii & iii). आशुलिपि, टंकण एवं अनुवाद का ज्ञान:</span>
+                     <table>
+                       <thead>
+                         <tr>
+                           <th>श्रेणी</th>
+                           <th>कुल</th>
+                           <th>प्रशिक्षित</th>
+                           <th>हिंदी में कार्य कर रहे</th>
+                           <th>प्रशिक्षण शेष</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         <tr>
+                           <td>आशुलिपिक</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_working||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_pending||'0'}</td>
+                         </tr>
+                         <tr>
+                           <td>टंकक/लिपिक/निजी सहायक</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_typing_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_typing_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_typing_working||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_typing_pending||'0'}</td>
+                         </tr>
+                         <tr>
+                           <td>अनुवादक</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_translation_total||'0'}</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_translation_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>-</td>
+                           <td style={{textAlign: "center"}}>{agg.b2_translation_pending||'0'}</td>
+                         </tr>
+                       </tbody>
+                     </table>
+                  </div>
+
+                  <table>
+                     <tbody>
+                        <tr>
+                           <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>3.</td>
+                           <td style={{width: "45%"}}><strong>कंप्यूटर टंकण प्रशिक्षण</strong></td>
+                           <td style={{width: "50%"}}>कुल कार्मिक: {agg.b2_comp_total||'0'} | प्रशिक्षित: {agg.b2_comp_trained||'0'} | कार्यरत: {agg.b2_comp_working||'0'}</td>
+                        </tr>
+                        <tr>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>4.</td>
+                           <td><strong>कंप्यूटर/लैपटॉप की स्थिति</strong></td>
+                           <td>कुल: {agg.b2_s4_totalLaptops||'0'} | यूनिकोड सक्षम: {agg.b2_s4_unicode||'0'}</td>
+                        </tr>
+                        <tr>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>5.</td>
+                           <td><strong>कोड/मैनुअल/प्रपत्र</strong></td>
+                           <td>कुल मैनुअल: {agg.b2_s5_manualsTotal||'0'} | द्विभाषी: {agg.b2_s5_manualsBilingual||'0'}<br/>कुल प्रपत्र: {agg.b2_s5_formsTotal||'0'} | द्विभाषी: {agg.b2_s5_formsBilingual||'0'}</td>
+                        </tr>
+                        <tr>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>6.</td>
+                           <td><strong>नियम 8(4) के अंतर्गत आदेश</strong></td>
+                           <td>जारी आदेश: {agg.b2_rule84_ordered||'0'} | शेष: {agg.b2_rule84_pending||'0'}</td>
+                        </tr>
+                        <tr>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
+                           <td><strong>निरीक्षण</strong></td>
+                           <td>कुल अनुभाग: {agg.b2_inspection_sections_total||'0'} | निरीक्षित: {agg.b2_inspection_sections_inspected||'0'}<br/>कार्यालय कुल: {agg.b2_inspection_offices_total||'0'} | निरीक्षित: {agg.b2_inspection_offices_inspected||'0'}</td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+            )}
+            
+            <div style={{marginTop: "50px", textAlign: "right"}}>
+               <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>समेकित रिपोर्ट जेनरेटर</strong></p>
+               <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}>राजभाषा प्रकोष्ठ, पश्चिम रेलवे</p>
+               <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>दिनांक:</strong> {new Date().toLocaleDateString('en-GB')}</p>
             </div>
           </div>
+
         </div>
       );
     }
@@ -916,7 +1056,7 @@
       
       const visible = useMemo(()=>{
         if(user.role==="SECTION")    return reports.filter(x=>x.sectionName===user.name);
-        if(user.role==="AAO")        return reports.filter(x=>x.status==="PENDING_AAO" && x.sectionName===user.mappedSection);
+        if(user.role==="AAO")        return reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x.status) && x.sectionName===user.mappedSection);
         if(user.role==="SAO")        return reports.filter(x=>["AAO_APPROVED"].includes(x.status) && x.sectionName===user.mappedSection);
         if(user.role==="HINDI_CELL") return reports.filter(x=>x.status==="SAO_APPROVED");
         return reports;
@@ -947,7 +1087,9 @@
             filtered.map((rep,i)=>{
               const st   = STATUS[rep.status]||STATUS.DRAFT;
               const c    = SECTION_COLORS[i%SECTION_COLORS.length];
-              const canAct = (user.role==="AAO"&&rep.status==="PENDING_AAO") || (user.role==="SAO"&&rep.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&rep.status==="SAO_APPROVED");
+              
+              // 🌟 यहाँ भी कार्रवाई की स्थिति अपडेट की गई है 🌟
+              const canAct = (user.role==="SECTION"&&rep.status==="AAO_RETURNED") || (user.role==="AAO"&&["PENDING_AAO", "SAO_RETURNED"].includes(rep.status)) || (user.role==="SAO"&&rep.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&rep.status==="SAO_APPROVED");
               return (
                 <div key={rep.id} onClick={()=>setSelected(rep)} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
                   <div style={{ width:40, height:40, borderRadius:12, background:c.bg, border:`1.5px solid ${c.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{c.icon}</div>
@@ -955,7 +1097,7 @@
                   <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
                     <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
                   </div>
-                  {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>समीक्षा करें</span>}
+                  {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>कार्रवाई करें</span>}
                 </div>
               );
             })
@@ -970,7 +1112,7 @@
        const isPart2Filled = report.quarter === "Q4" && report.sectionName === "हिंदी अनुभाग" && hasPart2Data;
        
        return (
-         <div className="print-only official-print">
+         <div className="print-only standard-doc">
             <div style={{textAlign: "center", marginBottom: "15px"}}>
                 <h2>राजभाषा के प्रगामी प्रयोग के संबंध में तिमाही प्रगति रिपोर्ट</h2>
                 <h3>(अनुलग्नक-2)</h3>
@@ -979,23 +1121,23 @@
             <table>
                <tbody>
                   <tr>
-                     <td style={{width: "50%"}}><strong>कार्यालय का नाम व पता:</strong> {report.officeNameAddress || '-'}</td>
-                     <td style={{width: "25%"}}><strong>तिमाही:</strong> {QUARTERS.find(q=>q.id===report.quarter)?.label || report.quarter}</td>
-                     <td style={{width: "25%"}}><strong>वर्ष:</strong> {report.year}</td>
+                     <td style={{width: "50%", border: "none"}}><strong>कार्यालय का नाम व पता:</strong> {report.officeNameAddress || '-'}</td>
+                     <td style={{width: "25%", border: "none"}}><strong>तिमाही:</strong> {QUARTERS.find(q=>q.id===report.quarter)?.label || report.quarter}</td>
+                     <td style={{width: "25%", border: "none"}}><strong>वर्ष:</strong> {report.year}</td>
                   </tr>
                   <tr>
-                     <td><strong>अधिकारी का नाम व पदनाम:</strong> {report.officerName || '-'}</td>
-                     <td><strong>फोन नं.:</strong> {report.phone || '-'}</td>
-                     <td><strong>ई-मेल:</strong> {report.email || '-'}</td>
+                     <td style={{border: "none"}}><strong>अधिकारी का नाम व पदनाम:</strong> {report.officerName || '-'}</td>
+                     <td style={{border: "none"}}><strong>फोन नं.:</strong> {report.phone || '-'}</td>
+                     <td style={{border: "none"}}><strong>ई-मेल:</strong> {report.email || '-'}</td>
                   </tr>
                   <tr>
-                     <td><strong>राजभाषा अधिकारी का नाम:</strong> - </td>
-                     <td><strong>फोन नं.:</strong> {report.rbOfficerPhone || '-'}</td>
-                     <td><strong>ई-मेल:</strong> {report.rbOfficerEmail || '-'}</td>
+                     <td style={{border: "none"}}><strong>राजभाषा अधिकारी का नाम:</strong> - </td>
+                     <td style={{border: "none"}}><strong>फोन नं.:</strong> {report.rbOfficerPhone || '-'}</td>
+                     <td style={{border: "none"}}><strong>ई-मेल:</strong> {report.rbOfficerEmail || '-'}</td>
                   </tr>
                   <tr>
-                     <td><strong>अनुभाग का नाम:</strong> {report.sectionName}</td>
-                     <td colSpan="2"><strong>क्षेत्र:</strong> '{report.region}'</td>
+                     <td style={{border: "none"}}><strong>अनुभाग का नाम:</strong> {report.sectionName}</td>
+                     <td style={{border: "none"}} colSpan="2"><strong>क्षेत्र:</strong> '{report.region}'</td>
                   </tr>
                </tbody>
             </table>
@@ -1319,12 +1461,20 @@
     function ReportDetail({ report, user, remark, setRemark, onAction, onBack, onEdit }) {
       const r  = ROLES[user.role];
       const st = STATUS[report.status]||STATUS.DRAFT;
-      const canAct = (user.role==="AAO"&&report.status==="PENDING_AAO") || (user.role==="SAO"&&report.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&report.status==="SAO_APPROVED");
+      
+      const canAct = (user.role==="SECTION" && report.status==="AAO_RETURNED") || 
+                     (user.role==="AAO" && ["PENDING_AAO", "SAO_RETURNED"].includes(report.status)) || 
+                     (user.role==="SAO" && report.status==="AAO_APPROVED") || 
+                     (user.role==="HINDI_CELL" && report.status==="SAO_APPROVED");
 
       const actionBtns = {
-        AAO:        [{ label:"✅ SAO को अग्रेषित करें",    action:"AAO_APPROVED",  grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ अनुभाग को वापस करें",   action:"AAO_RETURNED",  grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
-        SAO:        [{ label:"✅ हिंदी प्रकोष्ठ को भेजें",  action:"SAO_APPROVED",  grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ AAO को वापस करें",       action:"SAO_RETURNED",  grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
-        HINDI_CELL: [{ label:"🎉 अंतिम स्वीकृति दें",        action:"SUBMITTED",     grad:"linear-gradient(135deg,#f59e0b,#10b981)" },{ label:"❌ अस्वीकृत करें",          action:"REJECTED",      grad:"linear-gradient(135deg,#dc2626,#9f1239)" }],
+        SECTION: report.status === "AAO_RETURNED" 
+                 ? [{ label:"✅ AAO को पुनः भेजें (बिना एडिट किए)", action:"PENDING_AAO", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" }] : [],
+        AAO: report.status === "SAO_RETURNED" 
+             ? [{ label:"✅ SAO को पुनः भेजें", action:"AAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" }] 
+             : [{ label:"✅ SAO को अग्रेषित करें", action:"AAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ अनुभाग को वापस करें", action:"AAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
+        SAO: [{ label:"✅ हिंदी प्रकोष्ठ को भेजें", action:"SAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ AAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
+        HINDI_CELL: [{ label:"🎉 अंतिम स्वीकृति दें", action:"SUBMITTED", grad:"linear-gradient(135deg,#f59e0b,#10b981)" },{ label:"↩️ SAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#dc2626,#9f1239)" }],
       };
 
       return (
@@ -1346,7 +1496,6 @@
             <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:13, fontWeight:700, color:"#fff" }}>{st.icon} {st.label}</div>
           </div>
 
-          {/* 🌟 स्क्रीन व्यू 🌟 */}
           <div className="print-box screen-only" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
             <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण (स्क्रीन व्यू)</div>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
@@ -1375,6 +1524,7 @@
           {/* 🌟 छिपा हुआ प्रिंट व्यू 🌟 */}
           <OfficialPrintView report={report} />
 
+          {/* 🌟 कार्रवाई (Action) बटन - Resubmit Feature 🌟 */}
           {canAct && (
             <div className="no-print screen-only" style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
               <div style={{ fontSize:14, fontWeight:800, color:"#1e293b", marginBottom:12 }}>{r.icon} आपकी कार्रवाई</div>
