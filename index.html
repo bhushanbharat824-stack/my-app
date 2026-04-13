@@ -33,6 +33,7 @@
   </script>
 
   <style>
+    /* 🌟 एडवांस्ड प्रिंटिंग CSS - शुद्ध सरकारी प्रारूप के लिए 🌟 */
     @media screen {
       .print-only { display: none !important; }
     }
@@ -42,16 +43,24 @@
        width: 100%; line-height: 1.4; color: #000; 
        font-family: 'Noto Sans Devanagari', 'Times New Roman', serif; 
        background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #cbd5e1;
-       box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box;
+       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+       box-sizing: border-box;
     }
-    .standard-doc table { width: 100%; border-collapse: collapse; margin-bottom: 15px; page-break-inside: auto; border: 1px solid #000; }
+    .standard-doc table { 
+       width: 100%; border-collapse: collapse; 
+       margin-bottom: 15px; page-break-inside: auto; border: 1px solid #000;
+    }
     .standard-doc tr { page-break-inside: avoid; page-break-after: auto; }
-    .standard-doc th, .standard-doc td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: middle; font-size: 10.5pt; color: #000; }
-    .standard-doc th { font-weight: bold; text-align: center; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .standard-doc th, .standard-doc td { 
+       border: 1px solid #000; padding: 6px 8px; 
+       text-align: left; vertical-align: middle; 
+       font-size: 10.5pt; color: #000;
+    }
+    .standard-doc th { font-weight: bold; text-align: center; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;}
     .standard-doc h2 { text-align: center; font-size: 15pt; margin: 0 0 6px 0; color: #000; font-weight: bold; text-decoration: underline; }
     .standard-doc h3 { text-align: center; font-size: 13pt; margin: 0 0 20px 0; color: #000; font-weight: normal; }
     .standard-doc h4 { font-size: 12pt; margin: 20px 0 10px 0; color: #000; text-decoration: underline; font-weight: bold; text-align: left; background: #e2e8f0; padding: 5px; -webkit-print-color-adjust: exact; }
-    .standard-doc .field-title { font-weight: bold; margin: 15px 0 6px 0; display: block; font-size: 11pt; }
+    .standard-doc .field-title { font-weight: bold; margin: 15px 0 6px 0; display: block; font-size: 11pt;}
 
     @media print {
       .no-print, .screen-only { display: none !important; }
@@ -69,11 +78,12 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
+    const AUDIT_KEY   = "rajbhasha_audit_v4";
     const ROLES = {
-      SECTION:    { id: "SECTION",    label: "अनुभाग",        icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
-      AAO:        { id: "AAO",        label: "AAO",            icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
-      SAO:        { id: "SAO",        label: "SAO",            icon: "✅", color: "#10b981", bg: "#ecfdf5", grad: "linear-gradient(135deg,#10b981,#0ea5e9)" },
-      HINDI_CELL: { id: "HINDI_CELL", label: "हिंदी प्रकोष्ठ", icon: "🏛️", color: "#f59e0b", bg: "#fffbeb", grad: "linear-gradient(135deg,#f59e0b,#ef4444)" },
+      SECTION:    { id: "SECTION",    label: "अनुभाग",        labelEn: "Section",     icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
+      AAO:        { id: "AAO",        label: "AAO",            labelEn: "AAO",         icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
+      SAO:        { id: "SAO",        label: "SAO",            labelEn: "SAO",         icon: "✅", color: "#10b981", bg: "#ecfdf5", grad: "linear-gradient(135deg,#10b981,#0ea5e9)" },
+      HINDI_CELL: { id: "HINDI_CELL", label: "हिंदी प्रकोष्ठ", labelEn: "Hindi Cell", icon: "🏛️", color: "#f59e0b", bg: "#fffbeb", grad: "linear-gradient(135deg,#f59e0b,#ef4444)" },
     };
     const PASSWORDS = { AAO: "AAO@2025", SAO: "SAO@2025", HINDI_CELL: "HINDI@2025" };
 
@@ -153,7 +163,6 @@
         <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
-    
     const Radio = ({ label, value, onChange, options, disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:6, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
@@ -162,7 +171,6 @@
         </div>
       </div>
     );
-    
     const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
     
     const SecCard = ({ title, icon, color, children }) => {
@@ -443,7 +451,6 @@
 
       const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
-      // 🌟 STRICT EXACT MATCH VALIDATION 🌟
       const validationErrors = useMemo(() => {
         const errs = [];
         const num = (v) => parseFloat(v) || 0;
@@ -511,7 +518,7 @@
           </h2>
           <div style={{ fontSize:18, fontWeight:800, color:"#6366f1", background:"#eef2ff", display:"inline-block", padding:"8px 20px", borderRadius:10 }}>{data.ackId}</div>
           <br/>
-          {initialData && <button onClick={onCancel} style={{marginTop: 20, padding: "10px 20px", background: "#f1f5f9", borderRadius: 8, cursor: "pointer", border: "1px solid #cbd5e1", fontWeight: "bold", color: "#475569"}}>← वापस इनबॉक्स में जाएँ</button>}
+          {initialData && <button onClick={onCancel} style={{marginTop: 20, padding: "10px 20px", background: "#f1f5f9", borderRadius: 8, cursor: "pointer", border: "1px solid #cbd5e1", fontWeight: "bold", color: "#475569"}}>← वापस जाएँ</button>}
         </div>
       );
 
@@ -670,7 +677,7 @@
       const [y, setY] = useState("2026");
 
       const [excludedSections, setExcludedSections] = useState([]);
-      const [auditErrors, setAuditErrors] = useState(null); // 🌟 नया: डेटा ऑडिटर के लिए 🌟
+      const [auditErrors, setAuditErrors] = useState(null); 
 
       const reportsForPeriod = reports.filter(r => r.quarter === q && r.year === y);
       const availableSections = Array.from(new Set(reportsForPeriod.map(r => r.sectionName)));
@@ -693,7 +700,6 @@
 
       const filtered = reportsForPeriod.filter(r => !excludedSections.includes(r.sectionName));
       
-      // 🌟 डेटा ऑडिट लॉजिक (गड़बड़ अनुभागों को पकड़ने के लिए) 🌟
       const runAudit = () => {
         const errList = [];
         filtered.forEach(r => {
@@ -771,7 +777,6 @@
                </div>
             )}
             
-            {/* 🌟 डेटा ऑडिट बटन और रिजल्ट 🌟 */}
             {filtered.length > 0 && (
               <div style={{marginTop: "16px", paddingTop: "16px", borderTop: "1px dashed #cbd5e1"}}>
                 <button onClick={runAudit} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"6px 12px", borderRadius:6, fontSize:12, fontWeight:700, cursor:"pointer" }}>
@@ -784,7 +789,7 @@
                 
                 {auditErrors && auditErrors.length > 0 && (
                    <div style={{marginTop: 10, background: "#fee2e2", padding: 12, borderRadius: 8, border: "1px solid #ef4444"}}>
-                     <div style={{fontSize: 13, color: "#991b1b", fontWeight: "bold", marginBottom: 6}}>⚠️ इन अनुभागों के पुराने डेटा में गलती है (कृपया इन्हें इनबॉक्स से एडिट करके सेव करवाएं):</div>
+                     <div style={{fontSize: 13, color: "#991b1b", fontWeight: "bold", marginBottom: 6}}>⚠️ इन अनुभागों के पुराने डेटा में गलती है (कृपया मास्टर एडिटर से इन्हें सही करें):</div>
                      <ul style={{margin: 0, paddingLeft: 20, fontSize: 12, color: "#7f1d1d"}}>
                        {auditErrors.map((err, i) => (
                          <li key={i} style={{marginBottom: 4}}>
@@ -1137,7 +1142,6 @@
             filtered.map((rep,i)=>{
               const st   = STATUS[rep.status]||STATUS.DRAFT;
               const c    = SECTION_COLORS[i%SECTION_COLORS.length];
-              
               const canAct = (user.role==="SECTION"&&rep.status==="AAO_RETURNED") || (user.role==="AAO"&&["PENDING_AAO", "SAO_RETURNED"].includes(rep.status)) || (user.role==="SAO"&&rep.status==="AAO_APPROVED") || (user.role==="HINDI_CELL"&&rep.status==="SAO_APPROVED");
               return (
                 <div key={rep.id} onClick={()=>setSelected(rep)} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
@@ -1155,444 +1159,18 @@
       );
     }
 
-    // ── 🖨️ OFFICIAL PRINT VIEW (HIDDEN ON SCREEN, VISIBLE ON PRINT) ────────
-    function OfficialPrintView({ report }) {
-       if (!report) return null;
-       const hasPart2Data = Boolean(report.b2_s1_subOfficesTotal || report.b2_s2_off_total || report.b2_comp_total);
-       const isPart2Filled = report.quarter === "Q4" && report.sectionName === "हिंदी अनुभाग" && hasPart2Data;
-       
-       return (
-         <div className="print-only standard-doc">
-            <div style={{textAlign: "center", marginBottom: "15px"}}>
-                <h2>राजभाषा के प्रगामी प्रयोग के संबंध में तिमाही प्रगति रिपोर्ट</h2>
-                <h3>(अनुलग्नक-2)</h3>
-            </div>
-            
-            <table>
-               <tbody>
-                  <tr>
-                     <td style={{width: "50%", border: "none"}}><strong>कार्यालय का नाम व पता:</strong> {report.officeNameAddress || '-'}</td>
-                     <td style={{width: "25%", border: "none"}}><strong>तिमाही:</strong> {QUARTERS.find(q=>q.id===report.quarter)?.label || report.quarter || '-'}</td>
-                     <td style={{width: "25%", border: "none"}}><strong>वर्ष:</strong> {report.year || '-'}</td>
-                  </tr>
-                  <tr>
-                     <td style={{border: "none"}}><strong>अधिकारी का नाम व पदनाम:</strong> {report.officerName || '-'}</td>
-                     <td style={{border: "none"}}><strong>फोन नं.:</strong> {report.phone || '-'}</td>
-                     <td style={{border: "none"}}><strong>ई-मेल:</strong> {report.email || '-'}</td>
-                  </tr>
-                  <tr>
-                     <td style={{border: "none"}}><strong>राजभाषा अधिकारी का नाम:</strong> - </td>
-                     <td style={{border: "none"}}><strong>फोन नं.:</strong> {report.rbOfficerPhone || '-'}</td>
-                     <td style={{border: "none"}}><strong>ई-मेल:</strong> {report.rbOfficerEmail || '-'}</td>
-                  </tr>
-                  <tr>
-                     <td style={{border: "none"}}><strong>अनुभाग का नाम:</strong> {report.sectionName || '-'}</td>
-                     <td style={{border: "none"}} colSpan="2"><strong>क्षेत्र:</strong> '{report.region || '-'}'</td>
-                  </tr>
-               </tbody>
-            </table>
-
-            <h4>भाग-I (केवल तिमाही आधार पर भरा जाना है)</h4>
-            
-            <table>
-               <tbody>
-                  <tr>
-                     <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
-                     <td style={{width: "55%"}}>माननीय मंत्री जी को प्रस्तुत की गई कुल फाइलों की संख्या</td>
-                     <td style={{width: "20%"}}>कुल: {report.b1_s1_totalFiles || '0'}</td>
-                     <td style={{width: "20%"}}>हिंदी में: {report.b1_s1_hindiFiles || '0'}</td>
-                  </tr>
-                  <tr>
-                     <td style={{textAlign: "center", fontWeight: "bold"}}>2.</td>
-                     <td>सचिव/समकक्ष स्तर पर आयोजित कुल बैठकें व प्रस्तुत कागजात</td>
-                     <td>कुल बैठकें: {report.b1_s2_totalMeetings || '0'}<br/>कुल कागजात: {report.b1_s2_totalDocs || '0'}</td>
-                     <td>हिंदी कार्यवाही: {report.b1_s2_hindiMinutes || '0'}<br/>हिंदी कागजात: {report.b1_s2_hindiDocs || '0'}</td>
-                  </tr>
-               </tbody>
-            </table>
-
-            <div style={{marginBottom: "10px"}}>
-                <span className="field-title">3. राजभाषा अधिनियम की धारा 3(3) के अंतर्गत जारी दस्तावेजों की स्थिति:</span>
-                <table>
-                   <thead>
-                      <tr>
-                        <th>(क) कुल जारी</th>
-                        <th>(ख) द्विभाषी</th>
-                        <th>(ग) केवल अंग्रेजी</th>
-                        <th>(घ) केवल हिंदी</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      <tr>
-                         <td style={{textAlign: "center"}}>{report.b1_s3_totalIssued || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s3_bilingual || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s3_englishOnly || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s3_hindiOnly || '0'}</td>
-                      </tr>
-                   </tbody>
-                </table>
-            </div>
-
-            <div style={{marginBottom: "10px"}}>
-                <span className="field-title">4. हिंदी में प्राप्त पत्रों की स्थिति (राजभाषा नियम-5 के अनुपालन सहित):</span>
-                <table>
-                   <thead>
-                      <tr>
-                        <th>(क) कुल प्राप्त</th>
-                        <th>(ख) उत्तर अपेक्षित नहीं</th>
-                        <th>(ग) हिंदी/द्विभाषी में उत्तर</th>
-                        <th>(घ) अंग्रेजी में उत्तर</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      <tr>
-                         <td style={{textAlign: "center"}}>{report.b1_s4_totalReceived || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s4_noReplyNeeded || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s4_hindiReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s4_englishReply || '0'}</td>
-                      </tr>
-                   </tbody>
-                </table>
-            </div>
-
-            <div style={{marginBottom: "10px"}}>
-                <span className="field-title">5 व 6. अंग्रेजी पत्रों के उत्तर हिंदी में देने एवं मूल पत्राचार का ब्यौरा:</span>
-                <table>
-                   <thead>
-                      <tr>
-                         <th rowSpan="2" style={{verticalAlign: "middle"}}>क्षेत्र</th>
-                         <th colSpan="4">अंग्रेजी पत्रों के उत्तर (मद 5)</th>
-                         <th colSpan="4">मूल पत्राचार (मद 6)</th>
-                      </tr>
-                      <tr>
-                         <th style={{fontSize:"9pt"}}>अंग्रेजी में प्राप्त</th>
-                         <th style={{fontSize:"9pt"}}>हिंदी में उत्तर</th>
-                         <th style={{fontSize:"9pt"}}>अंग्रेजी में उत्तर</th>
-                         <th style={{fontSize:"9pt"}}>उत्तर अपेक्षित नहीं</th>
-                         <th style={{fontSize:"9pt"}}>कुल</th>
-                         <th style={{fontSize:"9pt"}}>हिंदी में</th>
-                         <th style={{fontSize:"9pt"}}>अंग्रेजी में</th>
-                         <th style={{fontSize:"9pt"}}>हिंदी %</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      <tr>
-                         <td style={{textAlign: "center", fontWeight: "bold"}}>'क'</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_hindiReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_engReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_ka_noReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_hindi || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_english || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ka_total>0 ? Math.round((report.b1_s6_ka_hindi/report.b1_s6_ka_total)*100)+'%' : '-'}</td>
-                      </tr>
-                      <tr>
-                         <td style={{textAlign: "center", fontWeight: "bold"}}>'ख'</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_hindiReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_engReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s5_kha_noReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_hindi || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_english || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_kha_total>0 ? Math.round((report.b1_s6_kha_hindi/report.b1_s6_kha_total)*100)+'%' : '-'}</td>
-                      </tr>
-                      <tr>
-                         <td style={{textAlign: "center", fontWeight: "bold"}}>'ग'</td>
-                         <td style={{textAlign: "center"}} colSpan="4">-</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_hindi || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_english || '0'}</td>
-                         <td style={{textAlign: "center"}}>{report.b1_s6_ga_total>0 ? Math.round((report.b1_s6_ga_hindi/report.b1_s6_ga_total)*100)+'%' : '-'}</td>
-                      </tr>
-                   </tbody>
-                </table>
-            </div>
-
-            <table>
-               <tbody>
-                  <tr>
-                     <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>7.</td>
-                     <td style={{width: "25%"}}><strong>फाइल टिप्पण कार्य</strong></td>
-                     <td style={{width: "70%"}}>
-                        कुल पृष्ठ: {report.b1_s7_totalPages||'0'} &nbsp;|&nbsp; 
-                        हिंदी में: {report.b1_s7_hindiPages||'0'} &nbsp;|&nbsp; 
-                        अंग्रेजी में: {report.b1_s7_engPages||'0'} &nbsp;|&nbsp; 
-                        ई-ऑफिस टिप्पणियाँ: {report.b1_s7_eoffice||'0'}
-                     </td>
-                  </tr>
-                  <tr>
-                     <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
-                     <td><strong>हिंदी कार्यशालाएं</strong></td>
-                     <td>
-                        आयोजित कार्यशालाएं: {report.b1_s8_workshops||'0'} &nbsp;|&nbsp; 
-                        प्रशिक्षित अधिकारी: {report.b1_s8_officers||'0'} &nbsp;|&nbsp; 
-                        प्रशिक्षित कर्मचारी: {report.b1_s8_staff||'0'}
-                     </td>
-                  </tr>
-                  <tr>
-                     <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
-                     <td><strong>रा.भा.का.स. बैठकें</strong></td>
-                     <td>
-                        बैठक की तिथि: {report.b1_s9_meetingDate||'-'} &nbsp;|&nbsp; 
-                        अधीनस्थ समितियां: {report.b1_s9_subOfficeCmtes||'0'} &nbsp;|&nbsp; 
-                        आयोजित बैठकें: {report.b1_s9_subOfficeMeetings||'0'} &nbsp;|&nbsp; 
-                        कार्यसूची हिंदी में: {report.b1_s9_agendaHindi||'-'}
-                     </td>
-                  </tr>
-                  <tr>
-                     <td style={{textAlign: "center", fontWeight: "bold"}}>10.</td>
-                     <td><strong>हिंदी सलाहकार समिति</strong></td>
-                     <td>बैठक की तिथि: {report.b1_s10_meetingDate||'-'}</td>
-                  </tr>
-                  <tr>
-                     <td style={{textAlign: "center", fontWeight: "bold"}}>11.</td>
-                     <td><strong>उल्लेखनीय कार्य/उपलब्धियाँ</strong></td>
-                     <td>
-                        <strong>नवोन्मेषी कार्य:</strong> {report.b1_s11_innovation||'-'}<br/>
-                        <strong>विशिष्ट आयोजन:</strong> {report.b1_s11_special||'-'}<br/>
-                        <strong>अन्य:</strong> {report.b1_s11_other||'-'}
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-
-            {isPart2Filled && (
-               <div className="page-break">
-                  <h4>भाग-II (वार्षिक मूल्यांकन - केवल Q4 में देय)</h4>
-                  
-                  <table>
-                    <tbody>
-                      <tr>
-                        <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
-                        <td style={{width: "35%"}}><strong>नियम 10(4) अधिसूचना</strong></td>
-                        <td style={{width: "60%"}}>
-                           अधिसूचित: {report.b2_s1_notified} &nbsp;|&nbsp; 
-                           कुल कार्यालय: {report.b2_s1_subOfficesTotal||'0'} &nbsp;|&nbsp; 
-                           अधिसूचित कार्यालय: {report.b2_s1_subOfficesNotified||'0'}<br/>
-                           शेष हेतु कार्रवाई: {report.b2_s1_subOfficesAction||'-'}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  
-                  <div style={{marginBottom: "10px"}}>
-                     <span className="field-title">2(i). अधिकारियों/कर्मचारियों को हिंदी का ज्ञान:</span>
-                     <table>
-                       <thead>
-                         <tr>
-                           <th>श्रेणी</th>
-                           <th>कुल</th>
-                           <th>अनुसचिवीय कार्य</th>
-                           <th>प्रवीणता प्राप्त</th>
-                           <th>कार्यसाधक ज्ञान</th>
-                           <th>प्रशिक्षण ले रहे</th>
-                           <th>प्रशिक्षण शेष</th>
-                         </tr>
-                       </thead>
-                       <tbody>
-                         <tr>
-                           <td>अधिकारी</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_off_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_off_ministerial||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_off_pravinta||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_off_karyasadhak||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_off_training||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_off_remaining||'0'}</td>
-                         </tr>
-                         <tr>
-                           <td>कर्मचारी</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_ministerial||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_pravinta||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_karyasadhak||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_training||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_s2_staff_remaining||'0'}</td>
-                         </tr>
-                       </tbody>
-                     </table>
-                  </div>
-
-                  <div style={{marginBottom: "10px"}}>
-                     <span className="field-title">2(ii & iii). आशुलिपि, टंकण एवं अनुवाद का ज्ञान:</span>
-                     <table>
-                       <thead>
-                         <tr>
-                           <th>श्रेणी</th>
-                           <th>कुल</th>
-                           <th>प्रशिक्षित</th>
-                           <th>हिंदी में कार्य कर रहे</th>
-                           <th>प्रशिक्षण शेष</th>
-                         </tr>
-                       </thead>
-                       <tbody>
-                         <tr>
-                           <td>आशुलिपिक</td>
-                           <td style={{textAlign: "center"}}>{report.b2_shorthand_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_shorthand_trained||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_shorthand_working||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_shorthand_pending||'0'}</td>
-                         </tr>
-                         <tr>
-                           <td>टंकक/लिपिक/निजी सहायक</td>
-                           <td style={{textAlign: "center"}}>{report.b2_typing_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_typing_trained||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_typing_working||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_typing_pending||'0'}</td>
-                         </tr>
-                         <tr>
-                           <td>अनुवादक</td>
-                           <td style={{textAlign: "center"}}>{report.b2_translation_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{report.b2_translation_trained||'0'}</td>
-                           <td style={{textAlign: "center"}}>-</td>
-                           <td style={{textAlign: "center"}}>{report.b2_translation_pending||'0'}</td>
-                         </tr>
-                       </tbody>
-                     </table>
-                  </div>
-
-                  <table>
-                     <tbody>
-                        <tr>
-                           <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>3.</td>
-                           <td style={{width: "45%"}}><strong>कंप्यूटर टंकण प्रशिक्षण</strong></td>
-                           <td style={{width: "50%"}}>कुल कार्मिक: {report.b2_comp_total||'0'} | प्रशिक्षित: {report.b2_comp_trained||'0'} | कार्यरत: {report.b2_comp_working||'0'}</td>
-                        </tr>
-                        <tr>
-                           <td style={{textAlign: "center", fontWeight: "bold"}}>4.</td>
-                           <td><strong>कंप्यूटर/लैपटॉप की स्थिति</strong></td>
-                           <td>कुल: {report.b2_s4_totalLaptops||'0'} | यूनिकोड सक्षम: {report.b2_s4_unicode||'0'} | हिंदी कार्य %: {report.b2_s4_hindiPct||'0'}%</td>
-                        </tr>
-                        <tr>
-                           <td style={{textAlign: "center", fontWeight: "bold"}}>5.</td>
-                           <td><strong>कोड/मैनुअल/प्रपत्र</strong></td>
-                           <td>कुल मैनुअल: {report.b2_s5_manualsTotal||'0'} | द्विभाषी: {report.b2_s5_manualsBilingual||'0'}<br/>कुल प्रपत्र: {report.b2_s5_formsTotal||'0'} | द्विभाषी: {report.b2_s5_formsBilingual||'0'}</td>
-                        </tr>
-                        <tr>
-                           <td style={{textAlign: "center", fontWeight: "bold"}}>6.</td>
-                           <td><strong>नियम 8(4) के अंतर्गत आदेश</strong></td>
-                           <td>जारी आदेश: {report.b2_rule84_ordered||'0'} | शेष: {report.b2_rule84_pending||'0'}</td>
-                        </tr>
-                        <tr>
-                           <td style={{textAlign: "center", fontWeight: "bold"}}>7.</td>
-                           <td><strong>प्रशिक्षण कार्यक्रम (संस्थानों हेतु)</strong></td>
-                           <td>नाम: {report.b2_s7_name||'-'} | अवधि: {report.b2_s7_duration||'0'} घंटे<br/>हिंदी: {report.b2_s7_hindi||'0'} | अंग्रेजी: {report.b2_s7_eng||'0'} | मिश्रित: {report.b2_s7_mixed||'0'}</td>
-                        </tr>
-                        <tr>
-                           <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
-                           <td><strong>निरीक्षण</strong></td>
-                           <td>कुल अनुभाग: {report.b2_inspection_sections_total||'0'} | निरीक्षित: {report.b2_inspection_sections_inspected||'0'}<br/>कार्यालय कुल: {report.b2_inspection_offices_total||'0'} | निरीक्षित: {report.b2_inspection_offices_inspected||'0'}</td>
-                        </tr>
-                        <tr>
-                           <td style={{textAlign: "center", fontWeight: "bold"}}>14.</td>
-                           <td><strong>वेबसाइट की स्थिति</strong></td>
-                           <td>URL: {report.b2_website_url||'-'} <br/>भाषा: {report.b2_website_type||'-'} <br/>विकल्प उपलब्ध: {report.b2_website_langOption||'-'}</td>
-                        </tr>
-                     </tbody>
-                  </table>
-               </div>
-            )}
-
-            <div style={{marginTop: "50px", display: "flex", justifyContent: "space-between"}}>
-               <div style={{width: "40%", textAlign: "left"}}>
-                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>हस्ताक्षर:</strong> _______________________</p>
-                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>नाम:</strong> {report.officerName || '...........................................'}</p>
-               </div>
-               <div style={{width: "40%", textAlign: "right"}}>
-                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>पदनाम:</strong> राजभाषा अधिकारी / अनुभाग प्रभारी</p>
-                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>दिनांक:</strong> {report.timestamp ? new Date(report.timestamp).toLocaleDateString('en-GB') : '-'}</p>
-               </div>
-            </div>
-         </div>
-       );
-    }
-
-    function ReportDetail({ report, user, remark, setRemark, onAction, onBack, onEdit }) {
-      if (!report) return null;
-      
-      const r  = ROLES[user.role];
-      const st = STATUS[report.status]||STATUS.DRAFT;
-      
-      const canAct = (user.role==="SECTION" && report.status==="AAO_RETURNED") || 
-                     (user.role==="AAO" && ["PENDING_AAO", "SAO_RETURNED"].includes(report.status)) || 
-                     (user.role==="SAO" && report.status==="AAO_APPROVED") || 
-                     (user.role==="HINDI_CELL" && report.status==="SAO_APPROVED");
-
-      const actionBtns = {
-        SECTION: report.status === "AAO_RETURNED" 
-                 ? [{ label:"✅ AAO को पुनः भेजें (बिना एडिट किए)", action:"PENDING_AAO", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" }] : [],
-        AAO: report.status === "SAO_RETURNED" 
-             ? [{ label:"✅ SAO को पुनः भेजें", action:"AAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" }] 
-             : [{ label:"✅ SAO को अग्रेषित करें", action:"AAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ अनुभाग को वापस करें", action:"AAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
-        SAO: [{ label:"✅ हिंदी प्रकोष्ठ को भेजें", action:"SAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ AAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
-        HINDI_CELL: [{ label:"🎉 अंतिम स्वीकृति दें", action:"SUBMITTED", grad:"linear-gradient(135deg,#f59e0b,#10b981)" },{ label:"↩️ SAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#dc2626,#9f1239)" }],
-      };
-
-      return (
-        <div style={{ maxWidth:760, margin:"0 auto" }}>
-          
-          <div className="no-print screen-only" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-            <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700 }}>← वापस सूची में</button>
-            <div style={{ display:"flex", gap:10 }}>
-               <button onClick={() => onEdit(report)} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>✏️ रिपोर्ट एडिट करें</button>
-               <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>🖨️ PDF में सेव करें</button>
-            </div>
-          </div>
-
-          <div className="screen-only" style={{ background:r.grad, borderRadius:16, padding:"18px 22px", marginBottom:16, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <div>
-              <div style={{ fontSize:18, fontWeight:800, color:"#fff" }}>{report.sectionName}</div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,0.8)" }}>{(QUARTERS.find(q=>q.id===report?.quarter)?.label) || report?.quarter || ''} · {report.year} · पावती: {report.ackId}</div>
-            </div>
-            <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:13, fontWeight:700, color:"#fff" }}>{st.icon} {st.label}</div>
-          </div>
-
-          <div className="print-box screen-only" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
-            <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण (स्क्रीन व्यू)</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
-              {Object.entries(report).map(([k,v]) => {
-                const excludeKeys = ["id", "ackId", "timestamp", "timeline", "status", "sectionName", "formData", "year", "quarter", "region"];
-                const isPart2Key = k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_");
-                const isHindiSection = report.sectionName === "हिंदी अनुभाग";
-                const isQ4 = report.quarter === "Q4";
-
-                if (isPart2Key && (!isHindiSection || !isQ4)) return null;
-
-                if(v !== null && v !== undefined && v !== "" && !excludeKeys.includes(k) && typeof v !== "object") {
-                  let formattedKey = FIELD_LABELS_HINDI[k] || k.replace('b1_','').replace('b2_','').replace('s1_','').replace(/_/g, ' ').toUpperCase();
-                  return (
-                    <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
-                      <div style={{ fontSize:11, color:"#64748b", fontWeight:700, wordBreak:"break-word", marginBottom:2 }}>{formattedKey}</div>
-                      <div style={{ fontSize:13, color:"#1e293b", fontWeight:800 }}>{v}</div>
-                    </div>
-                  )
-                }
-                return null;
-              })}
-            </div>
-          </div>
-
-          <OfficialPrintView report={report} />
-
-          {canAct && (
-            <div className="no-print screen-only" style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
-              <div style={{ fontSize:14, fontWeight:800, color:"#1e293b", marginBottom:12 }}>{r.icon} आपकी कार्रवाई</div>
-              <textarea value={remark} onChange={e=>setRemark(e.target.value)} rows={2} placeholder="टिप्पणी..." style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", marginBottom:12 }} />
-              <div style={{ display:"flex", gap:12 }}>
-                {(actionBtns[user.role]||[]).map(btn=>(
-                  <button key={btn.action} onClick={()=>onAction(btn.action, remark)} style={{ flex:1, padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:btn.grad, color:"#fff", fontWeight:800 }}>{btn.label}</button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    function MasterControl({ reports, sectionsList, settingsId }) {
+    // 🌟 मास्टर कंट्रोल (Admin Panel) 🌟
+    function MasterControl({ reports, sectionsList, settingsId, onEditReport }) {
       const [isClearing, setIsClearing] = useState(false);
       const [newSec, setNewSec] = useState("");
+      const [searchQuery, setSearchQuery] = useState("");
+
+      const validReports = reports.filter(r => r.status !== "SETTINGS");
+      const filteredReports = validReports.filter(r => 
+         (r.sectionName && r.sectionName.includes(searchQuery)) || 
+         (r.year && r.year.includes(searchQuery)) || 
+         (r.quarter && r.quarter.includes(searchQuery))
+      );
 
       const handleReset = async () => {
         const pass = prompt("⚠️ डेंजर ज़ोन: क्या आप सच में सिस्टम की सभी रिपोर्ट डिलीट करना चाहते हैं?\nपुष्टि के लिए कैपिटल में 'RESET' टाइप करें:");
@@ -1644,6 +1222,42 @@
 
       return (
          <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth:800, margin:"0 auto" }}>
+            
+            {/* 🌟 मास्टर एडिटर (Master Editor UI) 🌟 */}
+            <div style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 16, padding: 24 }}>
+               <h2 style={{ color: "#1e293b", margin: "0 0 8px 0", fontSize: 18, fontWeight: 800 }}>✏️ मास्टर रिपोर्ट एडिटर (सभी रिपोर्टें)</h2>
+               <p style={{ color: "#64748b", fontSize: 12, marginBottom: 16 }}>यहाँ से हिंदी प्रकोष्ठ किसी भी अनुभाग की रिपोर्ट को सीधे एडिट कर सकता है।</p>
+               <input value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} placeholder="अनुभाग, वर्ष या तिमाही खोजें..." style={{ width:"100%", padding: "10px 14px", borderRadius: 10, border: "1.5px solid #cbd5e1", outline: "none", fontSize: 14, marginBottom: 16, boxSizing:"border-box" }} />
+               
+               <div style={{ maxHeight: "300px", overflowY: "auto", border: "1px solid #e2e8f0", borderRadius: 10 }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                     <thead style={{ background: "#f8fafc", position: "sticky", top: 0, boxShadow:"0 1px 2px rgba(0,0,0,0.05)" }}>
+                        <tr>
+                           <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #e2e8f0", color: "#475569" }}>अनुभाग</th>
+                           <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #e2e8f0", color: "#475569" }}>तिमाही/वर्ष</th>
+                           <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #e2e8f0", color: "#475569" }}>स्थिति</th>
+                           <th style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #e2e8f0", color: "#475569" }}>कार्रवाई</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {filteredReports.map(r => (
+                           <tr key={r.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "10px", color: "#1e293b", fontWeight: "bold" }}>{r.sectionName}</td>
+                              <td style={{ padding: "10px", color: "#64748b" }}>{QUARTERS.find(q=>q.id===r?.quarter)?.label?.split('·')[0]} · {r.year}</td>
+                              <td style={{ padding: "10px" }}><span style={{ fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:10, background:STATUS[r.status]?.bg||"#f1f5f9", color:STATUS[r.status]?.color||"#64748b" }}>{STATUS[r.status]?.label || r.status}</span></td>
+                              <td style={{ padding: "10px", textAlign: "center" }}>
+                                 <button onClick={() => onEditReport(r)} style={{ background: "#f59e0b", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontWeight: "bold", fontSize: 11, boxShadow:"0 2px 4px rgba(245,158,11,0.2)" }}>✏️ एडिट करें</button>
+                              </td>
+                           </tr>
+                        ))}
+                        {filteredReports.length === 0 && (
+                           <tr><td colSpan="4" style={{ padding: "20px", textAlign: "center", color: "#94a3b8" }}>कोई रिपोर्ट नहीं मिली।</td></tr>
+                        )}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+
             <div style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 16, padding: 24 }}>
                <h2 style={{ color: "#1e293b", margin: "0 0 16px 0", fontSize: 18, fontWeight: 800 }}>⚙️ अनुभाग प्रबंधन (Master Data)</h2>
                <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
@@ -1736,10 +1350,13 @@
           <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} clearEdit={clearEdit} />
           <main style={{ maxWidth:960, margin:"0 auto", padding:"24px 16px 80px" }}>
             {view==="dashboard" && <Dashboard reports={reports} user={user} setView={setView} sectionsList={sectionsList} />}
-            {view==="form" && <ReportForm key={editingReport ? editingReport.id : 'new'} onSave={handleSave} user={user} reports={reports} initialData={editingReport} onCancel={() => { setEditingReport(null); setView("inbox"); }} />}
+            
+            {view==="form" && <ReportForm key={editingReport ? editingReport.id : 'new'} onSave={handleSave} user={user} reports={reports} initialData={editingReport} onCancel={() => { setEditingReport(null); setView(user.role === "HINDI_CELL" ? "master" : "inbox"); }} />}
+            
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} onEdit={(r) => { setEditingReport(r); setView("form"); }} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} sectionsList={sectionsList} />}
-            {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} sectionsList={sectionsList} settingsId={settingsId} />}
+            
+            {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} sectionsList={sectionsList} settingsId={settingsId} onEditReport={(r) => { setEditingReport(r); setView("form"); }} />}
           </main>
           <footer className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)" }}>
             <span>© 2026 Digital India · राजभाषा QPR v4.0</span>
