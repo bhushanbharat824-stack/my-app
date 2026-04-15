@@ -41,24 +41,16 @@
        width: 100%; line-height: 1.4; color: #000; 
        font-family: 'Noto Sans Devanagari', 'Times New Roman', serif; 
        background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #cbd5e1;
-       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-       box-sizing: border-box;
+       box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box;
     }
-    .standard-doc table { 
-       width: 100%; border-collapse: collapse; 
-       margin-bottom: 15px; page-break-inside: auto; border: 1px solid #000;
-    }
+    .standard-doc table { width: 100%; border-collapse: collapse; margin-bottom: 15px; page-break-inside: auto; border: 1px solid #000; }
     .standard-doc tr { page-break-inside: avoid; page-break-after: auto; }
-    .standard-doc th, .standard-doc td { 
-       border: 1px solid #000; padding: 6px 8px; 
-       text-align: left; vertical-align: middle; 
-       font-size: 10.5pt; color: #000;
-    }
-    .standard-doc th { font-weight: bold; text-align: center; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;}
+    .standard-doc th, .standard-doc td { border: 1px solid #000; padding: 6px 8px; text-align: left; vertical-align: middle; font-size: 10.5pt; color: #000; }
+    .standard-doc th { font-weight: bold; text-align: center; background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .standard-doc h2 { text-align: center; font-size: 15pt; margin: 0 0 6px 0; color: #000; font-weight: bold; text-decoration: underline; }
     .standard-doc h3 { text-align: center; font-size: 13pt; margin: 0 0 20px 0; color: #000; font-weight: normal; }
     .standard-doc h4 { font-size: 12pt; margin: 20px 0 10px 0; color: #000; text-decoration: underline; font-weight: bold; text-align: left; background: #e2e8f0; padding: 5px; -webkit-print-color-adjust: exact; }
-    .standard-doc .field-title { font-weight: bold; margin: 15px 0 6px 0; display: block; font-size: 11pt;}
+    .standard-doc .field-title { font-weight: bold; margin: 15px 0 6px 0; display: block; font-size: 11pt; }
 
     @media print {
       .no-print, .screen-only { display: none !important; }
@@ -76,6 +68,14 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
+    // 🌟 क्रैश प्रिवेंशन: सुरक्षित डेट फॉर्मेटर 🌟
+    function formatDate(ds) {
+       if (!ds) return '-';
+       const d = new Date(ds);
+       return isNaN(d.getTime()) ? '-' : d.toLocaleDateString('en-GB');
+    }
+
+    const AUDIT_KEY   = "rajbhasha_audit_v4";
     const ROLES = {
       SECTION:    { id: "SECTION",    label: "अनुभाग",        icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
       AAO:        { id: "AAO",        label: "AAO",            icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
@@ -161,7 +161,6 @@
         <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
-    
     const Radio = ({ label, value, onChange, options, disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:6, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
@@ -170,7 +169,6 @@
         </div>
       </div>
     );
-    
     const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
     
     const SecCard = ({ title, icon, color, children }) => {
@@ -211,8 +209,8 @@
             return (
               <div key={s.role} style={{ display:"flex", alignItems:"center", flex:1 }}>
                 <div style={{ display:"flex", flexDirection:"column", alignItems:"center", flex:1, gap:4 }}>
-                  <div style={{ width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, border:"2.5px solid", background: active ? r.color : done ? "#d1fae5" : "#f1f5f9", borderColor: active ? r.color : done ? "#10b981" : "#e2e8f0", boxShadow: active ? `0 0 0 4px ${r.color}30` : "none", transition:"all 0.3s", }}>{done ? "✓" : s.icon}</div>
-                  <span style={{ fontSize:10, fontWeight: active?700:400, color: active?r.color : done?"#10b981":"#94a3b8", textAlign:"center" }}>{s.label}</span>
+                  <div style={{ width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, border:"2.5px solid", background: active ? r?.color : done ? "#d1fae5" : "#f1f5f9", borderColor: active ? r?.color : done ? "#10b981" : "#e2e8f0", boxShadow: active ? `0 0 0 4px ${r?.color}30` : "none", transition:"all 0.3s", }}>{done ? "✓" : s.icon}</div>
+                  <span style={{ fontSize:10, fontWeight: active?700:400, color: active?r?.color : done?"#10b981":"#94a3b8", textAlign:"center" }}>{s.label}</span>
                 </div>
                 {i < steps.length-1 && (<div style={{ height:3, flex:0.4, background: i<currentIdx?"#10b981":"#e2e8f0", borderRadius:2, transition:"background 0.3s" }} />)}
               </div>
@@ -265,9 +263,9 @@
                     {roleCards.map(rc=>{
                       const r = ROLES[rc.role];
                       return (
-                        <button key={rc.role} onClick={()=>{ setStep(rc.step); setErr(""); setPass(""); }} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", borderRadius:14, border:"none", background:r.grad, color:"#fff", cursor:"pointer", textAlign:"left", boxShadow:"0 4px 14px rgba(0,0,0,0.12)", transition:"transform 0.15s" }}>
-                          <span style={{ fontSize:30, flexShrink:0 }}>{r.icon}</span>
-                          <div><div style={{ fontWeight:800, fontSize:15 }}>{r.label}</div><div style={{ fontSize:11, opacity:0.85, marginTop:2 }}>{rc.desc}</div></div>
+                        <button key={rc.role} onClick={()=>{ setStep(rc.step); setErr(""); setPass(""); }} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 18px", borderRadius:14, border:"none", background:r?.grad, color:"#fff", cursor:"pointer", textAlign:"left", boxShadow:"0 4px 14px rgba(0,0,0,0.12)", transition:"transform 0.15s" }}>
+                          <span style={{ fontSize:30, flexShrink:0 }}>{r?.icon}</span>
+                          <div><div style={{ fontWeight:800, fontSize:15 }}>{r?.label}</div><div style={{ fontSize:11, opacity:0.85, marginTop:2 }}>{rc.desc}</div></div>
                           <span style={{ marginLeft:"auto", fontSize:18, opacity:0.7 }}>→</span>
                         </button>
                       );
@@ -299,7 +297,7 @@
     }
 
     function PwdLogin({ role, pass, setPass, err, setErr, onLogin, onBack, section, setSection, sectionsList }) {
-      const r = ROLES[role];
+      const r = ROLES[role] || ROLES.SECTION;
       const needsSection = role === "AAO" || role === "SAO"; 
       return (
         <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -325,13 +323,13 @@
     function BackBtn({ onClick }) { return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>; }
 
     function Navbar({ user, view, setView, onLogout, clearEdit }) {
-      const r = ROLES[user.role];
-      const isHindiAdmin = user.role === "HINDI_CELL" || user.name === "हिंदी अनुभाग";
+      const r = ROLES[user?.role] || ROLES.SECTION;
+      const isHindiAdmin = user?.role === "HINDI_CELL" || user?.name === "हिंदी अनुभाग";
       
       const tabs = [
         { id:"dashboard", icon:"📊", label:"डैशबोर्ड" },
-        ...(user.role==="SECTION" ? [{ id:"form", icon:"📝", label:"नई रिपोर्ट" }] : []),
-        { id:"inbox", icon:"📥", label: user.role==="SECTION" ? "मेरी रिपोर्टें" : "आवक रिपोर्टें" },
+        ...(user?.role==="SECTION" ? [{ id:"form", icon:"📝", label:"नई रिपोर्ट" }] : []),
+        { id:"inbox", icon:"📥", label: user?.role==="SECTION" ? "मेरी रिपोर्टें" : "आवक रिपोर्टें" },
         ...(isHindiAdmin ? [{ id:"consolidated", icon:"📑", label:"समेकित रिपोर्ट" }] : []),
         ...(isHindiAdmin ? [{ id:"master", icon:"⚙️", label:"मास्टर कंट्रोल" }] : []),
       ];
@@ -349,7 +347,7 @@
             ))}
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>{r.icon} {user.name}</div>
+            <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>{r.icon} {user?.name}</div>
             <button onClick={onLogout} style={{ fontSize:11, color:"#fecaca", background:"rgba(220,38,38,0.2)", border:"1px solid rgba(220,38,38,0.35)", borderRadius:8, padding:"5px 10px", cursor:"pointer", fontWeight:700 }}>बाहर</button>
           </div>
         </nav>
@@ -357,15 +355,15 @@
     }
 
     function Dashboard({ reports, user, setView, sectionsList }) {
-      const r = ROLES[user.role];
-      const myReports = user.role==="SECTION" ? reports.filter(x=>x.sectionName===user.name) : reports;
+      const r = ROLES[user?.role] || ROLES.SECTION;
+      const myReports = user?.role==="SECTION" ? reports.filter(x=>x?.sectionName===user?.name) : reports;
       
       const inboxCount = { 
-        AAO: reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x.status) && x.sectionName===user.mappedSection).length, 
-        SAO: reports.filter(x=>x.status==="AAO_APPROVED" && x.sectionName===user.mappedSection).length, 
-        HINDI_CELL: reports.filter(x=>x.status==="SAO_APPROVED").length 
+        AAO: reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x?.status) && x?.sectionName===user?.mappedSection).length, 
+        SAO: reports.filter(x=>x?.status==="AAO_APPROVED" && x?.sectionName===user?.mappedSection).length, 
+        HINDI_CELL: reports.filter(x=>x?.status==="SAO_APPROVED").length 
       };
-      const pendingForMe = inboxCount[user.role] || 0;
+      const pendingForMe = inboxCount[user?.role] || 0;
 
       const [trackQ, setTrackQ] = useState("Q4");
       const [trackY, setTrackY] = useState("2026");
@@ -373,17 +371,17 @@
       const stats = [
         { label:"कुल रिपोर्टें",  value: myReports.length, icon:"📄", c:"#6366f1" },
         { label:"लंबित", value: pendingForMe, icon:"⏳", c:"#f59e0b" },
-        { label:"स्वीकृत", value: myReports.filter(x=>x.status==="SUBMITTED").length, icon:"✅", c:"#10b981" },
+        { label:"स्वीकृत", value: myReports.filter(x=>x?.status==="SUBMITTED").length, icon:"✅", c:"#10b981" },
       ];
 
       return (
         <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
           <div style={{ background:"#fff", borderRadius:16, padding:"16px 20px", border:"1.5px solid #e2e8f0" }}>
             <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>रिपोर्ट प्रवाह</div>
-            <WorkflowPipeline currentRole={user.role} />
+            <WorkflowPipeline currentRole={user?.role} />
           </div>
 
-          {user.role === "HINDI_CELL" && (
+          {user?.role === "HINDI_CELL" && (
             <div className="no-print" style={{ background:"#fff", borderRadius:16, padding:"20px", border:"1.5px solid #e2e8f0" }}>
               <h3 style={{ fontSize:16, fontWeight:800, margin:"0 0 14px", color:"#1e293b" }}>📊 अनुभागों की रिपोर्ट जमा स्थिति</h3>
               <div style={{ display:"flex", gap:10, marginBottom:16 }}>
@@ -396,12 +394,12 @@
               </div>
               
               <div style={{ fontSize:13, fontWeight:700, color:"#475569", marginBottom:12 }}>
-                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r.year === trackY && r.quarter === trackQ).length}</span> / {sectionsList.length}
+                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r?.year === trackY && r?.quarter === trackQ).length}</span> / {sectionsList.length}
               </div>
               
               <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
                 {sectionsList.map(sec => {
-                  const hasSubmitted = reports.some(r => r.sectionName === sec && r.year === trackY && r.quarter === trackQ);
+                  const hasSubmitted = reports.some(r => r?.sectionName === sec && r?.year === trackY && r?.quarter === trackQ);
                   return (
                     <div key={sec} style={{ 
                       padding:"8px 14px", borderRadius:8, fontSize:12, fontWeight:700,
@@ -427,7 +425,7 @@
             ))}
           </div>
 
-          {user.role!=="SECTION" && pendingForMe>0 && (
+          {user?.role!=="SECTION" && pendingForMe>0 && (
             <button onClick={()=>setView("inbox")} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:r.grad, borderRadius:14, padding:"16px 22px", border:"none", cursor:"pointer", color:"#fff", boxShadow:`0 4px 18px ${r.color}40`, }}>
               <div style={{ display:"flex", alignItems:"center", gap:12 }}><span style={{ fontSize:28 }}>📥</span><div style={{ textAlign:"left" }}><div style={{ fontWeight:800, fontSize:15 }}>{pendingForMe} रिपोर्ट आपकी प्रतीक्षा में</div></div></div><span style={{ fontSize:22 }}>→</span>
             </button>
@@ -443,13 +441,13 @@
       const set = (k,v) => setData(d=>({...d,[k]:v}));
       
       const isQ4 = data.quarter==="Q4";
-      const isHindiSection = data.sectionName === "हिंदी अनुभाग" || user.name === "हिंदी अनुभाग";
+      const isHindiSection = data.sectionName === "हिंदी अनुभाग" || user?.name === "हिंदी अनुभाग";
       const showPart2 = isQ4 && isHindiSection; 
       const totalSteps = showPart2 ? 4 : 3;
 
       const disableBasicInfo = !isHindiSection;
 
-      const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
+      const alreadySubmitted = !initialData && reports.some(r => r?.sectionName === user?.name && r?.year === data.year && r?.quarter === data.quarter);
 
       const validationErrors = useMemo(() => {
         const errs = [];
@@ -462,6 +460,7 @@
         const sum3 = num(data.b1_s3_bilingual) + num(data.b1_s3_englishOnly) + num(data.b1_s3_hindiOnly);
         if(num(data.b1_s3_totalIssued) > 0 && sum3 !== num(data.b1_s3_totalIssued)) errs.push(`भाग 1(3): जारी दस्तावेजों का योग (${sum3}) कुल (${data.b1_s3_totalIssued}) के बराबर होना चाहिए।`);
 
+        // 🌟 STRICT EXACT MATCH VALIDATION 🌟
         const sum4Reply = num(data.b1_s4_hindiReply) + num(data.b1_s4_englishReply) + num(data.b1_s4_noReplyNeeded);
         if(num(data.b1_s4_totalReceived) > 0 && sum4Reply !== num(data.b1_s4_totalReceived)) {
             errs.push(`भाग 1(4): कुल उत्तरों का योग (${sum4Reply}) प्राप्त पत्रों (${data.b1_s4_totalReceived}) के बराबर होना चाहिए।`);
@@ -495,15 +494,15 @@
         if(validationErrors.length > 0) return;
 
         const report = { ...data, timestamp:new Date().toISOString() };
-        if (!report.sectionName) report.sectionName = user.name; 
+        if (!report.sectionName) report.sectionName = user?.name; 
 
         if (!initialData) {
             report.status = "PENDING_AAO";
-            report.timeline = [{ ts:new Date().toISOString(), role:"SECTION", name:user.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }];
+            report.timeline = [{ ts:new Date().toISOString(), role:user?.role, name:user?.name, action:"रिपोर्ट जमा की और AAO को भेजी", remark:"" }];
         } else {
-            if (user.role === "SECTION" && report.status === "AAO_RETURNED") report.status = "PENDING_AAO";
-            if (user.role === "AAO" && report.status === "SAO_RETURNED") report.status = "AAO_APPROVED";
-            report.timeline = [...(report.timeline||[]), { ts:new Date().toISOString(), role:user.role, name:user.name, action:"रिपोर्ट में संशोधन किया गया (Edited)", remark:"" }];
+            if (user?.role === "SECTION" && report.status === "AAO_RETURNED") report.status = "PENDING_AAO";
+            if (user?.role === "AAO" && report.status === "SAO_RETURNED") report.status = "AAO_APPROVED";
+            report.timeline = [...(report.timeline||[]), { ts:new Date().toISOString(), role:user?.role, name:user?.name, action:"रिपोर्ट में संशोधन किया गया (Edited)", remark:"" }];
         }
         
         onSave(report); 
@@ -687,30 +686,26 @@
     }
 
     function AnnualReviewReport({ report, onClose }) {
-      const region = report.region || 'A';
+      const region = report?.region || 'A';
       
       const num = (v) => parseFloat(v) || 0;
       
-      // 1. धारा 3(3) (Target: 100%)
-      const sec33Total = num(report.b1_s3_totalIssued);
-      const sec33Hindi = num(report.b1_s3_bilingual) + num(report.b1_s3_hindiOnly);
+      const sec33Total = num(report?.b1_s3_totalIssued);
+      const sec33Hindi = num(report?.b1_s3_bilingual) + num(report?.b1_s3_hindiOnly);
       const sec33Pct = sec33Total > 0 ? Math.round((sec33Hindi/sec33Total)*100) : 100;
       
-      // 2. नियम 5 (Target: 100%)
-      const rule5Total = num(report.b1_s4_totalReceived) - num(report.b1_s4_noReplyNeeded);
-      const rule5Hindi = num(report.b1_s4_hindiReply);
+      const rule5Total = num(report?.b1_s4_totalReceived) - num(report?.b1_s4_noReplyNeeded);
+      const rule5Hindi = num(report?.b1_s4_hindiReply);
       const rule5Pct = rule5Total > 0 ? Math.round((rule5Hindi/rule5Total)*100) : 100;
 
-      // 3. मूल पत्राचार (Target: A-100%, B-90%, C-55%)
       const corrTarget = region === 'A' ? 100 : region === 'B' ? 90 : 55;
-      const corrTotal = num(report.b1_s6_ka_total) + num(report.b1_s6_kha_total) + num(report.b1_s6_ga_total);
-      const corrHindi = num(report.b1_s6_ka_hindi) + num(report.b1_s6_kha_hindi) + num(report.b1_s6_ga_hindi);
+      const corrTotal = num(report?.b1_s6_ka_total) + num(report?.b1_s6_kha_total) + num(report?.b1_s6_ga_total);
+      const corrHindi = num(report?.b1_s6_ka_hindi) + num(report?.b1_s6_kha_hindi) + num(report?.b1_s6_ga_hindi);
       const corrPct = corrTotal > 0 ? Math.round((corrHindi/corrTotal)*100) : 100;
 
-      // 4. फाइल टिप्पण (Target: A-75%, B-50%, C-30%)
       const notingTarget = region === 'A' ? 75 : region === 'B' ? 50 : 30;
-      const notingTotal = num(report.b1_s7_totalPages);
-      const notingHindi = num(report.b1_s7_hindiPages);
+      const notingTotal = num(report?.b1_s7_totalPages);
+      const notingHindi = num(report?.b1_s7_hindiPages);
       const notingPct = notingTotal > 0 ? Math.round((notingHindi/notingTotal)*100) : 100;
 
       const evalData = [
@@ -730,7 +725,7 @@
               </div>
 
               <h2 style={{ marginTop: "20px" }}>राजभाषा वार्षिक कार्यक्रम (2025-26) के अनुसार समीक्षा रिपोर्ट</h2>
-              <h3 style={{ textDecoration: "underline", fontWeight: "bold" }}>अनुभाग: {report.sectionName} | तिमाही: {QUARTERS.find(q=>q.id===report.quarter)?.label?.split('·')[0]} {report.year}</h3>
+              <h3 style={{ textDecoration: "underline", fontWeight: "bold" }}>अनुभाग: {report?.sectionName || '-'} | तिमाही: {QUARTERS.find(q=>q.id===report?.quarter)?.label?.split('·')[0] || '-'} {report?.year || '-'}</h3>
 
               <div style={{ marginTop: "30px", marginBottom: "15px", fontSize: "11pt" }}>
                  गृह मंत्रालय, राजभाषा विभाग द्वारा जारी <strong>वार्षिक कार्यक्रम 2025-26</strong> के आलोक में आपके अनुभाग द्वारा प्रस्तुत तिमाही प्रगति रिपोर्ट के आँकड़ों की समीक्षा निम्न प्रकार है:
@@ -785,8 +780,8 @@
       const [excludedSections, setExcludedSections] = useState([]);
       const [auditErrors, setAuditErrors] = useState(null); 
 
-      const reportsForPeriod = reports.filter(r => r.quarter === q && r.year === y);
-      const availableSections = Array.from(new Set(reportsForPeriod.map(r => r.sectionName)));
+      const reportsForPeriod = reports.filter(r => r?.quarter === q && r?.year === y);
+      const availableSections = Array.from(new Set(reportsForPeriod.map(r => r?.sectionName).filter(Boolean)));
 
       useEffect(() => {
         setExcludedSections([]);
@@ -804,7 +799,7 @@
       const handleSelectAll = () => setExcludedSections([]);
       const handleDeselectAll = () => setExcludedSections(availableSections);
 
-      const filtered = reportsForPeriod.filter(r => !excludedSections.includes(r.sectionName));
+      const filtered = reportsForPeriod.filter(r => !excludedSections.includes(r?.sectionName));
       
       const runAudit = () => {
         const errList = [];
@@ -822,7 +817,7 @@
           if(num(r.b1_s5_kha_total) > 0 && sum5kha !== num(r.b1_s5_kha_total)) secErr.push(`मद 5('ख') में प्राप्त(${num(r.b1_s5_kha_total)}) और उत्तरों का योग(${sum5kha}) अलग है।`);
 
           if (secErr.length > 0) {
-             errList.push({ section: r.sectionName, errors: secErr });
+             errList.push({ section: r.sectionName || 'अज्ञात', errors: secErr });
           }
         });
         setAuditErrors(errList);
@@ -917,7 +912,7 @@
                <tbody>
                   <tr>
                      <td style={{width: "50%", border: "none"}}><strong>कार्यालय का नाम:</strong> पश्चिम रेलवे (विभिन्न अनुभाग)</td>
-                     <td style={{width: "25%", border: "none"}}><strong>तिमाही:</strong> {QUARTERS.find(x=>x.id===q)?.label}</td>
+                     <td style={{width: "25%", border: "none"}}><strong>तिमाही:</strong> {QUARTERS.find(x=>x.id===q)?.label || '-'}</td>
                      <td style={{width: "25%", border: "none"}}><strong>वर्ष:</strong> {y}</td>
                   </tr>
                   <tr>
@@ -1224,7 +1219,157 @@
       );
     }
 
-    // 🌟 मास्टर कंट्रोल (Admin Panel) Firebase के लिए 🌟
+    // 🌟 क्रैश प्रिवेंशन: इनबॉक्स फ़िल्टर 🌟
+    function Inbox({ reports, user, onAction, onEdit }) {
+      const r = ROLES[user?.role] || ROLES.SECTION;
+      
+      const visible = useMemo(()=>{
+        if(!reports) return [];
+        if(user?.role==="SECTION")    return reports.filter(x=>x?.sectionName === user?.name);
+        if(user?.role==="AAO")        return reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x?.status) && x?.sectionName === user?.mappedSection);
+        if(user?.role==="SAO")        return reports.filter(x=>["AAO_APPROVED"].includes(x?.status) && x?.sectionName === user?.mappedSection);
+        if(user?.role==="HINDI_CELL") return reports.filter(x=>x?.status === "SAO_APPROVED");
+        return reports;
+      },[reports,user]);
+
+      const [selected, setSelected] = useState(null);
+      const [remark, setRemark]     = useState("");
+      const [search, setSearch]     = useState("");
+
+      const filtered = visible.filter(x => {
+         if (!search) return true;
+         const s = search.toLowerCase();
+         const secName = String(x?.sectionName || "").toLowerCase();
+         const ack = String(x?.ackId || "").toLowerCase();
+         return secName.includes(s) || ack.includes(s);
+      });
+
+      if(selected) return <ReportDetail report={selected} user={user} remark={remark} setRemark={setRemark} onAction={(action,rem)=>{ onAction(selected,action,rem); setSelected(null); setRemark(""); }} onBack={()=>{ setSelected(null); setRemark(""); }} onEdit={onEdit} />;
+
+      return (
+        <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #e2e8f0", overflow:"hidden" }}>
+          <div style={{ background:r.grad, padding:"16px 22px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>{user?.role==="SECTION" ? "📋 मेरी रिपोर्टें" : "📥 आवक रिपोर्टें"}</h2>
+          </div>
+          <div style={{ padding:"12px 16px", background:"#f8fafc", borderBottom:"1px solid #e2e8f0" }}>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 अनुभाग या पावती संख्या से खोजें..." style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }} />
+          </div>
+          {filtered.length===0?(
+            <div style={{ textAlign:"center", padding:48, color:"#94a3b8" }}>
+              <div style={{ fontSize:40 }}>{user?.role==="SECTION"?"📂":"📭"}</div>
+              <div style={{ marginTop:10, fontSize:14 }}>{user?.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में नहीं।"}</div>
+            </div>
+          ):(
+            filtered.map((rep,i)=>{
+              const st   = STATUS[rep?.status] || STATUS.DRAFT;
+              const c    = SECTION_COLORS[i%SECTION_COLORS.length];
+              
+              const canAct = (user?.role==="SECTION"&&rep?.status==="AAO_RETURNED") || (user?.role==="AAO"&&["PENDING_AAO", "SAO_RETURNED"].includes(rep?.status)) || (user?.role==="SAO"&&rep?.status==="AAO_APPROVED") || (user?.role==="HINDI_CELL"&&rep?.status==="SAO_APPROVED");
+              const qLabel = QUARTERS.find(q=>q.id===rep?.quarter)?.label || rep?.quarter || 'अज्ञात';
+
+              return (
+                <div key={rep.id} onClick={()=>setSelected(rep)} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                  <div style={{ width:40, height:40, borderRadius:12, background:c.bg, border:`1.5px solid ${c.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{c.icon}</div>
+                  <div style={{ flex:1, minWidth:0 }}><div style={{ fontSize:13, fontWeight:700, color:"#1e293b" }}>{rep?.sectionName || 'अज्ञात अनुभाग'}</div><div style={{ fontSize:10, color:"#94a3b8" }}>{qLabel} · {rep?.year || ''} · {rep?.ackId || ''}</div></div>
+                  <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
+                    <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
+                  </div>
+                  {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>कार्रवाई करें</span>}
+                </div>
+              );
+            })
+          )}
+        </div>
+      );
+    }
+
+    function ReportDetail({ report, user, remark, setRemark, onAction, onBack, onEdit }) {
+      const [showReview, setShowReview] = useState(false); 
+      
+      if (!report) return null;
+      
+      const r  = ROLES[user?.role] || ROLES.SECTION;
+      const st = STATUS[report?.status] || STATUS.DRAFT;
+      
+      const canAct = (user?.role==="SECTION" && report?.status==="AAO_RETURNED") || 
+                     (user?.role==="AAO" && ["PENDING_AAO", "SAO_RETURNED"].includes(report?.status)) || 
+                     (user?.role==="SAO" && report?.status==="AAO_APPROVED") || 
+                     (user?.role==="HINDI_CELL" && report?.status==="SAO_APPROVED");
+
+      const actionBtns = {
+        SECTION: report?.status === "AAO_RETURNED" 
+                 ? [{ label:"✅ AAO को पुनः भेजें (बिना एडिट किए)", action:"PENDING_AAO", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" }] : [],
+        AAO: report?.status === "SAO_RETURNED" 
+             ? [{ label:"✅ SAO को पुनः भेजें", action:"AAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" }] 
+             : [{ label:"✅ SAO को अग्रेषित करें", action:"AAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ अनुभाग को वापस करें", action:"AAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
+        SAO: [{ label:"✅ हिंदी प्रकोष्ठ को भेजें", action:"SAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ AAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
+        HINDI_CELL: [{ label:"🎉 अंतिम स्वीकृति दें", action:"SUBMITTED", grad:"linear-gradient(135deg,#f59e0b,#10b981)" },{ label:"↩️ SAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#dc2626,#9f1239)" }],
+      };
+
+      return (
+        <div style={{ maxWidth:760, margin:"0 auto" }}>
+          
+          {showReview && <AnnualReviewReport report={report} onClose={()=>setShowReview(false)} />}
+
+          <div className="no-print screen-only" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+            <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700 }}>← वापस सूची में</button>
+            <div style={{ display:"flex", gap:10 }}>
+               <button onClick={() => setShowReview(true)} style={{ background:"#8b5cf6", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>📊 वार्षिक कार्यक्रम समीक्षा (2025-26)</button>
+               <button onClick={() => onEdit(report)} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>✏️ रिपोर्ट एडिट करें</button>
+               <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>🖨️ PDF में सेव करें</button>
+            </div>
+          </div>
+
+          <div className="screen-only" style={{ background:r.grad, borderRadius:16, padding:"18px 22px", marginBottom:16, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div>
+              <div style={{ fontSize:18, fontWeight:800, color:"#fff" }}>{report?.sectionName || '-'}</div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.8)" }}>{(QUARTERS.find(q=>q.id===report?.quarter)?.label) || report?.quarter || ''} · {report?.year || ''} · पावती: {report?.ackId || ''}</div>
+            </div>
+            <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:13, fontWeight:700, color:"#fff" }}>{st.icon} {st.label}</div>
+          </div>
+
+          <div className="print-box screen-only" style={{ background:"#fff", borderRadius:14, border:"1.5px solid #e2e8f0", padding:18, marginBottom:16 }}>
+            <div style={{ fontSize:13, fontWeight:800, color:"#1e293b", marginBottom:12 }}>📋 रिपोर्ट विवरण (स्क्रीन व्यू)</div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              {Object.entries(report).map(([k,v]) => {
+                const excludeKeys = ["id", "ackId", "timestamp", "timeline", "status", "sectionName", "formData", "year", "quarter", "region"];
+                const isPart2Key = k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_");
+                const isHindiSection = report?.sectionName === "हिंदी अनुभाग";
+                const isQ4 = report?.quarter === "Q4";
+
+                if (isPart2Key && (!isHindiSection || !isQ4)) return null;
+
+                if(v !== null && v !== undefined && v !== "" && !excludeKeys.includes(k) && typeof v !== "object") {
+                  let formattedKey = FIELD_LABELS_HINDI[k] || k.replace('b1_','').replace('b2_','').replace('s1_','').replace(/_/g, ' ').toUpperCase();
+                  return (
+                    <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
+                      <div style={{ fontSize:11, color:"#64748b", fontWeight:700, wordBreak:"break-word", marginBottom:2 }}>{formattedKey}</div>
+                      <div style={{ fontSize:13, color:"#1e293b", fontWeight:800 }}>{v}</div>
+                    </div>
+                  )
+                }
+                return null;
+              })}
+            </div>
+          </div>
+
+          <OfficialPrintView report={report} />
+
+          {canAct && (
+            <div className="no-print screen-only" style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
+              <div style={{ fontSize:14, fontWeight:800, color:"#1e293b", marginBottom:12 }}>{r.icon} आपकी कार्रवाई</div>
+              <textarea value={remark} onChange={e=>setRemark(e.target.value)} rows={2} placeholder="टिप्पणी..." style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", marginBottom:12 }} />
+              <div style={{ display:"flex", gap:12 }}>
+                {(actionBtns[user?.role]||[]).map(btn=>(
+                  <button key={btn.action} onClick={()=>onAction(btn.action, remark)} style={{ flex:1, padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:btn.grad, color:"#fff", fontWeight:800 }}>{btn.label}</button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     function MasterControl({ reports, sectionsList, settingsId, onEditReport }) {
       const [isClearing, setIsClearing] = useState(false);
       const [newSec, setNewSec] = useState("");
@@ -1233,45 +1378,42 @@
       const [evalQ, setEvalQ] = useState("Q4");
       const [evalY, setEvalY] = useState("2026");
 
-      const validReports = reports.filter(r => r.status !== "SETTINGS");
-      const filteredReports = validReports.filter(r => 
-         (r.sectionName && r.sectionName.includes(searchQuery)) || 
-         (r.year && r.year.includes(searchQuery)) || 
-         (r.quarter && r.quarter.includes(searchQuery))
-      );
+      const validReports = reports.filter(r => r?.status !== "SETTINGS");
+      const filteredReports = validReports.filter(r => {
+         const qry = searchQuery.toLowerCase();
+         const sec = String(r?.sectionName || "").toLowerCase();
+         const yr = String(r?.year || "").toLowerCase();
+         const qtr = String(r?.quarter || "").toLowerCase();
+         return sec.includes(qry) || yr.includes(qry) || qtr.includes(qry);
+      });
 
-      // 🌟 NEW: Target Defaulters Tracker Logic 🌟
-      const reportsForEval = validReports.filter(r => r.quarter === evalQ && r.year === evalY);
+      const reportsForEval = validReports.filter(r => r?.quarter === evalQ && r?.year === evalY);
       
       const defaulters = useMemo(() => {
         return reportsForEval.map(r => {
             const deficits = [];
             const num = (v) => parseFloat(v) || 0;
-            const region = r.region || 'A';
+            const region = r?.region || 'A';
 
-            // 1. 3(3) 
-            const sec33Total = num(r.b1_s3_totalIssued);
-            const sec33Hindi = num(r.b1_s3_bilingual) + num(r.b1_s3_hindiOnly);
+            const sec33Total = num(r?.b1_s3_totalIssued);
+            const sec33Hindi = num(r?.b1_s3_bilingual) + num(r?.b1_s3_hindiOnly);
             const sec33Pct = sec33Total > 0 ? Math.round((sec33Hindi/sec33Total)*100) : 100;
             if (sec33Pct < 100) deficits.push(`धारा 3(3): ${sec33Pct}% (लक्ष्य 100%)`);
 
-            // 2. Rule 5 
-            const rule5Total = num(r.b1_s4_totalReceived) - num(r.b1_s4_noReplyNeeded);
-            const rule5Hindi = num(r.b1_s4_hindiReply);
+            const rule5Total = num(r?.b1_s4_totalReceived) - num(r?.b1_s4_noReplyNeeded);
+            const rule5Hindi = num(r?.b1_s4_hindiReply);
             const rule5Pct = rule5Total > 0 ? Math.round((rule5Hindi/rule5Total)*100) : 100;
             if (rule5Pct < 100) deficits.push(`नियम-5: ${rule5Pct}% (लक्ष्य 100%)`);
 
-            // 3. Correspondence 
             const corrTarget = region === 'A' ? 100 : region === 'B' ? 90 : 55;
-            const corrTotal = num(r.b1_s6_ka_total) + num(r.b1_s6_kha_total) + num(r.b1_s6_ga_total);
-            const corrHindi = num(r.b1_s6_ka_hindi) + num(r.b1_s6_kha_hindi) + num(r.b1_s6_ga_hindi);
+            const corrTotal = num(r?.b1_s6_ka_total) + num(r?.b1_s6_kha_total) + num(r?.b1_s6_ga_total);
+            const corrHindi = num(r?.b1_s6_ka_hindi) + num(r?.b1_s6_kha_hindi) + num(r?.b1_s6_ga_hindi);
             const corrPct = corrTotal > 0 ? Math.round((corrHindi/corrTotal)*100) : 100;
             if (corrPct < corrTarget) deficits.push(`पत्राचार: ${corrPct}% (लक्ष्य ${corrTarget}%)`);
 
-            // 4. Noting 
             const notingTarget = region === 'A' ? 75 : region === 'B' ? 50 : 30;
-            const notingTotal = num(r.b1_s7_totalPages);
-            const notingHindi = num(r.b1_s7_hindiPages);
+            const notingTotal = num(r?.b1_s7_totalPages);
+            const notingHindi = num(r?.b1_s7_hindiPages);
             const notingPct = notingTotal > 0 ? Math.round((notingHindi/notingTotal)*100) : 100;
             if (notingPct < notingTarget) deficits.push(`टिप्पण: ${notingPct}% (लक्ष्य ${notingTarget}%)`);
 
@@ -1331,7 +1473,6 @@
       return (
          <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth:800, margin:"0 auto" }}>
             
-            {/* 🌟 NEW: TARGET DEFAULTER TRACKER 🌟 */}
             <div style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: 16, padding: 24 }}>
                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16}}>
                  <h2 style={{ color: "#1e293b", margin: 0, fontSize: 18, fontWeight: 800 }}>🎯 वार्षिक कार्यक्रम लक्ष्य ट्रैकर (Defaulters)</h2>
@@ -1357,7 +1498,7 @@
                      {defaulters.map(d => (
                         <div key={d.id} style={{ background: "#fee2e2", border: "1px solid #ef4444", borderRadius: 10, padding: "12px 16px" }}>
                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                              <span style={{ fontSize: 14, fontWeight: "bold", color: "#991b1b" }}>{d.sectionName} <span style={{fontSize:11, color:"#7f1d1d", fontWeight:"normal"}}>(क्षेत्र '{d.region || 'A'}')</span></span>
+                              <span style={{ fontSize: 14, fontWeight: "bold", color: "#991b1b" }}>{d?.sectionName || 'अज्ञात'} <span style={{fontSize:11, color:"#7f1d1d", fontWeight:"normal"}}>(क्षेत्र '{d?.region || 'A'}')</span></span>
                               <button onClick={() => onEditReport(d)} style={{ background: "transparent", color: "#b91c1c", border: "1px solid #b91c1c", padding: "4px 10px", borderRadius: 6, cursor: "pointer", fontSize: 11, fontWeight: "bold" }}>रिपोर्ट देखें</button>
                            </div>
                            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: "#7f1d1d" }}>
@@ -1387,9 +1528,9 @@
                      <tbody>
                         {filteredReports.map(r => (
                            <tr key={r.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                              <td style={{ padding: "10px", color: "#1e293b", fontWeight: "bold" }}>{r.sectionName}</td>
-                              <td style={{ padding: "10px", color: "#64748b" }}>{QUARTERS.find(q=>q.id===r?.quarter)?.label?.split('·')[0]} · {r.year}</td>
-                              <td style={{ padding: "10px" }}><span style={{ fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:10, background:STATUS[r.status]?.bg||"#f1f5f9", color:STATUS[r.status]?.color||"#64748b" }}>{STATUS[r.status]?.label || r.status}</span></td>
+                              <td style={{ padding: "10px", color: "#1e293b", fontWeight: "bold" }}>{r?.sectionName || '-'}</td>
+                              <td style={{ padding: "10px", color: "#64748b" }}>{QUARTERS.find(q=>q.id===r?.quarter)?.label?.split('·')[0] || '-'} · {r?.year || '-'}</td>
+                              <td style={{ padding: "10px" }}><span style={{ fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:10, background:STATUS[r?.status]?.bg||"#f1f5f9", color:STATUS[r?.status]?.color||"#64748b" }}>{STATUS[r?.status]?.label || r?.status || '-'}</span></td>
                               <td style={{ padding: "10px", textAlign: "center" }}>
                                  <button onClick={() => onEditReport(r)} style={{ background: "#f59e0b", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontWeight: "bold", fontSize: 11, boxShadow:"0 2px 4px rgba(245,158,11,0.2)" }}>✏️ एडिट करें</button>
                               </td>
@@ -1456,7 +1597,14 @@
           }
 
           const validReports = data.filter(r => r.status !== "SETTINGS");
-          validReports.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+          
+          // 🌟 क्रैश प्रिवेंशन: सुरक्षित डेट सॉर्टिंग 🌟
+          validReports.sort((a,b) => {
+             const tA = new Date(a.timestamp || 0).getTime() || 0;
+             const tB = new Date(b.timestamp || 0).getTime() || 0;
+             return tB - tA;
+          });
+          
           setReports(validReports);
         });
         return () => unsubscribe();
@@ -1498,7 +1646,7 @@
             {view==="form" && <ReportForm key={editingReport ? editingReport.id : 'new'} onSave={handleSave} user={user} reports={reports} initialData={editingReport} onCancel={() => { setEditingReport(null); setView(user.role === "HINDI_CELL" ? "master" : "inbox"); }} />}
             {view==="inbox"     && <Inbox reports={reports} user={user} onAction={handleAction} onEdit={(r) => { setEditingReport(r); setView("form"); }} />}
             {view==="consolidated" && <ConsolidatedView reports={reports} sectionsList={sectionsList} />}
-            {view==="master" && user.role==="HINDI_CELL" && <MasterControl reports={reports} sectionsList={sectionsList} settingsId={settingsId} onEditReport={(r) => { setEditingReport(r); setView("form"); }} />}
+            {view==="master" && user?.role==="HINDI_CELL" && <MasterControl reports={reports} sectionsList={sectionsList} settingsId={settingsId} onEditReport={(r) => { setEditingReport(r); setView("form"); }} />}
           </main>
           <footer className="no-print" style={{ position:"fixed", bottom:0, left:0, right:0, background:"linear-gradient(90deg,#1e1b4b,#312e81)", padding:"7px 22px", display:"flex", justifyContent:"space-between", fontSize:10, color:"rgba(255,255,255,0.5)" }}>
             <span>© 2026 Digital India · राजभाषा QPR v4.0</span>
