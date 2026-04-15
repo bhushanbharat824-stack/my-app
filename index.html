@@ -33,6 +33,7 @@
   </script>
 
   <style>
+    /* 🌟 एडवांस्ड प्रिंटिंग CSS - शुद्ध सरकारी प्रारूप के लिए 🌟 */
     @media screen {
       .print-only { display: none !important; }
     }
@@ -68,14 +69,13 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo } = React;
 
-    // 🌟 क्रैश प्रिवेंशन: सुरक्षित डेट फॉर्मेटर 🌟
-    function formatDate(ds) {
-       if (!ds) return '-';
-       const d = new Date(ds);
-       return isNaN(d.getTime()) ? '-' : d.toLocaleDateString('en-GB');
-    }
+    // 🛡️ क्रैश प्रिवेंशन (ग्लोबल सेफ-रेंडरिंग फंक्शन) 🛡️
+    const safeStr = (val, fallback = "") => {
+      if (val === null || val === undefined) return fallback;
+      if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') return String(val);
+      return fallback; // अमान्य ऑब्जेक्ट या ऐरे होने पर खाली/डिफ़ॉल्ट दिखाएगा, क्रैश नहीं करेगा
+    };
 
-    const AUDIT_KEY   = "rajbhasha_audit_v4";
     const ROLES = {
       SECTION:    { id: "SECTION",    label: "अनुभाग",        icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
       AAO:        { id: "AAO",        label: "AAO",            icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
@@ -151,16 +151,17 @@
     const Inp = ({ label, value, onChange, type="text", placeholder="", disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:4, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
-        <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} disabled={disabled} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
+        <input type={type} value={safeStr(value)} onChange={e=>onChange(e.target.value)} placeholder={placeholder} disabled={disabled} style={{ padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13, outline:"none", boxSizing:"border-box", width:"100%", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
 
     const Num = ({ label, value, onChange, disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:3, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", lineHeight:1.3 }}>{label}</label>}
-        <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
+        <input type="number" min={0} value={safeStr(value)} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
+    
     const Radio = ({ label, value, onChange, options, disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:6, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
@@ -169,6 +170,7 @@
         </div>
       </div>
     );
+    
     const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
     
     const SecCard = ({ title, icon, color, children }) => {
@@ -191,7 +193,7 @@
           <tbody>{rows.map((row,ri)=>(
             <tr key={ri}>{row.map((cell,ci)=>(
               <td key={ci} style={{ border:"1px solid #e2e8f0", padding:3 }}>
-                {cell.key ? <input type={cell.type||"number"} min={0} value={data[cell.key]||""} onChange={e=>onChange(cell.key,e.target.value)} style={{ width:"100%", padding:"5px 6px", border:"none", fontSize:13, fontWeight:600, textAlign:"center", background:"transparent", outline:"none" }} /> : <span style={{ padding:"5px 8px", display:"block", color:"#64748b", fontWeight:600 }}>{cell.label}</span>}
+                {cell.key ? <input type={cell.type||"number"} min={0} value={safeStr(data[cell.key])} onChange={e=>onChange(cell.key,e.target.value)} style={{ width:"100%", padding:"5px 6px", border:"none", fontSize:13, fontWeight:600, textAlign:"center", background:"transparent", outline:"none" }} /> : <span style={{ padding:"5px 8px", display:"block", color:"#64748b", fontWeight:600 }}>{cell.label}</span>}
               </td>
             ))}</tr>
           ))}</tbody>
@@ -201,11 +203,11 @@
 
     function WorkflowPipeline({ currentRole }) {
       const steps = [{ role:"SECTION", label:"अनुभाग", icon:"🏢" }, { role:"AAO", label:"AAO", icon:"🔎" }, { role:"SAO", label:"SAO", icon:"✅" }, { role:"HINDI_CELL", label:"हिंदी प्रकोष्ठ", icon:"🏛️" }];
-      const currentIdx = ["SECTION","AAO","SAO","HINDI_CELL"].indexOf(currentRole);
+      const currentIdx = ["SECTION","AAO","SAO","HINDI_CELL"].indexOf(safeStr(currentRole, "SECTION"));
       return (
         <div style={{ display:"flex", alignItems:"center", gap:0, padding:"10px 0" }}>
           {steps.map((s,i)=>{
-            const active = s.role === currentRole; const done = i < currentIdx; const r = ROLES[s.role];
+            const active = s.role === safeStr(currentRole); const done = i < currentIdx; const r = ROLES[s.role];
             return (
               <div key={s.role} style={{ display:"flex", alignItems:"center", flex:1 }}>
                 <div style={{ display:"flex", flexDirection:"column", alignItems:"center", flex:1, gap:4 }}>
@@ -279,7 +281,7 @@
                   <div>
                     <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none" }}>
                       <option value="">-- अनुभाग चुनें --</option>
-                      {sectionsList.map(s=><option key={s}>{s}</option>)}
+                      {sectionsList.map(s=><option key={s}>{safeStr(s)}</option>)}
                     </select>
                   </div>
                   {err && <ErrBox msg={err} />}
@@ -307,7 +309,7 @@
               <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em", display:"block", marginBottom:6 }}>आप किस अनुभाग के {r.label} हैं?</label>
               <select value={section} onChange={e=>{setSection(e.target.value); setErr("");}} style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", fontSize:14, outline:"none", marginBottom:4 }}>
                 <option value="">-- अपना अनुभाग चुनें --</option>
-                {sectionsList.map(s=><option key={s}>{s}</option>)}
+                {sectionsList.map(s=><option key={s}>{safeStr(s)}</option>)}
               </select>
             </div>
           )}
@@ -318,7 +320,7 @@
         </div>
       );
     }
-    function ErrBox({ msg }) { return <div style={{ fontSize:12, color:"#dc2626", background:"#fee2e2", padding:"8px 12px", borderRadius:8 }}>{msg}</div>; }
+    function ErrBox({ msg }) { return <div style={{ fontSize:12, color:"#dc2626", background:"#fee2e2", padding:"8px 12px", borderRadius:8 }}>{safeStr(msg)}</div>; }
     function BtnPrimary({ grad, onClick, children }) { return <button onClick={onClick} style={{ padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:grad, color:"#fff", fontWeight:800, fontSize:14, boxShadow:"0 4px 14px rgba(0,0,0,0.15)" }}>{children}</button>; }
     function BackBtn({ onClick }) { return <button onClick={onClick} style={{ background:"none", border:"none", color:"#94a3b8", fontSize:12, cursor:"pointer" }}>← वापस</button>; }
 
@@ -347,7 +349,7 @@
             ))}
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>{r.icon} {user?.name}</div>
+            <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:20, padding:"4px 12px", fontSize:11, color:"#fff", fontWeight:700 }}>{r.icon} {safeStr(user?.name)}</div>
             <button onClick={onLogout} style={{ fontSize:11, color:"#fecaca", background:"rgba(220,38,38,0.2)", border:"1px solid rgba(220,38,38,0.35)", borderRadius:8, padding:"5px 10px", cursor:"pointer", fontWeight:700 }}>बाहर</button>
           </div>
         </nav>
@@ -356,11 +358,11 @@
 
     function Dashboard({ reports, user, setView, sectionsList }) {
       const r = ROLES[user?.role] || ROLES.SECTION;
-      const myReports = user?.role==="SECTION" ? reports.filter(x=>x?.sectionName===user?.name) : reports;
+      const myReports = user?.role==="SECTION" ? reports.filter(x=>safeStr(x?.sectionName)===safeStr(user?.name)) : reports;
       
       const inboxCount = { 
-        AAO: reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x?.status) && x?.sectionName===user?.mappedSection).length, 
-        SAO: reports.filter(x=>x?.status==="AAO_APPROVED" && x?.sectionName===user?.mappedSection).length, 
+        AAO: reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x?.status) && safeStr(x?.sectionName)===safeStr(user?.mappedSection)).length, 
+        SAO: reports.filter(x=>x?.status==="AAO_APPROVED" && safeStr(x?.sectionName)===safeStr(user?.mappedSection)).length, 
         HINDI_CELL: reports.filter(x=>x?.status==="SAO_APPROVED").length 
       };
       const pendingForMe = inboxCount[user?.role] || 0;
@@ -394,14 +396,15 @@
               </div>
               
               <div style={{ fontSize:13, fontWeight:700, color:"#475569", marginBottom:12 }}>
-                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => r?.year === trackY && r?.quarter === trackQ).length}</span> / {sectionsList.length}
+                कुल जमा रिपोर्टें: <span style={{ color:"#10b981", fontSize:18 }}>{reports.filter(r => safeStr(r?.year) === trackY && safeStr(r?.quarter) === trackQ).length}</span> / {sectionsList.length}
               </div>
               
               <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
                 {sectionsList.map(sec => {
-                  const hasSubmitted = reports.some(r => r?.sectionName === sec && r?.year === trackY && r?.quarter === trackQ);
+                  const secStr = safeStr(sec);
+                  const hasSubmitted = reports.some(r => safeStr(r?.sectionName) === secStr && safeStr(r?.year) === trackY && safeStr(r?.quarter) === trackQ);
                   return (
-                    <div key={sec} style={{ 
+                    <div key={secStr} style={{ 
                       padding:"8px 14px", borderRadius:8, fontSize:12, fontWeight:700,
                       background: hasSubmitted ? "#f8fafc" : "#eef2ff",
                       color: hasSubmitted ? "#94a3b8" : "#3730a3",
@@ -409,7 +412,7 @@
                       opacity: hasSubmitted ? 0.6 : 1, 
                       display: "flex", alignItems: "center", gap: "6px"
                     }}>
-                      {sec} {hasSubmitted ? "✅" : ""}
+                      {secStr} {hasSubmitted ? "✅" : ""}
                     </div>
                   )
                 })}
@@ -447,7 +450,7 @@
 
       const disableBasicInfo = !isHindiSection;
 
-      const alreadySubmitted = !initialData && reports.some(r => r?.sectionName === user?.name && r?.year === data.year && r?.quarter === data.quarter);
+      const alreadySubmitted = !initialData && reports.some(r => safeStr(r?.sectionName) === safeStr(user?.name) && safeStr(r?.year) === safeStr(data.year) && safeStr(r?.quarter) === safeStr(data.quarter));
 
       const validationErrors = useMemo(() => {
         const errs = [];
@@ -515,7 +518,7 @@
           <h2 style={{ fontSize:20, fontWeight:800, color:"#065f46", margin:"16px 0 8px" }}>
              {initialData ? "रिपोर्ट सफलतापूर्वक अपडेट होकर आगे भेज दी गई है!" : "रिपोर्ट AAO के पास भेज दी गई है!"}
           </h2>
-          <div style={{ fontSize:18, fontWeight:800, color:"#6366f1", background:"#eef2ff", display:"inline-block", padding:"8px 20px", borderRadius:10 }}>{data.ackId}</div>
+          <div style={{ fontSize:18, fontWeight:800, color:"#6366f1", background:"#eef2ff", display:"inline-block", padding:"8px 20px", borderRadius:10 }}>{safeStr(data.ackId)}</div>
           <br/>
           {initialData && <button onClick={onCancel} style={{marginTop: 20, padding: "10px 20px", background: "#f1f5f9", borderRadius: 8, cursor: "pointer", border: "1px solid #cbd5e1", fontWeight: "bold", color: "#475569"}}>← वापस जाएँ</button>}
         </div>
@@ -587,7 +590,7 @@
               {alreadySubmitted && (
                 <div style={{ background:"#fee2e2", color:"#991b1b", padding:"14px 18px", borderRadius:10, border:"1.5px solid #ef4444", fontSize:13, fontWeight:700, marginTop:16, display:"flex", gap:10, alignItems:"center" }}>
                   <span style={{fontSize:24}}>⛔</span>
-                  <div>आप <strong>{data.year}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा नहीं भर सकते।</div>
+                  <div>आप <strong>{safeStr(data.year)}</strong> की <strong>{QUARTERS.find(q=>q.id===data.quarter)?.label || ''}</strong> की रिपोर्ट पहले ही जमा कर चुके हैं। आप इसे दोबारा नहीं भर सकते।</div>
                 </div>
               )}
             </div>
@@ -607,7 +610,7 @@
               <SecCard title="8. हिंदी कार्यशालाएं" icon="🎓" color={SECTION_COLORS[7]}><Grid cols={3}><Num label="कार्यशालाएं" value={data.b1_s8_workshops} onChange={v=>set("b1_s8_workshops",v)} disabled={!isHindiSection} /><Num label="प्रशिक्षित अधिकारी" value={data.b1_s8_officers} onChange={v=>set("b1_s8_officers",v)} disabled={!isHindiSection} /><Num label="प्रशिक्षित कर्मचारी" value={data.b1_s8_staff} onChange={v=>set("b1_s8_staff",v)} disabled={!isHindiSection} /></Grid></SecCard>
               <SecCard title="9. राजभाषा कार्यान्वयन समिति बैठक" icon="🤝" color={SECTION_COLORS[8]}><Grid><Inp label="(क) बैठक की तिथि" value={data.b1_s9_meetingDate} onChange={v=>set("b1_s9_meetingDate",v)} type="date" disabled={!isHindiSection} /><Num label="(ख) अधीनस्थ समितियां" value={data.b1_s9_subOfficeCmtes} onChange={v=>set("b1_s9_subOfficeCmtes",v)} disabled={!isHindiSection} /><Num label="(ग) आयोजित बैठकें" value={data.b1_s9_subOfficeMeetings} onChange={v=>set("b1_s9_subOfficeMeetings",v)} disabled={!isHindiSection} /><Radio label="(घ) कार्यसूची हिंदी में?" value={data.b1_s9_agendaHindi} onChange={v=>set("b1_s9_agendaHindi",v)} options={["हाँ","नहीं"]} disabled={!isHindiSection} /></Grid></SecCard>
               <SecCard title="10. हिंदी सलाहकार समिति बैठक" icon="💡" color={SECTION_COLORS[9]}><Inp label="बैठक की तिथि" value={data.b1_s10_meetingDate} onChange={v=>set("b1_s10_meetingDate",v)} type="date" disabled={!isHindiSection} /></SecCard>
-              <SecCard title="11. उल्लेखनीय कार्य/उपलब्धियाँ" icon="🏆" color={SECTION_COLORS[10]}><div style={{ display:"flex", flexDirection:"column", gap:10 }}>{[["b1_s11_innovation","i) नवोन्मेषी कार्य"],["b1_s11_special","ii) विशिष्ट आयोजन"],["b1_s11_other","iii) अन्य आयोजन"]].map(([k,l])=>(<div key={k}><label style={{ fontSize:11, fontWeight:700, color:"#475569", display:"block", marginBottom:4 }}>{l}</label><textarea value={data[k]} onChange={e=>set(k,e.target.value)} maxLength={500} rows={2} disabled={!isHindiSection} style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:12, resize:"vertical", background: !isHindiSection ? "#f8fafc" : "#fff", cursor: !isHindiSection ? "not-allowed" : "text", opacity: !isHindiSection ? 0.7 : 1 }} /></div>))}</div></SecCard>
+              <SecCard title="11. उल्लेखनीय कार्य/उपलब्धियाँ" icon="🏆" color={SECTION_COLORS[10]}><div style={{ display:"flex", flexDirection:"column", gap:10 }}>{[["b1_s11_innovation","i) नवोन्मेषी कार्य"],["b1_s11_special","ii) विशिष्ट आयोजन"],["b1_s11_other","iii) अन्य आयोजन"]].map(([k,l])=>(<div key={k}><label style={{ fontSize:11, fontWeight:700, color:"#475569", display:"block", marginBottom:4 }}>{l}</label><textarea value={safeStr(data[k])} onChange={e=>set(k,e.target.value)} maxLength={500} rows={2} disabled={!isHindiSection} style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:12, resize:"vertical", background: !isHindiSection ? "#f8fafc" : "#fff", cursor: !isHindiSection ? "not-allowed" : "text", opacity: !isHindiSection ? 0.7 : 1 }} /></div>))}</div></SecCard>
             </div>
           )}
 
@@ -653,7 +656,7 @@
                 <div style={{ background:"#fee2e2", borderRadius:12, padding:16, border:"1.5px solid #ef4444", marginBottom:16 }}>
                   <h4 style={{ color:"#991b1b", margin:"0 0 8px", fontSize:14, fontWeight:800 }}>⚠️ कृपया फॉर्म जमा करने से पहले निम्नलिखित गलतियाँ सुधारें:</h4>
                   <ul style={{ margin:0, paddingLeft:20, color:"#7f1d1d", fontSize:13, fontWeight:600 }}>
-                    {validationErrors.map((e,i)=><li key={i} style={{marginBottom:4}}>{e}</li>)}
+                    {validationErrors.map((e,i)=><li key={i} style={{marginBottom:4}}>{safeStr(e)}</li>)}
                   </ul>
                 </div>
               )}
@@ -685,239 +688,106 @@
       );
     }
 
-    function AnnualReviewReport({ report, onClose }) {
-      const region = report?.region || 'A';
+    function Inbox({ reports, user, onAction, onEdit }) {
+      const r = ROLES[user?.role] || ROLES.SECTION;
       
-      const num = (v) => parseFloat(v) || 0;
-      
-      const sec33Total = num(report?.b1_s3_totalIssued);
-      const sec33Hindi = num(report?.b1_s3_bilingual) + num(report?.b1_s3_hindiOnly);
-      const sec33Pct = sec33Total > 0 ? Math.round((sec33Hindi/sec33Total)*100) : 100;
-      
-      const rule5Total = num(report?.b1_s4_totalReceived) - num(report?.b1_s4_noReplyNeeded);
-      const rule5Hindi = num(report?.b1_s4_hindiReply);
-      const rule5Pct = rule5Total > 0 ? Math.round((rule5Hindi/rule5Total)*100) : 100;
+      const visible = useMemo(()=>{
+        if(!reports) return [];
+        if(user?.role==="SECTION")    return reports.filter(x=>safeStr(x?.sectionName) === safeStr(user?.name));
+        if(user?.role==="AAO")        return reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x?.status) && safeStr(x?.sectionName) === safeStr(user?.mappedSection));
+        if(user?.role==="SAO")        return reports.filter(x=>["AAO_APPROVED"].includes(x?.status) && safeStr(x?.sectionName) === safeStr(user?.mappedSection));
+        if(user?.role==="HINDI_CELL") return reports.filter(x=>x?.status === "SAO_APPROVED");
+        return reports;
+      },[reports,user]);
 
-      const corrTarget = region === 'A' ? 100 : region === 'B' ? 90 : 55;
-      const corrTotal = num(report?.b1_s6_ka_total) + num(report?.b1_s6_kha_total) + num(report?.b1_s6_ga_total);
-      const corrHindi = num(report?.b1_s6_ka_hindi) + num(report?.b1_s6_kha_hindi) + num(report?.b1_s6_ga_hindi);
-      const corrPct = corrTotal > 0 ? Math.round((corrHindi/corrTotal)*100) : 100;
+      const [selected, setSelected] = useState(null);
+      const [remark, setRemark]     = useState("");
+      const [search, setSearch]     = useState("");
 
-      const notingTarget = region === 'A' ? 75 : region === 'B' ? 50 : 30;
-      const notingTotal = num(report?.b1_s7_totalPages);
-      const notingHindi = num(report?.b1_s7_hindiPages);
-      const notingPct = notingTotal > 0 ? Math.round((notingHindi/notingTotal)*100) : 100;
+      const filtered = visible.filter(x => {
+         if (!search) return true;
+         const s = search.toLowerCase();
+         const secName = safeStr(x?.sectionName).toLowerCase();
+         const ack = safeStr(x?.ackId).toLowerCase();
+         return secName.includes(s) || ack.includes(s);
+      });
 
-      const evalData = [
-         { label: "धारा 3(3) का अनुपालन", target: 100, actual: sec33Pct },
-         { label: "राजभाषा नियम-5 (हिंदी पत्रों के उत्तर)", target: 100, actual: rule5Pct },
-         { label: `मूल पत्राचार (क्षेत्र '${region}' हेतु)`, target: corrTarget, actual: corrPct },
-         { label: `फाइल टिप्पण (क्षेत्र '${region}' हेतु)`, target: notingTarget, actual: notingPct }
-      ];
+      if(selected) return <ReportDetail report={selected} user={user} remark={remark} setRemark={setRemark} onAction={(action,rem)=>{ onAction(selected,action,rem); setSelected(null); setRemark(""); }} onBack={()=>{ setSelected(null); setRemark(""); }} onEdit={onEdit} />;
 
       return (
-        <div style={{ position: "fixed", top:0, left:0, right:0, bottom:0, background: "rgba(15,23,42,0.85)", zIndex: 9999, display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }}>
-           <div className="standard-doc" style={{ maxWidth: 800, width: "100%", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
+        <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #e2e8f0", overflow:"hidden" }}>
+          <div style={{ background:r.grad, padding:"16px 22px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>{user?.role==="SECTION" ? "📋 मेरी रिपोर्टें" : "📥 आवक रिपोर्टें"}</h2>
+          </div>
+          <div style={{ padding:"12px 16px", background:"#f8fafc", borderBottom:"1px solid #e2e8f0" }}>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 अनुभाग या पावती संख्या से खोजें..." style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }} />
+          </div>
+          {filtered.length===0?(
+            <div style={{ textAlign:"center", padding:48, color:"#94a3b8" }}>
+              <div style={{ fontSize:40 }}>{user?.role==="SECTION"?"📂":"📭"}</div>
+              <div style={{ marginTop:10, fontSize:14 }}>{user?.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में नहीं।"}</div>
+            </div>
+          ):(
+            filtered.map((rep,i)=>{
+              const st   = STATUS[safeStr(rep?.status)] || STATUS.DRAFT;
+              const c    = SECTION_COLORS[i%SECTION_COLORS.length];
               
-              <div className="no-print" style={{ position: "absolute", top: 20, right: 20, display: "flex", gap: 10 }}>
-                 <button onClick={() => window.print()} style={{ background: "#1e293b", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontWeight: "bold" }}>🖨️ प्रिंट करें</button>
-                 <button onClick={onClose} style={{ background: "#ef4444", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontWeight: "bold" }}>❌ बंद करें</button>
-              </div>
+              const canAct = (user?.role==="SECTION"&&rep?.status==="AAO_RETURNED") || (user?.role==="AAO"&&["PENDING_AAO", "SAO_RETURNED"].includes(rep?.status)) || (user?.role==="SAO"&&rep?.status==="AAO_APPROVED") || (user?.role==="HINDI_CELL"&&rep?.status==="SAO_APPROVED");
+              
+              const qId = safeStr(rep?.quarter);
+              const qLabelStr = QUARTERS.find(q=>q.id===qId)?.label || qId || 'अज्ञात';
+              const secNameStr = safeStr(rep?.sectionName, 'अज्ञात अनुभाग');
+              const yrStr = safeStr(rep?.year);
+              const ackStr = safeStr(rep?.ackId);
 
-              <h2 style={{ marginTop: "20px" }}>राजभाषा वार्षिक कार्यक्रम (2025-26) के अनुसार समीक्षा रिपोर्ट</h2>
-              <h3 style={{ textDecoration: "underline", fontWeight: "bold" }}>अनुभाग: {report?.sectionName || '-'} | तिमाही: {QUARTERS.find(q=>q.id===report?.quarter)?.label?.split('·')[0] || '-'} {report?.year || '-'}</h3>
-
-              <div style={{ marginTop: "30px", marginBottom: "15px", fontSize: "11pt" }}>
-                 गृह मंत्रालय, राजभाषा विभाग द्वारा जारी <strong>वार्षिक कार्यक्रम 2025-26</strong> के आलोक में आपके अनुभाग द्वारा प्रस्तुत तिमाही प्रगति रिपोर्ट के आँकड़ों की समीक्षा निम्न प्रकार है:
-              </div>
-
-              <table>
-                 <thead>
-                    <tr>
-                       <th>क्र.</th>
-                       <th>समीक्षा का विषय</th>
-                       <th>निर्धारित लक्ष्य (%)</th>
-                       <th>अनुभाग की उपलब्धि (%)</th>
-                       <th>समीक्षा / टिप्पणी</th>
-                    </tr>
-                 </thead>
-                 <tbody>
-                    {evalData.map((item, idx) => {
-                       const isMet = item.actual >= item.target;
-                       return (
-                         <tr key={idx}>
-                            <td style={{textAlign: "center", fontWeight: "bold"}}>{idx+1}.</td>
-                            <td>{item.label}</td>
-                            <td style={{textAlign: "center"}}>{item.target}%</td>
-                            <td style={{textAlign: "center", fontWeight: "bold", color: isMet ? "#16a34a" : "#dc2626"}}>{item.actual}%</td>
-                            <td style={{textAlign: "center", fontWeight: "bold", color: isMet ? "#16a34a" : "#dc2626"}}>
-                               {isMet ? "✅ लक्ष्य प्राप्त" : `❌ ${item.target - item.actual}% की कमी`}
-                            </td>
-                         </tr>
-                       )
-                    })}
-                 </tbody>
-              </table>
-
-              <div style={{ marginTop: "20px", padding: "15px", background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "10.5pt" }}>
-                 <strong>महत्वपूर्ण निर्देश:</strong> जिन मदों में निर्धारित लक्ष्य प्राप्त नहीं किया गया है, कृपया आगामी तिमाही में राजभाषा नियमों का कड़ाई से अनुपालन सुनिश्चित करते हुए लक्ष्य प्राप्ति हेतु आवश्यक कदम उठाएं।
-              </div>
-
-              <div style={{ marginTop: "50px", textAlign: "right" }}>
-                 <p style={{ margin: "0 0 5px 0", fontSize: "11pt" }}><strong>प्रभारी अधिकारी (राजभाषा)</strong></p>
-                 <p style={{ margin: "0 0 5px 0", fontSize: "11pt" }}>राजभाषा प्रकोष्ठ, पश्चिम रेलवे</p>
-                 <p style={{ margin: "0 0 5px 0", fontSize: "11pt" }}><strong>दिनांक:</strong> {new Date().toLocaleDateString('en-GB')}</p>
-              </div>
-           </div>
+              return (
+                <div key={safeStr(rep?.id, i)} onClick={()=>setSelected(rep)} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                  <div style={{ width:40, height:40, borderRadius:12, background:c.bg, border:`1.5px solid ${c.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{c.icon}</div>
+                  <div style={{ flex:1, minWidth:0 }}><div style={{ fontSize:13, fontWeight:700, color:"#1e293b" }}>{secNameStr}</div><div style={{ fontSize:10, color:"#94a3b8" }}>{qLabelStr} · {yrStr} · {ackStr}</div></div>
+                  <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
+                    <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
+                  </div>
+                  {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>कार्रवाई करें</span>}
+                </div>
+              );
+            })
+          )}
         </div>
       );
     }
 
-    function ConsolidatedView({ reports, sectionsList }) {
-      const [q, setQ] = useState("Q4");
-      const [y, setY] = useState("2026");
-
-      const [excludedSections, setExcludedSections] = useState([]);
-      const [auditErrors, setAuditErrors] = useState(null); 
-
-      const reportsForPeriod = reports.filter(r => r?.quarter === q && r?.year === y);
-      const availableSections = Array.from(new Set(reportsForPeriod.map(r => r?.sectionName).filter(Boolean)));
-
-      useEffect(() => {
-        setExcludedSections([]);
-        setAuditErrors(null);
-      }, [q, y]);
-
-      const handleToggle = (sec) => {
-        if (excludedSections.includes(sec)) {
-          setExcludedSections(excludedSections.filter(s => s !== sec));
-        } else {
-          setExcludedSections([...excludedSections, sec]);
-        }
-      };
-
-      const handleSelectAll = () => setExcludedSections([]);
-      const handleDeselectAll = () => setExcludedSections(availableSections);
-
-      const filtered = reportsForPeriod.filter(r => !excludedSections.includes(r?.sectionName));
-      
-      const runAudit = () => {
-        const errList = [];
-        filtered.forEach(r => {
-          const num = (v) => parseFloat(v) || 0;
-          let secErr = [];
-          
-          const sum4 = num(r.b1_s4_hindiReply) + num(r.b1_s4_englishReply) + num(r.b1_s4_noReplyNeeded);
-          if(num(r.b1_s4_totalReceived) > 0 && sum4 !== num(r.b1_s4_totalReceived)) secErr.push(`मद 4 में प्राप्त(${num(r.b1_s4_totalReceived)}) और उत्तरों का योग(${sum4}) अलग है।`);
-          
-          const sum5ka = num(r.b1_s5_ka_hindiReply) + num(r.b1_s5_ka_engReply) + num(r.b1_s5_ka_noReply);
-          if(num(r.b1_s5_ka_total) > 0 && sum5ka !== num(r.b1_s5_ka_total)) secErr.push(`मद 5('क') में प्राप्त(${num(r.b1_s5_ka_total)}) और उत्तरों का योग(${sum5ka}) अलग है।`);
-          
-          const sum5kha = num(r.b1_s5_kha_hindiReply) + num(r.b1_s5_kha_engReply) + num(r.b1_s5_kha_noReply);
-          if(num(r.b1_s5_kha_total) > 0 && sum5kha !== num(r.b1_s5_kha_total)) secErr.push(`मद 5('ख') में प्राप्त(${num(r.b1_s5_kha_total)}) और उत्तरों का योग(${sum5kha}) अलग है।`);
-
-          if (secErr.length > 0) {
-             errList.push({ section: r.sectionName || 'अज्ञात', errors: secErr });
-          }
-        });
-        setAuditErrors(errList);
-      };
-
-      const agg = {};
-      filtered.forEach(r => {
-        Object.keys(r).forEach(k => {
-          if (k.startsWith("b1_") || k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_")) {
-             const v = parseFloat(r[k]);
-             if (!isNaN(v)) agg[k] = (agg[k] || 0) + v;
-          }
-        });
-      });
-
-      const isPart2Filled = q === "Q4" && Boolean(agg.b2_s1_subOfficesTotal || agg.b2_s2_off_total || agg.b2_comp_total);
-
-      return (
-        <div style={{ maxWidth:800, margin:"0 auto" }}>
-          <div className="no-print" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
-            <h2 style={{ fontSize:18, fontWeight:800, margin:0, color:"#1e293b" }}>📑 समेकित रिपोर्ट जनरेटर</h2>
-            <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>
-              🖨️ PDF में सेव करें / प्रिंट करें
-            </button>
-          </div>
-
-          <div className="no-print" style={{ background:"#fff", padding:16, borderRadius:12, display:"flex", gap:12, marginBottom:16, border:"1.5px solid #e2e8f0" }}>
-             <div>
-               <label style={{fontSize:11, fontWeight:"bold", display:"block"}}>तिमाही चुनें</label>
-               <select value={q} onChange={e=>setQ(e.target.value)} style={{padding:6, borderRadius:6, border:"1px solid #ccc", outline:"none"}}>{QUARTERS.map(x=><option key={x.id} value={x.id}>{x.label}</option>)}</select>
-             </div>
-             <div>
-               <label style={{fontSize:11, fontWeight:"bold", display:"block"}}>वर्ष चुनें</label>
-               <select value={y} onChange={e=>setY(e.target.value)} style={{padding:6, borderRadius:6, border:"1px solid #ccc", outline:"none"}}>{YEARS.map(x=><option key={x} value={x}>{x}</option>)}</select>
-             </div>
-          </div>
-
-          <div className="no-print" style={{ background:"#fff", padding:16, borderRadius:12, marginBottom:16, border:"1.5px solid #e2e8f0" }}>
-            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
-              <label style={{fontSize:13, fontWeight:"bold", color:"#1e293b"}}>समेकित करने के लिए अनुभाग चुनें ({filtered.length}/{availableSections.length}):</label>
-              <div style={{display:"flex", gap:6}}>
-                <button onClick={handleSelectAll} style={{fontSize:11, padding:"4px 8px", background:"#f1f5f9", border:"1px solid #cbd5e1", borderRadius:6, cursor:"pointer"}}>सभी चुनें</button>
-                <button onClick={handleDeselectAll} style={{fontSize:11, padding:"4px 8px", background:"#f1f5f9", border:"1px solid #cbd5e1", borderRadius:6, cursor:"pointer"}}>सभी हटाएँ</button>
-              </div>
+    function OfficialPrintView({ report }) {
+       if (!report) return null;
+       const hasPart2Data = Boolean(report.b2_s1_subOfficesTotal || report.b2_s2_off_total || report.b2_comp_total);
+       const isPart2Filled = safeStr(report.quarter) === "Q4" && safeStr(report.sectionName) === "हिंदी अनुभाग" && hasPart2Data;
+       
+       return (
+         <div className="print-only standard-doc">
+            <div style={{textAlign: "center", marginBottom: "15px"}}>
+                <h2>राजभाषा के प्रगामी प्रयोग के संबंध में तिमाही प्रगति रिपोर्ट</h2>
+                <h3>(अनुलग्नक-2)</h3>
             </div>
-            {availableSections.length === 0 ? (
-               <div style={{fontSize:12, color:"#dc2626"}}>इस तिमाही/वर्ष के लिए कोई रिपोर्ट उपलब्ध नहीं है।</div>
-            ) : (
-               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                 {availableSections.map(sec => {
-                   const isSel = !excludedSections.includes(sec);
-                   return (
-                     <button key={sec} onClick={() => handleToggle(sec)} style={{ padding:"6px 12px", borderRadius:20, fontSize:11, fontWeight:700, cursor:"pointer", border:"1px solid", background: isSel ? "#10b981" : "#f8fafc", color: isSel ? "#fff" : "#94a3b8", borderColor: isSel ? "#10b981" : "#e2e8f0", transition:"all 0.2s" }}>
-                        {isSel ? "✓ " : "+ "}{sec}
-                     </button>
-                   )
-                 })}
-               </div>
-            )}
-            
-            {filtered.length > 0 && (
-              <div style={{marginTop: "16px", paddingTop: "16px", borderTop: "1px dashed #cbd5e1"}}>
-                <button onClick={runAudit} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"6px 12px", borderRadius:6, fontSize:12, fontWeight:700, cursor:"pointer" }}>
-                  🔍 डेटा ऑडिट करें (मद 4 और 5 की गलतियाँ ढूँढें)
-                </button>
-                
-                {auditErrors && auditErrors.length === 0 && (
-                   <div style={{marginTop: 10, fontSize: 13, color: "#16a34a", fontWeight: "bold"}}>✅ सभी चुने गए अनुभागों का डेटा (मद 4 और 5) बिल्कुल सही है।</div>
-                )}
-                
-                {auditErrors && auditErrors.length > 0 && (
-                   <div style={{marginTop: 10, background: "#fee2e2", padding: 12, borderRadius: 8, border: "1px solid #ef4444"}}>
-                     <div style={{fontSize: 13, color: "#991b1b", fontWeight: "bold", marginBottom: 6}}>⚠️ इन अनुभागों के पुराने डेटा में गलती है (कृपया मास्टर एडिटर से इन्हें सही करें):</div>
-                     <ul style={{margin: 0, paddingLeft: 20, fontSize: 12, color: "#7f1d1d"}}>
-                       {auditErrors.map((err, i) => (
-                         <li key={i} style={{marginBottom: 4}}>
-                           <strong>{err.section}:</strong> {err.errors.join(" | ")}
-                         </li>
-                       ))}
-                     </ul>
-                   </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="standard-doc print-only" style={{display: 'block'}}>
-            <h2>राजभाषा के प्रगामी प्रयोग के संबंध में समेकित तिमाही प्रगति रिपोर्ट</h2>
-            <h3>(अनुलग्नक-2)</h3>
             
             <table>
                <tbody>
                   <tr>
-                     <td style={{width: "50%", border: "none"}}><strong>कार्यालय का नाम:</strong> पश्चिम रेलवे (विभिन्न अनुभाग)</td>
-                     <td style={{width: "25%", border: "none"}}><strong>तिमाही:</strong> {QUARTERS.find(x=>x.id===q)?.label || '-'}</td>
-                     <td style={{width: "25%", border: "none"}}><strong>वर्ष:</strong> {y}</td>
+                     <td style={{width: "50%", border: "none"}}><strong>कार्यालय का नाम व पता:</strong> {safeStr(report?.officeNameAddress, '-')}</td>
+                     <td style={{width: "25%", border: "none"}}><strong>तिमाही:</strong> {safeStr(QUARTERS.find(q=>q.id===safeStr(report?.quarter))?.label || report?.quarter, '-')}</td>
+                     <td style={{width: "25%", border: "none"}}><strong>वर्ष:</strong> {safeStr(report?.year, '-')}</td>
                   </tr>
                   <tr>
-                     <td style={{border: "none"}}><strong>समेकित अनुभागों की संख्या:</strong> {filtered.length}</td>
-                     <td style={{border: "none"}} colSpan="2"><strong>क्षेत्र:</strong> 'क', 'ख' एवं 'ग'</td>
+                     <td style={{border: "none"}}><strong>अधिकारी का नाम व पदनाम:</strong> {safeStr(report?.officerName, '-')}</td>
+                     <td style={{border: "none"}}><strong>फोन नं.:</strong> {safeStr(report?.phone, '-')}</td>
+                     <td style={{border: "none"}}><strong>ई-मेल:</strong> {safeStr(report?.email, '-')}</td>
+                  </tr>
+                  <tr>
+                     <td style={{border: "none"}}><strong>राजभाषा अधिकारी का नाम:</strong> - </td>
+                     <td style={{border: "none"}}><strong>फोन नं.:</strong> {safeStr(report?.rbOfficerPhone, '-')}</td>
+                     <td style={{border: "none"}}><strong>ई-मेल:</strong> {safeStr(report?.rbOfficerEmail, '-')}</td>
+                  </tr>
+                  <tr>
+                     <td style={{border: "none"}}><strong>अनुभाग का नाम:</strong> {safeStr(report?.sectionName, '-')}</td>
+                     <td style={{border: "none"}} colSpan="2"><strong>क्षेत्र:</strong> '{safeStr(report?.region, '-')}'</td>
                   </tr>
                </tbody>
             </table>
@@ -929,14 +799,14 @@
                   <tr>
                      <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
                      <td style={{width: "55%"}}>माननीय मंत्री जी को प्रस्तुत की गई कुल फाइलों की संख्या</td>
-                     <td style={{width: "20%"}}>कुल: {agg.b1_s1_totalFiles || '0'}</td>
-                     <td style={{width: "20%"}}>हिंदी में: {agg.b1_s1_hindiFiles || '0'}</td>
+                     <td style={{width: "20%"}}>कुल: {safeStr(report?.b1_s1_totalFiles, '0')}</td>
+                     <td style={{width: "20%"}}>हिंदी में: {safeStr(report?.b1_s1_hindiFiles, '0')}</td>
                   </tr>
                   <tr>
                      <td style={{textAlign: "center", fontWeight: "bold"}}>2.</td>
                      <td>सचिव/समकक्ष स्तर पर आयोजित कुल बैठकें व प्रस्तुत कागजात</td>
-                     <td>कुल बैठकें: {agg.b1_s2_totalMeetings || '0'}<br/>कुल कागजात: {agg.b1_s2_totalDocs || '0'}</td>
-                     <td>हिंदी कार्यवाही: {agg.b1_s2_hindiMinutes || '0'}<br/>हिंदी कागजात: {agg.b1_s2_hindiDocs || '0'}</td>
+                     <td>कुल बैठकें: {safeStr(report?.b1_s2_totalMeetings, '0')}<br/>कुल कागजात: {safeStr(report?.b1_s2_totalDocs, '0')}</td>
+                     <td>हिंदी कार्यवाही: {safeStr(report?.b1_s2_hindiMinutes, '0')}<br/>हिंदी कागजात: {safeStr(report?.b1_s2_hindiDocs, '0')}</td>
                   </tr>
                </tbody>
             </table>
@@ -954,10 +824,10 @@
                    </thead>
                    <tbody>
                       <tr>
-                         <td style={{textAlign: "center"}}>{agg.b1_s3_totalIssued || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s3_bilingual || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s3_englishOnly || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s3_hindiOnly || '0'}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s3_totalIssued, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s3_bilingual, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s3_englishOnly, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s3_hindiOnly, '0')}</td>
                       </tr>
                    </tbody>
                 </table>
@@ -976,10 +846,10 @@
                    </thead>
                    <tbody>
                       <tr>
-                         <td style={{textAlign: "center"}}>{agg.b1_s4_totalReceived || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s4_noReplyNeeded || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s4_hindiReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s4_englishReply || '0'}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s4_totalReceived, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s4_noReplyNeeded, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s4_hindiReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s4_englishReply, '0')}</td>
                       </tr>
                    </tbody>
                 </table>
@@ -1008,33 +878,33 @@
                    <tbody>
                       <tr>
                          <td style={{textAlign: "center", fontWeight: "bold"}}>'क'</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_hindiReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_engReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_ka_noReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_hindi || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_english || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ka_total>0 ? Math.round((agg.b1_s6_ka_hindi/agg.b1_s6_ka_total)*100)+'%' : '-'}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_ka_total, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_ka_hindiReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_ka_engReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_ka_noReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_ka_total, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_ka_hindi, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_ka_english, '0')}</td>
+                         <td style={{textAlign: "center"}}>{report?.b1_s6_ka_total>0 ? Math.round((report?.b1_s6_ka_hindi/report?.b1_s6_ka_total)*100)+'%' : '-'}</td>
                       </tr>
                       <tr>
                          <td style={{textAlign: "center", fontWeight: "bold"}}>'ख'</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_hindiReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_engReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s5_kha_noReply || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_hindi || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_english || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_kha_total>0 ? Math.round((agg.b1_s6_kha_hindi/agg.b1_s6_kha_total)*100)+'%' : '-'}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_kha_total, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_kha_hindiReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_kha_engReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s5_kha_noReply, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_kha_total, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_kha_hindi, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_kha_english, '0')}</td>
+                         <td style={{textAlign: "center"}}>{report?.b1_s6_kha_total>0 ? Math.round((report?.b1_s6_kha_hindi/report?.b1_s6_kha_total)*100)+'%' : '-'}</td>
                       </tr>
                       <tr>
                          <td style={{textAlign: "center", fontWeight: "bold"}}>'ग'</td>
                          <td style={{textAlign: "center"}} colSpan="4">-</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_total || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_hindi || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_english || '0'}</td>
-                         <td style={{textAlign: "center"}}>{agg.b1_s6_ga_total>0 ? Math.round((agg.b1_s6_ga_hindi/agg.b1_s6_ga_total)*100)+'%' : '-'}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_ga_total, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_ga_hindi, '0')}</td>
+                         <td style={{textAlign: "center"}}>{safeStr(report?.b1_s6_ga_english, '0')}</td>
+                         <td style={{textAlign: "center"}}>{report?.b1_s6_ga_total>0 ? Math.round((report?.b1_s6_ga_hindi/report?.b1_s6_ga_total)*100)+'%' : '-'}</td>
                       </tr>
                    </tbody>
                 </table>
@@ -1046,34 +916,50 @@
                      <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>7.</td>
                      <td style={{width: "25%"}}><strong>फाइल टिप्पण कार्य</strong></td>
                      <td style={{width: "70%"}}>
-                        कुल पृष्ठ: {agg.b1_s7_totalPages||'0'} &nbsp;|&nbsp; 
-                        हिंदी में: {agg.b1_s7_hindiPages||'0'} &nbsp;|&nbsp; 
-                        अंग्रेजी में: {agg.b1_s7_engPages||'0'} &nbsp;|&nbsp; 
-                        ई-ऑफिस टिप्पणियाँ: {agg.b1_s7_eoffice||'0'}
+                        कुल पृष्ठ: {safeStr(report?.b1_s7_totalPages, '0')} &nbsp;|&nbsp; 
+                        हिंदी में: {safeStr(report?.b1_s7_hindiPages, '0')} &nbsp;|&nbsp; 
+                        अंग्रेजी में: {safeStr(report?.b1_s7_engPages, '0')} &nbsp;|&nbsp; 
+                        ई-ऑफिस टिप्पणियाँ: {safeStr(report?.b1_s7_eoffice, '0')}
                      </td>
                   </tr>
                   <tr>
                      <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
                      <td><strong>हिंदी कार्यशालाएं</strong></td>
                      <td>
-                        आयोजित कार्यशालाएं: {agg.b1_s8_workshops||'0'} &nbsp;|&nbsp; 
-                        प्रशिक्षित अधिकारी: {agg.b1_s8_officers||'0'} &nbsp;|&nbsp; 
-                        प्रशिक्षित कर्मचारी: {agg.b1_s8_staff||'0'}
+                        आयोजित कार्यशालाएं: {safeStr(report?.b1_s8_workshops, '0')} &nbsp;|&nbsp; 
+                        प्रशिक्षित अधिकारी: {safeStr(report?.b1_s8_officers, '0')} &nbsp;|&nbsp; 
+                        प्रशिक्षित कर्मचारी: {safeStr(report?.b1_s8_staff, '0')}
                      </td>
                   </tr>
                   <tr>
                      <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
                      <td><strong>रा.भा.का.स. बैठकें</strong></td>
                      <td>
-                        अधीनस्थ समितियां: {agg.b1_s9_subOfficeCmtes||'0'} &nbsp;|&nbsp; 
-                        आयोजित बैठकें: {agg.b1_s9_subOfficeMeetings||'0'}
+                        बैठक की तिथि: {safeStr(report?.b1_s9_meetingDate, '-')} &nbsp;|&nbsp; 
+                        अधीनस्थ समितियां: {safeStr(report?.b1_s9_subOfficeCmtes, '0')} &nbsp;|&nbsp; 
+                        आयोजित बैठकें: {safeStr(report?.b1_s9_subOfficeMeetings, '0')} &nbsp;|&nbsp; 
+                        कार्यसूची हिंदी में: {safeStr(report?.b1_s9_agendaHindi, '-')}
+                     </td>
+                  </tr>
+                  <tr>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>10.</td>
+                     <td><strong>हिंदी सलाहकार समिति</strong></td>
+                     <td>बैठक की तिथि: {safeStr(report?.b1_s10_meetingDate, '-')}</td>
+                  </tr>
+                  <tr>
+                     <td style={{textAlign: "center", fontWeight: "bold"}}>11.</td>
+                     <td><strong>उल्लेखनीय कार्य/उपलब्धियाँ</strong></td>
+                     <td>
+                        <strong>नवोन्मेषी कार्य:</strong> {safeStr(report?.b1_s11_innovation, '-')}<br/>
+                        <strong>विशिष्ट आयोजन:</strong> {safeStr(report?.b1_s11_special, '-')}<br/>
+                        <strong>अन्य:</strong> {safeStr(report?.b1_s11_other, '-')}
                      </td>
                   </tr>
                </tbody>
             </table>
 
             {isPart2Filled && (
-               <div className="page-break" style={{marginTop: "20px"}}>
+               <div className="page-break">
                   <h4>भाग-II (वार्षिक मूल्यांकन - केवल Q4 में देय)</h4>
                   
                   <table>
@@ -1082,8 +968,10 @@
                         <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>1.</td>
                         <td style={{width: "35%"}}><strong>नियम 10(4) अधिसूचना</strong></td>
                         <td style={{width: "60%"}}>
-                           कुल कार्यालय: {agg.b2_s1_subOfficesTotal||'0'} &nbsp;|&nbsp; 
-                           अधिसूचित कार्यालय: {agg.b2_s1_subOfficesNotified||'0'}
+                           अधिसूचित: {safeStr(report?.b2_s1_notified, '-')} &nbsp;|&nbsp; 
+                           कुल कार्यालय: {safeStr(report?.b2_s1_subOfficesTotal, '0')} &nbsp;|&nbsp; 
+                           अधिसूचित कार्यालय: {safeStr(report?.b2_s1_subOfficesNotified, '0')}<br/>
+                           शेष हेतु कार्रवाई: {safeStr(report?.b2_s1_subOfficesAction, '-')}
                         </td>
                       </tr>
                     </tbody>
@@ -1106,21 +994,21 @@
                        <tbody>
                          <tr>
                            <td>अधिकारी</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_ministerial||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_pravinta||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_karyasadhak||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_training||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_off_remaining||'0'}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_off_total, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_off_ministerial, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_off_pravinta, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_off_karyasadhak, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_off_training, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_off_remaining, '0')}</td>
                          </tr>
                          <tr>
                            <td>कर्मचारी</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_ministerial||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_pravinta||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_karyasadhak||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_training||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_s2_staff_remaining||'0'}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_staff_total, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_staff_ministerial, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_staff_pravinta, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_staff_karyasadhak, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_staff_training, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_s2_staff_remaining, '0')}</td>
                          </tr>
                        </tbody>
                      </table>
@@ -1141,24 +1029,24 @@
                        <tbody>
                          <tr>
                            <td>आशुलिपिक</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_trained||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_working||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_shorthand_pending||'0'}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_shorthand_total, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_shorthand_trained, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_shorthand_working, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_shorthand_pending, '0')}</td>
                          </tr>
                          <tr>
                            <td>टंकक/लिपिक/निजी सहायक</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_typing_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_typing_trained||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_typing_working||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_typing_pending||'0'}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_typing_total, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_typing_trained, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_typing_working, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_typing_pending, '0')}</td>
                          </tr>
                          <tr>
                            <td>अनुवादक</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_translation_total||'0'}</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_translation_trained||'0'}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_translation_total, '0')}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_translation_trained, '0')}</td>
                            <td style={{textAlign: "center"}}>-</td>
-                           <td style={{textAlign: "center"}}>{agg.b2_translation_pending||'0'}</td>
+                           <td style={{textAlign: "center"}}>{safeStr(report?.b2_translation_pending, '0')}</td>
                          </tr>
                        </tbody>
                      </table>
@@ -1169,118 +1057,67 @@
                         <tr>
                            <td style={{width: "5%", textAlign: "center", fontWeight: "bold"}}>3.</td>
                            <td style={{width: "45%"}}><strong>कंप्यूटर टंकण प्रशिक्षण</strong></td>
-                           <td style={{width: "50%"}}>कुल कार्मिक: {agg.b2_comp_total||'0'} | प्रशिक्षित: {agg.b2_comp_trained||'0'} | कार्यरत: {agg.b2_comp_working||'0'}</td>
+                           <td style={{width: "50%"}}>कुल कार्मिक: {safeStr(report?.b2_comp_total, '0')} | प्रशिक्षित: {safeStr(report?.b2_comp_trained, '0')} | कार्यरत: {safeStr(report?.b2_comp_working, '0')}</td>
                         </tr>
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>4.</td>
                            <td><strong>कंप्यूटर/लैपटॉप की स्थिति</strong></td>
-                           <td>कुल: {agg.b2_s4_totalLaptops||'0'} | यूनिकोड सक्षम: {agg.b2_s4_unicode||'0'}</td>
+                           <td>कुल: {safeStr(report?.b2_s4_totalLaptops, '0')} | यूनिकोड सक्षम: {safeStr(report?.b2_s4_unicode, '0')} | हिंदी कार्य %: {safeStr(report?.b2_s4_hindiPct, '0')}%</td>
                         </tr>
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>5.</td>
                            <td><strong>कोड/मैनुअल/प्रपत्र</strong></td>
-                           <td>कुल मैनुअल: {agg.b2_s5_manualsTotal||'0'} | द्विभाषी: {agg.b2_s5_manualsBilingual||'0'}<br/>कुल प्रपत्र: {agg.b2_s5_formsTotal||'0'} | द्विभाषी: {agg.b2_s5_formsBilingual||'0'}</td>
+                           <td>कुल मैनुअल: {safeStr(report?.b2_s5_manualsTotal, '0')} | द्विभाषी: {safeStr(report?.b2_s5_manualsBilingual, '0')}<br/>कुल प्रपत्र: {safeStr(report?.b2_s5_formsTotal, '0')} | द्विभाषी: {safeStr(report?.b2_s5_formsBilingual, '0')}</td>
                         </tr>
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>6.</td>
                            <td><strong>नियम 8(4) के अंतर्गत आदेश</strong></td>
-                           <td>जारी आदेश: {agg.b2_rule84_ordered||'0'} | शेष: {agg.b2_rule84_pending||'0'}</td>
+                           <td>जारी आदेश: {safeStr(report?.b2_rule84_ordered, '0')} | शेष: {safeStr(report?.b2_rule84_pending, '0')}</td>
+                        </tr>
+                        <tr>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>7.</td>
+                           <td><strong>प्रशिक्षण कार्यक्रम (संस्थानों हेतु)</strong></td>
+                           <td>नाम: {safeStr(report?.b2_s7_name, '-')} | अवधि: {safeStr(report?.b2_s7_duration, '0')} घंटे<br/>हिंदी: {safeStr(report?.b2_s7_hindi, '0')} | अंग्रेजी: {safeStr(report?.b2_s7_eng, '0')} | मिश्रित: {safeStr(report?.b2_s7_mixed, '0')}</td>
                         </tr>
                         
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
-                           <td><strong>प्रकाशन/पत्रिकाएं</strong></td>
-                           <td>कुल: {agg.b2_publications_total||'0'} | हिंदी: {agg.b2_publications_hindi||'0'} | अंग्रेजी: {agg.b2_publications_eng||'0'}</td>
+                           <td><strong>प्रकाशन / पत्रिकाएं</strong></td>
+                           <td>कुल: {safeStr(report?.b2_publications_total, '0')} | हिंदी: {safeStr(report?.b2_publications_hindi, '0')} | अंग्रेजी: {safeStr(report?.b2_publications_eng, '0')}</td>
                         </tr>
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>10.</td>
-                           <td><strong>पुस्तकों पर व्यय</strong></td>
-                           <td>कुल व्यय: ₹{agg.b2_books_expenditure||'0'} | हिंदी पुस्तकों पर: ₹{agg.b2_books_hindiExpenditure||'0'}</td>
+                           <td><strong>पुस्तकालय / पुस्तकों पर व्यय</strong></td>
+                           <td>कुल व्यय: ₹{safeStr(report?.b2_books_expenditure, '0')} | हिंदी पुस्तकों पर: ₹{safeStr(report?.b2_books_hindiExpenditure, '0')}</td>
                         </tr>
 
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>8.</td>
                            <td><strong>निरीक्षण</strong></td>
-                           <td>कुल अनुभाग: {agg.b2_inspection_sections_total||'0'} | निरीक्षित: {agg.b2_inspection_sections_inspected||'0'}<br/>कार्यालय कुल: {agg.b2_inspection_offices_total||'0'} | निरीक्षित: {agg.b2_inspection_offices_inspected||'0'}</td>
+                           <td>कुल अनुभाग: {safeStr(report?.b2_inspection_sections_total, '0')} | निरीक्षित: {safeStr(report?.b2_inspection_sections_inspected, '0')}<br/>कार्यालय कुल: {safeStr(report?.b2_inspection_offices_total, '0')} | निरीक्षित: {safeStr(report?.b2_inspection_offices_inspected, '0')}</td>
+                        </tr>
+                        <tr>
+                           <td style={{textAlign: "center", fontWeight: "bold"}}>14.</td>
+                           <td><strong>वेबसाइट की स्थिति</strong></td>
+                           <td>URL: {safeStr(report?.b2_website_url, '-')} <br/>भाषा: {safeStr(report?.b2_website_type, '-')} <br/>विकल्प उपलब्ध: {safeStr(report?.b2_website_langOption, '-')}</td>
                         </tr>
                      </tbody>
                   </table>
                </div>
             )}
-            
-            <div style={{marginTop: "50px", textAlign: "right"}}>
-               <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>समेकित रिपोर्ट जेनरेटर</strong></p>
-               <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}>राजभाषा प्रकोष्ठ, पश्चिम रेलवे</p>
-               <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>दिनांक:</strong> {new Date().toLocaleDateString('en-GB')}</p>
+
+            <div style={{marginTop: "50px", display: "flex", justifyContent: "space-between"}}>
+               <div style={{width: "40%", textAlign: "left"}}>
+                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>हस्ताक्षर:</strong> _______________________</p>
+                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>नाम:</strong> {safeStr(report?.officerName, '...........................................')}</p>
+               </div>
+               <div style={{width: "40%", textAlign: "right"}}>
+                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>पदनाम:</strong> राजभाषा अधिकारी / अनुभाग प्रभारी</p>
+                  <p style={{margin: "0 0 5px 0", fontSize: "11pt"}}><strong>दिनांक:</strong> {formatDate(report?.timestamp)}</p>
+               </div>
             </div>
-          </div>
-
-        </div>
-      );
-    }
-
-    // 🌟 क्रैश प्रिवेंशन: इनबॉक्स फ़िल्टर 🌟
-    function Inbox({ reports, user, onAction, onEdit }) {
-      const r = ROLES[user?.role] || ROLES.SECTION;
-      
-      const visible = useMemo(()=>{
-        if(!reports) return [];
-        if(user?.role==="SECTION")    return reports.filter(x=>x?.sectionName === user?.name);
-        if(user?.role==="AAO")        return reports.filter(x=>["PENDING_AAO", "SAO_RETURNED"].includes(x?.status) && x?.sectionName === user?.mappedSection);
-        if(user?.role==="SAO")        return reports.filter(x=>["AAO_APPROVED"].includes(x?.status) && x?.sectionName === user?.mappedSection);
-        if(user?.role==="HINDI_CELL") return reports.filter(x=>x?.status === "SAO_APPROVED");
-        return reports;
-      },[reports,user]);
-
-      const [selected, setSelected] = useState(null);
-      const [remark, setRemark]     = useState("");
-      const [search, setSearch]     = useState("");
-
-      const filtered = visible.filter(x => {
-         if (!search) return true;
-         const s = search.toLowerCase();
-         const secName = String(x?.sectionName || "").toLowerCase();
-         const ack = String(x?.ackId || "").toLowerCase();
-         return secName.includes(s) || ack.includes(s);
-      });
-
-      if(selected) return <ReportDetail report={selected} user={user} remark={remark} setRemark={setRemark} onAction={(action,rem)=>{ onAction(selected,action,rem); setSelected(null); setRemark(""); }} onBack={()=>{ setSelected(null); setRemark(""); }} onEdit={onEdit} />;
-
-      return (
-        <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #e2e8f0", overflow:"hidden" }}>
-          <div style={{ background:r.grad, padding:"16px 22px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-            <h2 style={{ fontSize:15, fontWeight:800, margin:0, color:"#fff" }}>{user?.role==="SECTION" ? "📋 मेरी रिपोर्टें" : "📥 आवक रिपोर्टें"}</h2>
-          </div>
-          <div style={{ padding:"12px 16px", background:"#f8fafc", borderBottom:"1px solid #e2e8f0" }}>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍 अनुभाग या पावती संख्या से खोजें..." style={{ width:"100%", boxSizing:"border-box", padding:"8px 12px", borderRadius:8, border:"1.5px solid #e2e8f0", fontSize:13 }} />
-          </div>
-          {filtered.length===0?(
-            <div style={{ textAlign:"center", padding:48, color:"#94a3b8" }}>
-              <div style={{ fontSize:40 }}>{user?.role==="SECTION"?"📂":"📭"}</div>
-              <div style={{ marginTop:10, fontSize:14 }}>{user?.role==="SECTION" ? "अभी तक कोई रिपोर्ट नहीं।" : "अभी कोई रिपोर्ट प्रतीक्षा में नहीं।"}</div>
-            </div>
-          ):(
-            filtered.map((rep,i)=>{
-              const st   = STATUS[rep?.status] || STATUS.DRAFT;
-              const c    = SECTION_COLORS[i%SECTION_COLORS.length];
-              
-              const canAct = (user?.role==="SECTION"&&rep?.status==="AAO_RETURNED") || (user?.role==="AAO"&&["PENDING_AAO", "SAO_RETURNED"].includes(rep?.status)) || (user?.role==="SAO"&&rep?.status==="AAO_APPROVED") || (user?.role==="HINDI_CELL"&&rep?.status==="SAO_APPROVED");
-              const qLabel = QUARTERS.find(q=>q.id===rep?.quarter)?.label || rep?.quarter || 'अज्ञात';
-
-              return (
-                <div key={rep.id} onClick={()=>setSelected(rep)} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 20px", borderBottom:"1px solid #f1f5f9", cursor:"pointer", transition:"background 0.15s" }} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
-                  <div style={{ width:40, height:40, borderRadius:12, background:c.bg, border:`1.5px solid ${c.border}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>{c.icon}</div>
-                  <div style={{ flex:1, minWidth:0 }}><div style={{ fontSize:13, fontWeight:700, color:"#1e293b" }}>{rep?.sectionName || 'अज्ञात अनुभाग'}</div><div style={{ fontSize:10, color:"#94a3b8" }}>{qLabel} · {rep?.year || ''} · {rep?.ackId || ''}</div></div>
-                  <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
-                    <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:20, background:st.bg, color:st.color, border:`1px solid ${st.color}40`, whiteSpace:"nowrap" }}>{st.icon} {st.label}</span>
-                  </div>
-                  {canAct && <span style={{ fontSize:11, background:r.color, color:"#fff", padding:"4px 10px", borderRadius:10, fontWeight:700, flexShrink:0 }}>कार्रवाई करें</span>}
-                </div>
-              );
-            })
-          )}
-        </div>
-      );
+         </div>
+       );
     }
 
     function ReportDetail({ report, user, remark, setRemark, onAction, onBack, onEdit }) {
@@ -1289,7 +1126,7 @@
       if (!report) return null;
       
       const r  = ROLES[user?.role] || ROLES.SECTION;
-      const st = STATUS[report?.status] || STATUS.DRAFT;
+      const st = STATUS[safeStr(report?.status)] || STATUS.DRAFT;
       
       const canAct = (user?.role==="SECTION" && report?.status==="AAO_RETURNED") || 
                      (user?.role==="AAO" && ["PENDING_AAO", "SAO_RETURNED"].includes(report?.status)) || 
@@ -1305,6 +1142,8 @@
         SAO: [{ label:"✅ हिंदी प्रकोष्ठ को भेजें", action:"SAO_APPROVED", grad:"linear-gradient(135deg,#10b981,#0ea5e9)" },{ label:"↩️ AAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#f97316,#ef4444)" }],
         HINDI_CELL: [{ label:"🎉 अंतिम स्वीकृति दें", action:"SUBMITTED", grad:"linear-gradient(135deg,#f59e0b,#10b981)" },{ label:"↩️ SAO को वापस करें", action:"SAO_RETURNED", grad:"linear-gradient(135deg,#dc2626,#9f1239)" }],
       };
+
+      const qLabelStr = QUARTERS.find(q=>q.id===safeStr(report?.quarter))?.label || safeStr(report?.quarter);
 
       return (
         <div style={{ maxWidth:760, margin:"0 auto" }}>
@@ -1322,8 +1161,8 @@
 
           <div className="screen-only" style={{ background:r.grad, borderRadius:16, padding:"18px 22px", marginBottom:16, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
             <div>
-              <div style={{ fontSize:18, fontWeight:800, color:"#fff" }}>{report?.sectionName || '-'}</div>
-              <div style={{ fontSize:12, color:"rgba(255,255,255,0.8)" }}>{(QUARTERS.find(q=>q.id===report?.quarter)?.label) || report?.quarter || ''} · {report?.year || ''} · पावती: {report?.ackId || ''}</div>
+              <div style={{ fontSize:18, fontWeight:800, color:"#fff" }}>{safeStr(report?.sectionName, '-')}</div>
+              <div style={{ fontSize:12, color:"rgba(255,255,255,0.8)" }}>{safeStr(qLabelStr)} · {safeStr(report?.year)} · पावती: {safeStr(report?.ackId)}</div>
             </div>
             <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:20, padding:"4px 14px", fontSize:13, fontWeight:700, color:"#fff" }}>{st.icon} {st.label}</div>
           </div>
@@ -1334,8 +1173,8 @@
               {Object.entries(report).map(([k,v]) => {
                 const excludeKeys = ["id", "ackId", "timestamp", "timeline", "status", "sectionName", "formData", "year", "quarter", "region"];
                 const isPart2Key = k.startsWith("b2_") || k.startsWith("b11_") || k.startsWith("b12_") || k.startsWith("b13_");
-                const isHindiSection = report?.sectionName === "हिंदी अनुभाग";
-                const isQ4 = report?.quarter === "Q4";
+                const isHindiSection = safeStr(report?.sectionName) === "हिंदी अनुभाग";
+                const isQ4 = safeStr(report?.quarter) === "Q4";
 
                 if (isPart2Key && (!isHindiSection || !isQ4)) return null;
 
@@ -1344,7 +1183,7 @@
                   return (
                     <div key={k} style={{ background:"#f8fafc", borderRadius:8, padding:"8px 10px", border:"1px solid #f1f5f9" }}>
                       <div style={{ fontSize:11, color:"#64748b", fontWeight:700, wordBreak:"break-word", marginBottom:2 }}>{formattedKey}</div>
-                      <div style={{ fontSize:13, color:"#1e293b", fontWeight:800 }}>{v}</div>
+                      <div style={{ fontSize:13, color:"#1e293b", fontWeight:800 }}>{safeStr(v)}</div>
                     </div>
                   )
                 }
@@ -1358,7 +1197,7 @@
           {canAct && (
             <div className="no-print screen-only" style={{ background:"#fff", borderRadius:14, border:`2px solid ${r.color}40`, padding:20 }}>
               <div style={{ fontSize:14, fontWeight:800, color:"#1e293b", marginBottom:12 }}>{r.icon} आपकी कार्रवाई</div>
-              <textarea value={remark} onChange={e=>setRemark(e.target.value)} rows={2} placeholder="टिप्पणी..." style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", marginBottom:12 }} />
+              <textarea value={safeStr(remark)} onChange={e=>setRemark(e.target.value)} rows={2} placeholder="टिप्पणी..." style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #e2e8f0", marginBottom:12 }} />
               <div style={{ display:"flex", gap:12 }}>
                 {(actionBtns[user?.role]||[]).map(btn=>(
                   <button key={btn.action} onClick={()=>onAction(btn.action, remark)} style={{ flex:1, padding:"12px 0", borderRadius:12, border:"none", cursor:"pointer", background:btn.grad, color:"#fff", fontWeight:800 }}>{btn.label}</button>
@@ -1380,20 +1219,20 @@
 
       const validReports = reports.filter(r => r?.status !== "SETTINGS");
       const filteredReports = validReports.filter(r => {
-         const qry = searchQuery.toLowerCase();
-         const sec = String(r?.sectionName || "").toLowerCase();
-         const yr = String(r?.year || "").toLowerCase();
-         const qtr = String(r?.quarter || "").toLowerCase();
+         const qry = safeStr(searchQuery).toLowerCase();
+         const sec = safeStr(r?.sectionName).toLowerCase();
+         const yr = safeStr(r?.year).toLowerCase();
+         const qtr = safeStr(r?.quarter).toLowerCase();
          return sec.includes(qry) || yr.includes(qry) || qtr.includes(qry);
       });
 
-      const reportsForEval = validReports.filter(r => r?.quarter === evalQ && r?.year === evalY);
+      const reportsForEval = validReports.filter(r => safeStr(r?.quarter) === evalQ && safeStr(r?.year) === evalY);
       
       const defaulters = useMemo(() => {
         return reportsForEval.map(r => {
             const deficits = [];
             const num = (v) => parseFloat(v) || 0;
-            const region = r?.region || 'A';
+            const region = safeStr(r?.region, 'A');
 
             const sec33Total = num(r?.b1_s3_totalIssued);
             const sec33Hindi = num(r?.b1_s3_bilingual) + num(r?.b1_s3_hindiOnly);
@@ -1498,11 +1337,11 @@
                      {defaulters.map(d => (
                         <div key={d.id} style={{ background: "#fee2e2", border: "1px solid #ef4444", borderRadius: 10, padding: "12px 16px" }}>
                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                              <span style={{ fontSize: 14, fontWeight: "bold", color: "#991b1b" }}>{d?.sectionName || 'अज्ञात'} <span style={{fontSize:11, color:"#7f1d1d", fontWeight:"normal"}}>(क्षेत्र '{d?.region || 'A'}')</span></span>
+                              <span style={{ fontSize: 14, fontWeight: "bold", color: "#991b1b" }}>{safeStr(d?.sectionName, 'अज्ञात')} <span style={{fontSize:11, color:"#7f1d1d", fontWeight:"normal"}}>(क्षेत्र '{safeStr(d?.region, 'A')}')</span></span>
                               <button onClick={() => onEditReport(d)} style={{ background: "transparent", color: "#b91c1c", border: "1px solid #b91c1c", padding: "4px 10px", borderRadius: 6, cursor: "pointer", fontSize: 11, fontWeight: "bold" }}>रिपोर्ट देखें</button>
                            </div>
                            <ul style={{ margin: 0, paddingLeft: 20, fontSize: 12, color: "#7f1d1d" }}>
-                             {d.deficits.map((err, i) => <li key={i} style={{marginBottom: 2}}>{err}</li>)}
+                             {d.deficits.map((err, i) => <li key={i} style={{marginBottom: 2}}>{safeStr(err)}</li>)}
                            </ul>
                         </div>
                      ))}
@@ -1528,9 +1367,9 @@
                      <tbody>
                         {filteredReports.map(r => (
                            <tr key={r.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                              <td style={{ padding: "10px", color: "#1e293b", fontWeight: "bold" }}>{r?.sectionName || '-'}</td>
-                              <td style={{ padding: "10px", color: "#64748b" }}>{QUARTERS.find(q=>q.id===r?.quarter)?.label?.split('·')[0] || '-'} · {r?.year || '-'}</td>
-                              <td style={{ padding: "10px" }}><span style={{ fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:10, background:STATUS[r?.status]?.bg||"#f1f5f9", color:STATUS[r?.status]?.color||"#64748b" }}>{STATUS[r?.status]?.label || r?.status || '-'}</span></td>
+                              <td style={{ padding: "10px", color: "#1e293b", fontWeight: "bold" }}>{safeStr(r?.sectionName, '-')}</td>
+                              <td style={{ padding: "10px", color: "#64748b" }}>{safeStr(QUARTERS.find(q=>q.id===safeStr(r?.quarter))?.label?.split('·')[0], '-')} · {safeStr(r?.year, '-')}</td>
+                              <td style={{ padding: "10px" }}><span style={{ fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:10, background:STATUS[safeStr(r?.status)]?.bg||"#f1f5f9", color:STATUS[safeStr(r?.status)]?.color||"#64748b" }}>{STATUS[safeStr(r?.status)]?.label || safeStr(r?.status, '-')}</span></td>
                               <td style={{ padding: "10px", textAlign: "center" }}>
                                  <button onClick={() => onEditReport(r)} style={{ background: "#f59e0b", color: "#fff", border: "none", padding: "6px 12px", borderRadius: 6, cursor: "pointer", fontWeight: "bold", fontSize: 11, boxShadow:"0 2px 4px rgba(245,158,11,0.2)" }}>✏️ एडिट करें</button>
                               </td>
@@ -1554,7 +1393,7 @@
                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
                   {sectionsList.map(s => (
                      <div key={s} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 700, color: "#475569" }}>
-                        <span>{s}</span>
+                        <span>{safeStr(s)}</span>
                         <button onClick={()=>handleDel(s)} disabled={isClearing} style={{ background: "none", border: "none", color: "#ef4444", cursor: isClearing ? "not-allowed" : "pointer", fontSize: 20, lineHeight: 1 }}>×</button>
                      </div>
                   ))}
@@ -1598,7 +1437,6 @@
 
           const validReports = data.filter(r => r.status !== "SETTINGS");
           
-          // 🌟 क्रैश प्रिवेंशन: सुरक्षित डेट सॉर्टिंग 🌟
           validReports.sort((a,b) => {
              const tA = new Date(a.timestamp || 0).getTime() || 0;
              const tB = new Date(b.timestamp || 0).getTime() || 0;
