@@ -80,10 +80,10 @@
 
     const AUDIT_KEY   = "rajbhasha_audit_v4";
     const ROLES = {
-      SECTION:    { id: "SECTION",    label: "अनुभाग",        icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
-      AAO:        { id: "AAO",        label: "AAO",            icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
-      SAO:        { id: "SAO",        label: "SAO",            icon: "✅", color: "#10b981", bg: "#ecfdf5", grad: "linear-gradient(135deg,#10b981,#0ea5e9)" },
-      HINDI_CELL: { id: "HINDI_CELL", label: "हिंदी प्रकोष्ठ", icon: "🏛️", color: "#f59e0b", bg: "#fffbeb", grad: "linear-gradient(135deg,#f59e0b,#ef4444)" },
+      SECTION:    { id: "SECTION",    label: "अनुभाग",        labelEn: "Section",     icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
+      AAO:        { id: "AAO",        label: "AAO",            labelEn: "AAO",         icon: "🔎", color: "#0ea5e9", bg: "#f0f9ff", grad: "linear-gradient(135deg,#0ea5e9,#6366f1)" },
+      SAO:        { id: "SAO",        label: "SAO",            labelEn: "SAO",         icon: "✅", color: "#10b981", bg: "#ecfdf5", grad: "linear-gradient(135deg,#10b981,#0ea5e9)" },
+      HINDI_CELL: { id: "HINDI_CELL", label: "हिंदी प्रकोष्ठ", labelEn: "Hindi Cell", icon: "🏛️", color: "#f59e0b", bg: "#fffbeb", grad: "linear-gradient(135deg,#f59e0b,#ef4444)" },
     };
     const PASSWORDS = { AAO: "AAO@2025", SAO: "SAO@2025", HINDI_CELL: "HINDI@2025" };
 
@@ -164,7 +164,6 @@
         <input type="number" min={0} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled} style={{ padding:"7px 10px", borderRadius:7, border:"1.5px solid #e2e8f0", fontSize:13, fontWeight:600, color:"#1e293b", width:"100%", boxSizing:"border-box", background: disabled ? "#f8fafc" : "#fff", cursor: disabled ? "not-allowed" : "text" }} />
       </div>
     );
-    
     const Radio = ({ label, value, onChange, options, disabled=false }) => (
       <div style={{ display:"flex", flexDirection:"column", gap:6, opacity: disabled ? 0.7 : 1 }}>
         {label && <label style={{ fontSize:11, fontWeight:700, color:"#475569", textTransform:"uppercase", letterSpacing:"0.04em" }}>{label}</label>}
@@ -173,7 +172,6 @@
         </div>
       </div>
     );
-    
     const Grid = ({ cols=2, children }) => (<div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:12 }}>{children}</div>);
     
     const SecCard = ({ title, icon, color, children }) => {
@@ -451,6 +449,7 @@
       const totalSteps = showPart2 ? 4 : 3;
 
       const disableBasicInfo = !isHindiSection;
+
       const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
       const validationErrors = useMemo(() => {
@@ -628,7 +627,6 @@
               <SecCard title="7. प्रशिक्षण कार्यक्रम (संस्थानों हेतु)" icon="🏫" color={SECTION_COLORS[8]}><Grid cols={3}><Inp label="कार्यक्रम का नाम" value={data.b2_s7_name} onChange={v=>set("b2_s7_name",v)} /><Num label="अवधि (घंटे)" value={data.b2_s7_duration} onChange={v=>set("b2_s7_duration",v)} /><Num label="हिंदी में प्रशिक्षण" value={data.b2_s7_hindi} onChange={v=>set("b2_s7_hindi",v)} /><Num label="अंग्रेजी में" value={data.b2_s7_eng} onChange={v=>set("b2_s7_eng",v)} /><Num label="मिली-जुली" value={data.b2_s7_mixed} onChange={v=>set("b2_s7_mixed",v)} /></Grid></SecCard>
               <SecCard title="8. राजभाषा संबंधित निरीक्षण" icon="🔍" color={SECTION_COLORS[9]}><Grid cols={3}><Num label="कुल अनुभाग" value={data.b2_inspection_sections_total} onChange={v=>set("b2_inspection_sections_total",v)} /><Num label="निरीक्षित अनुभाग" value={data.b2_inspection_sections_inspected} onChange={v=>set("b2_inspection_sections_inspected",v)} /><Num label="हिंदी कार्य हेतु निर्दिष्ट अनुभाग" value={data.b2_s8_hindiSections} onChange={v=>set("b2_s8_hindiSections",v)} /><Num label="कुल अधीनस्थ कार्यालय" value={data.b2_inspection_offices_total} onChange={v=>set("b2_inspection_offices_total",v)} /><Num label="निरीक्षित कार्यालय" value={data.b2_inspection_offices_inspected} onChange={v=>set("b2_inspection_offices_inspected",v)} /></Grid></SecCard>
               
-              {/* 🌟 NEW: Items 9 and 10 ADDED HERE 🌟 */}
               <SecCard title="9. प्रकाशन / पत्रिकाएं" icon="📰" color={SECTION_COLORS[8]}>
                 <Grid cols={3}>
                   <Num label="कुल प्रकाशन" value={data.b2_publications_total} onChange={v=>set("b2_publications_total",v)} />
@@ -685,6 +683,99 @@
               >अगला →</button>
             )}
           </div>
+        </div>
+      );
+    }
+
+    // 🌟 नया: वार्षिक कार्यक्रम के अनुसार समीक्षा रिपोर्ट (DOLA Guidelines 2025-26) 🌟
+    function AnnualReviewReport({ report, onClose }) {
+      const region = report.region || 'A';
+      
+      const num = (v) => parseFloat(v) || 0;
+      
+      // 1. धारा 3(3) (Target: 100%)
+      const sec33Total = num(report.b1_s3_totalIssued);
+      const sec33Hindi = num(report.b1_s3_bilingual) + num(report.b1_s3_hindiOnly);
+      const sec33Pct = sec33Total > 0 ? Math.round((sec33Hindi/sec33Total)*100) : 100;
+      
+      // 2. नियम 5 (Target: 100%)
+      const rule5Total = num(report.b1_s4_totalReceived) - num(report.b1_s4_noReplyNeeded);
+      const rule5Hindi = num(report.b1_s4_hindiReply);
+      const rule5Pct = rule5Total > 0 ? Math.round((rule5Hindi/rule5Total)*100) : 100;
+
+      // 3. मूल पत्राचार (Target: A-100%, B-90%, C-55%)
+      const corrTarget = region === 'A' ? 100 : region === 'B' ? 90 : 55;
+      const corrTotal = num(report.b1_s6_ka_total) + num(report.b1_s6_kha_total) + num(report.b1_s6_ga_total);
+      const corrHindi = num(report.b1_s6_ka_hindi) + num(report.b1_s6_kha_hindi) + num(report.b1_s6_ga_hindi);
+      const corrPct = corrTotal > 0 ? Math.round((corrHindi/corrTotal)*100) : (corrTarget === 100 ? 100 : 0);
+
+      // 4. फाइल टिप्पण (Target: A-75%, B-50%, C-30%)
+      const notingTarget = region === 'A' ? 75 : region === 'B' ? 50 : 30;
+      const notingTotal = num(report.b1_s7_totalPages);
+      const notingHindi = num(report.b1_s7_hindiPages);
+      const notingPct = notingTotal > 0 ? Math.round((notingHindi/notingTotal)*100) : 0;
+
+      const evalData = [
+         { label: "धारा 3(3) का अनुपालन", target: 100, actual: sec33Pct },
+         { label: "राजभाषा नियम-5 (हिंदी पत्रों के उत्तर)", target: 100, actual: rule5Pct },
+         { label: `मूल पत्राचार (क्षेत्र '${region}' हेतु)`, target: corrTarget, actual: corrPct },
+         { label: `फाइल टिप्पण (क्षेत्र '${region}' हेतु)`, target: notingTarget, actual: notingPct }
+      ];
+
+      return (
+        <div style={{ position: "fixed", top:0, left:0, right:0, bottom:0, background: "rgba(15,23,42,0.85)", zIndex: 9999, display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" }}>
+           <div className="standard-doc" style={{ maxWidth: 800, width: "100%", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
+              
+              <div className="no-print" style={{ position: "absolute", top: 20, right: 20, display: "flex", gap: 10 }}>
+                 <button onClick={() => window.print()} style={{ background: "#1e293b", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontWeight: "bold" }}>🖨️ प्रिंट करें</button>
+                 <button onClick={onClose} style={{ background: "#ef4444", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontWeight: "bold" }}>❌ बंद करें</button>
+              </div>
+
+              <h2 style={{ marginTop: "20px" }}>राजभाषा वार्षिक कार्यक्रम (2025-26) के अनुसार समीक्षा रिपोर्ट</h2>
+              <h3 style={{ textDecoration: "underline", fontWeight: "bold" }}>अनुभाग: {report.sectionName} | तिमाही: {QUARTERS.find(q=>q.id===report.quarter)?.label?.split('·')[0]} {report.year}</h3>
+
+              <div style={{ marginTop: "30px", marginBottom: "15px", fontSize: "11pt" }}>
+                 गृह मंत्रालय, राजभाषा विभाग द्वारा जारी <strong>वार्षिक कार्यक्रम 2025-26</strong> के आलोक में आपके अनुभाग द्वारा प्रस्तुत तिमाही प्रगति रिपोर्ट के आँकड़ों की समीक्षा निम्न प्रकार है:
+              </div>
+
+              <table>
+                 <thead>
+                    <tr>
+                       <th>क्र.</th>
+                       <th>समीक्षा का विषय</th>
+                       <th>निर्धारित लक्ष्य (%)</th>
+                       <th>अनुभाग की उपलब्धि (%)</th>
+                       <th>समीक्षा / टिप्पणी</th>
+                    </tr>
+                 </thead>
+                 <tbody>
+                    {evalData.map((item, idx) => {
+                       const isMet = item.actual >= item.target;
+                       return (
+                         <tr key={idx}>
+                            <td style={{textAlign: "center", fontWeight: "bold"}}>{idx+1}.</td>
+                            <td>{item.label}</td>
+                            <td style={{textAlign: "center"}}>{item.target}%</td>
+                            <td style={{textAlign: "center", fontWeight: "bold", color: isMet ? "#16a34a" : "#dc2626"}}>{item.actual}%</td>
+                            <td style={{textAlign: "center", fontWeight: "bold", color: isMet ? "#16a34a" : "#dc2626"}}>
+                               {isMet ? "✅ लक्ष्य प्राप्त" : `❌ ${item.target - item.actual}% की कमी`}
+                            </td>
+                         </tr>
+                       )
+                    })}
+                 </tbody>
+              </table>
+
+              <div style={{ marginTop: "20px", padding: "15px", background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: "8px", fontSize: "10.5pt" }}>
+                 <strong>महत्वपूर्ण निर्देश:</strong> जिन मदों में निर्धारित लक्ष्य प्राप्त नहीं किया गया है, कृपया आगामी तिमाही में राजभाषा नियमों का कड़ाई से अनुपालन सुनिश्चित करते हुए लक्ष्य प्राप्ति हेतु आवश्यक कदम उठाएं।
+              </div>
+
+              <div style={{ marginTop: "50px", textAlign: "right" }}>
+                 <p style={{ margin: "0 0 5px 0", fontSize: "11pt" }}><strong>प्रभारी अधिकारी (राजभाषा)</strong></p>
+                 <p style={{ margin: "0 0 5px 0", fontSize: "11pt" }}>राजभाषा प्रकोष्ठ, पश्चिम रेलवे</p>
+                 <p style={{ margin: "0 0 5px 0", fontSize: "11pt" }}><strong>दिनांक:</strong> {new Date().toLocaleDateString('en-GB')}</p>
+              </div>
+           </div>
         </div>
       );
     }
@@ -1090,7 +1181,7 @@
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>4.</td>
                            <td><strong>कंप्यूटर/लैपटॉप की स्थिति</strong></td>
-                           <td>कुल: {agg.b2_s4_totalLaptops||'0'} | यूनिकोड सक्षम: {agg.b2_s4_unicode||'0'}</td>
+                           <td>कुल: {agg.b2_s4_totalLaptops||'0'} | यूनिको सक्षम: {agg.b2_s4_unicode||'0'}</td>
                         </tr>
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>5.</td>
@@ -1103,7 +1194,6 @@
                            <td>जारी आदेश: {agg.b2_rule84_ordered||'0'} | शेष: {agg.b2_rule84_pending||'0'}</td>
                         </tr>
                         
-                        {/* 🌟 NEW: Items 9 and 10 in Consolidated View 🌟 */}
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
                            <td><strong>प्रकाशन/पत्रिकाएं</strong></td>
@@ -1514,7 +1604,6 @@
                            <td>नाम: {report.b2_s7_name||'-'} | अवधि: {report.b2_s7_duration||'0'} घंटे<br/>हिंदी: {report.b2_s7_hindi||'0'} | अंग्रेजी: {report.b2_s7_eng||'0'} | मिश्रित: {report.b2_s7_mixed||'0'}</td>
                         </tr>
                         
-                        {/* 🌟 NEW ITEMS IN PRINT OUT 🌟 */}
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
                            <td><strong>प्रकाशन / पत्रिकाएं</strong></td>
@@ -1556,6 +1645,8 @@
     }
 
     function ReportDetail({ report, user, remark, setRemark, onAction, onBack, onEdit }) {
+      const [showReview, setShowReview] = useState(false); // 🌟 NEW STATE FOR REVIEW MODAL 🌟
+      
       if (!report) return null;
       
       const r  = ROLES[user.role];
@@ -1579,9 +1670,13 @@
       return (
         <div style={{ maxWidth:760, margin:"0 auto" }}>
           
+          {showReview && <AnnualReviewReport report={report} onClose={()=>setShowReview(false)} />}
+
           <div className="no-print screen-only" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
             <button onClick={onBack} style={{ background:"none", border:"none", color:"#6366f1", cursor:"pointer", fontSize:13, fontWeight:700 }}>← वापस सूची में</button>
             <div style={{ display:"flex", gap:10 }}>
+               {/* 🌟 NEW BUTTON 🌟 */}
+               <button onClick={() => setShowReview(true)} style={{ background:"#8b5cf6", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>📊 वार्षिक कार्यक्रम समीक्षा (2025-26)</button>
                <button onClick={() => onEdit(report)} style={{ background:"#f59e0b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>✏️ रिपोर्ट एडिट करें</button>
                <button onClick={() => window.print()} style={{ background:"#1e293b", color:"#fff", border:"none", padding:"8px 16px", borderRadius:8, fontSize:12, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 10px rgba(0,0,0,0.1)" }}>🖨️ PDF में सेव करें</button>
             </div>
