@@ -73,8 +73,14 @@
     const safeStr = (val, fallback = "") => {
       if (val === null || val === undefined) return fallback;
       if (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean') return String(val);
-      return fallback; // अमान्य ऑब्जेक्ट या ऐरे होने पर खाली/डिफ़ॉल्ट दिखाएगा, क्रैश नहीं करेगा
+      return fallback; 
     };
+
+    function formatDate(ds) {
+       if (!ds) return '-';
+       const d = new Date(ds);
+       return isNaN(d.getTime()) ? '-' : d.toLocaleDateString('en-GB');
+    }
 
     const ROLES = {
       SECTION:    { id: "SECTION",    label: "अनुभाग",        icon: "🏢", color: "#6366f1", bg: "#eef2ff", grad: "linear-gradient(135deg,#6366f1,#8b5cf6)" },
@@ -1331,7 +1337,7 @@
                {reportsForEval.length === 0 ? (
                   <div style={{ padding: "15px", background: "#f8fafc", borderRadius: 8, color: "#94a3b8", textAlign: "center", fontSize: 13 }}>इस तिमाही के लिए कोई रिपोर्ट उपलब्ध नहीं है।</div>
                ) : defaulters.length === 0 ? (
-                  <div style={{ padding: "15px", background: "#dcfce7", border: "1px solid #16a34a", borderRadius: 8, color: "#166534", fontWeight: "bold", textAlign: "center", fontSize: 13 }}>✅ बहुत बढ़िया! सभी अनुभागों ने वार्षिक कार्यक्रम के निर्धारित लक्ष्य प्राप्त कर लिए हैं।</div>
+                  <div style={{ padding: "15px", background: "#dcfce7", border: "1px solid #16a34a", borderRadius: 8, color: "#166534", fontWeight: "bold", textAlign: "center", fontSize: 13 }}>✅ बहुत बढ़िया! सभी अनुभागों ने वार्षिक कार्यक्रम के निर्धारित लक्ष्य प्राप्त कर लिए हैं।</div>
                ) : (
                   <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
                      {defaulters.map(d => (
