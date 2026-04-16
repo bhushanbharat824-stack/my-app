@@ -71,6 +71,23 @@
       .page-break { page-break-before: always; }
       .print-box { border: none !important; box-shadow: none !important; }
     }
+
+    /* CSS Marquee replacement */
+    .marquee-container {
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .marquee-content {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 20s linear infinite;
+    }
+    @keyframes marquee {
+      0%   { transform: translate(0, 0); }
+      100% { transform: translate(-100%, 0); }
+    }
   </style>
 </head>
 <body>
@@ -446,11 +463,13 @@
       const set = (k,v) => setData(d=>({...d,[k]:v}));
       
       const isQ4 = data.quarter==="Q4";
-      const isHindiSection = data.sectionName === "हिंदी अनुभाग" || user.name === "हिंदी अनुभाग";
+      // FIXED: isHindiSection should depend on user, not data.sectionName
+      const isHindiSection = user.name === "हिंदी अनुभाग" || user.role === "HINDI_CELL";
       const showPart2 = isQ4 && isHindiSection; 
       const totalSteps = showPart2 ? 4 : 3;
 
       const disableBasicInfo = !isHindiSection;
+      // FIXED: alreadySubmitted should exclude current report when editing
       const alreadySubmitted = !initialData && reports.some(r => r.sectionName === user.name && r.year === data.year && r.quarter === data.quarter);
 
       const validationErrors = useMemo(() => {
@@ -489,6 +508,20 @@
             if(num(data.b2_comp_trained) > num(data.b2_comp_total)) errs.push("भाग 2(3): प्रशिक्षित कार्मिक कुल कार्मिकों से अधिक नहीं हो सकते।");
             if(num(data.b2_comp_working) > num(data.b2_comp_trained)) errs.push("भाग 2(3): हिंदी में काम करने वाले लोग प्रशिक्षित लोगों से अधिक नहीं हो सकते।");
             if(num(data.b2_s4_unicode) > num(data.b2_s4_totalLaptops)) errs.push("भाग 2(4): यूनिकोड सक्षम लैपटॉप कुल लैपटॉप से अधिक नहीं हो सकते।");
+            
+            // FIXED: Add validation for items 9 and 10
+            const pubsTotal = num(data.b2_publications_total);
+            const pubsHindi = num(data.b2_publications_hindi);
+            const pubsEng  = num(data.b2_publications_eng);
+            if (pubsHindi + pubsEng > pubsTotal) {
+                errs.push("भाग 2(9): हिंदी और अंग्रेजी प्रकाशनों का योग कुल प्रकाशनों से अधिक नहीं हो सकता।");
+            }
+            
+            const booksTotal = num(data.b2_books_expenditure);
+            const booksHindi = num(data.b2_books_hindiExpenditure);
+            if (booksHindi > booksTotal) {
+                errs.push("भाग 2(10): हिंदी पुस्तकों पर व्यय कुल व्यय से अधिक नहीं हो सकता।");
+            }
         }
         return errs;
       }, [data, showPart2]);
@@ -628,7 +661,7 @@
               <SecCard title="7. प्रशिक्षण कार्यक्रम (संस्थानों हेतु)" icon="🏫" color={SECTION_COLORS[8]}><Grid cols={3}><Inp label="कार्यक्रम का नाम" value={data.b2_s7_name} onChange={v=>set("b2_s7_name",v)} /><Num label="अवधि (घंटे)" value={data.b2_s7_duration} onChange={v=>set("b2_s7_duration",v)} /><Num label="हिंदी में प्रशिक्षण" value={data.b2_s7_hindi} onChange={v=>set("b2_s7_hindi",v)} /><Num label="अंग्रेजी में" value={data.b2_s7_eng} onChange={v=>set("b2_s7_eng",v)} /><Num label="मिली-जुली" value={data.b2_s7_mixed} onChange={v=>set("b2_s7_mixed",v)} /></Grid></SecCard>
               <SecCard title="8. राजभाषा संबंधित निरीक्षण" icon="🔍" color={SECTION_COLORS[9]}><Grid cols={3}><Num label="कुल अनुभाग" value={data.b2_inspection_sections_total} onChange={v=>set("b2_inspection_sections_total",v)} /><Num label="निरीक्षित अनुभाग" value={data.b2_inspection_sections_inspected} onChange={v=>set("b2_inspection_sections_inspected",v)} /><Num label="हिंदी कार्य हेतु निर्दिष्ट अनुभाग" value={data.b2_s8_hindiSections} onChange={v=>set("b2_s8_hindiSections",v)} /><Num label="कुल अधीनस्थ कार्यालय" value={data.b2_inspection_offices_total} onChange={v=>set("b2_inspection_offices_total",v)} /><Num label="निरीक्षित कार्यालय" value={data.b2_inspection_offices_inspected} onChange={v=>set("b2_inspection_offices_inspected",v)} /></Grid></SecCard>
               
-              {/* 🌟 NEW: Items 9 and 10 ADDED HERE 🌟 */}
+              {/* Items 9 and 10 */}
               <SecCard title="9. प्रकाशन / पत्रिकाएं" icon="📰" color={SECTION_COLORS[8]}>
                 <Grid cols={3}>
                   <Num label="कुल प्रकाशन" value={data.b2_publications_total} onChange={v=>set("b2_publications_total",v)} />
@@ -1103,7 +1136,7 @@
                            <td>जारी आदेश: {agg.b2_rule84_ordered||'0'} | शेष: {agg.b2_rule84_pending||'0'}</td>
                         </tr>
                         
-                        {/* 🌟 NEW: Items 9 and 10 in Consolidated View 🌟 */}
+                        {/* Items 9 and 10 in consolidated print */}
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
                            <td><strong>प्रकाशन/पत्रिकाएं</strong></td>
@@ -1514,7 +1547,7 @@
                            <td>नाम: {report.b2_s7_name||'-'} | अवधि: {report.b2_s7_duration||'0'} घंटे<br/>हिंदी: {report.b2_s7_hindi||'0'} | अंग्रेजी: {report.b2_s7_eng||'0'} | मिश्रित: {report.b2_s7_mixed||'0'}</td>
                         </tr>
                         
-                        {/* 🌟 NEW ITEMS IN PRINT OUT 🌟 */}
+                        {/* Items 9 and 10 in print out */}
                         <tr>
                            <td style={{textAlign: "center", fontWeight: "bold"}}>9.</td>
                            <td><strong>प्रकाशन / पत्रिकाएं</strong></td>
@@ -1820,7 +1853,9 @@
           
           <div className="no-print" style={{ background: "#fefcbf", color: "#975a16", padding: "8px 16px", fontSize: "13px", fontWeight: "700", borderBottom: "1px solid #fef08a", display: "flex", alignItems: "center" }}>
             <span style={{ marginRight: "10px", fontSize: "16px" }}>📢</span>
-            <marquee scrollamount="5">रिपोर्ट भरने की अंतिम तिथि तिमाही समाप्ति से आगामी माह की 5 तारीख है। कृपया रिपोर्ट समय पर प्रस्तुत करें।</marquee>
+            <div className="marquee-container">
+              <div className="marquee-content">रिपोर्ट भरने की अंतिम तिथि तिमाही समाप्ति से आगामी माह की 5 तारीख है। कृपया रिपोर्ट समय पर प्रस्तुत करें।</div>
+            </div>
           </div>
 
           <Navbar user={user} view={view} setView={setView} onLogout={handleLogout} clearEdit={clearEdit} />
